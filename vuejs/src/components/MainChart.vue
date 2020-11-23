@@ -3,7 +3,10 @@
     <v-container>
       <v-row>
         <v-col>
-          <div id="chart" style="width: 100vw; height: 100vh;"></div>
+          <div
+            id="chart"
+            style="width: 120%; height: 100vh; margin-left:-10%"
+          ></div>
         </v-col>
       </v-row>
     </v-container>
@@ -18,8 +21,6 @@ export default {
   mounted() {
     var chart = document.getElementById("chart");
     var myChart = echarts.init(chart);
-    console.log(chart);
-    console.log(myChart);
     let option = {
       xAxis: {
         type: "category",

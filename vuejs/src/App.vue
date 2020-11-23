@@ -28,8 +28,8 @@
 
     <v-main>
       <v-container>
-        <v-row class="text-center">
-          <v-col cols="12">
+        <v-row>
+          <v-col>
             <Search />
           </v-col>
         </v-row>
@@ -38,14 +38,17 @@
             <MainChart />
           </v-col>
         </v-row>
-        <v-row class="text-center">
-          <v-col>
+        <v-row class="text-center" cols="12">
+          <v-col cols="4">
             Hello
           </v-col>
-          <v-col>
+          <v-col cols="8">
             <HelloWorld />
           </v-col>
-          <v-col>
+        </v-row>
+        <v-row class="text-center" cols="12">
+          <v-col cols="4"> </v-col>
+          <v-col cols="8">
             Hello
           </v-col>
         </v-row>
