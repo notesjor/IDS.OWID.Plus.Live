@@ -1,5 +1,5 @@
 <template>
-  <v-theme-provider light>
+  <v-theme-provider>
     <v-container>
       <v-row class="text-center">
         <v-col cols="12">
@@ -33,13 +33,15 @@ export default {
   name: "HelloWorld",
 
   data: () => {
-    return "world";
+    return {
+      name: "world",
+    };
   },
   // define methods under the `methods` object
   methods: {
     greet: function() {
-      // `this` inside methods points to the Vue instance
-      alert("Hello " + this.$data + "!");
+      this.$store.commit("increment");
+      alert("Hello " + this.$data.name + " (" + this.$store.state.count + ")!");
     },
   },
 };

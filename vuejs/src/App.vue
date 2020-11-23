@@ -27,19 +27,45 @@
     </v-app-bar>
 
     <v-main>
-      <HelloWorld />
+      <v-container>
+        <v-row class="text-center">
+          <v-col cols="12">
+            <Search />
+          </v-col>
+        </v-row>
+        <v-row class="text-center">
+          <v-col>
+            <MainChart />
+          </v-col>
+        </v-row>
+        <v-row class="text-center">
+          <v-col>
+            Hello
+          </v-col>
+          <v-col>
+            <HelloWorld />
+          </v-col>
+          <v-col>
+            Hello
+          </v-col>
+        </v-row>
+      </v-container>
     </v-main>
   </v-app>
 </template>
 
 <script>
 import HelloWorld from "./components/HelloWorld";
+import MainChart from "./components/MainChart";
+import Search from "./components/Search";
 
 export default {
   name: "App",
 
   components: {
     HelloWorld,
+    MainChart,
+    Search,
   },
 
   data: () => ({
