@@ -39,17 +39,8 @@
           </v-col>
         </v-row>
         <v-row class="text-center" cols="12">
-          <v-col cols="4">
-            Hello
-          </v-col>
-          <v-col cols="8">
-            <HelloWorld />
-          </v-col>
-        </v-row>
-        <v-row class="text-center" cols="12">
-          <v-col cols="4"> </v-col>
-          <v-col cols="8">
-            Hello
+          <v-col>
+            <DataGrid />
           </v-col>
         </v-row>
       </v-container>
@@ -58,7 +49,7 @@
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld";
+import DataGrid from "./components/DataGrid";
 import MainChart from "./components/MainChart";
 import Search from "./components/Search";
 
@@ -66,7 +57,7 @@ export default {
   name: "App",
 
   components: {
-    HelloWorld,
+    DataGrid,
     MainChart,
     Search,
   },

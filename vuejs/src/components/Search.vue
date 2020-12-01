@@ -8,7 +8,7 @@
         <v-row>
           <v-col>
             <v-tabs>
-              <v-tab>
+              <v-tab @click="search_simple_index_change(1)">
                 <v-tooltip right>
                   <template v-slot:activator="{ on, attrs }">
                     <span v-bind="attrs" v-on="on">N=1</span>
@@ -22,7 +22,7 @@
                   </span>
                 </v-tooltip>
               </v-tab>
-              <v-tab>
+              <v-tab @click="search_simple_index_change(2)">
                 <v-tooltip right>
                   <template v-slot:activator="{ on, attrs }">
                     <span v-bind="attrs" v-on="on">N=2</span>
@@ -37,7 +37,7 @@
                   </span>
                 </v-tooltip>
               </v-tab>
-              <v-tab>
+              <v-tab @click="search_simple_index_change(3)">
                 <v-tooltip right>
                   <template v-slot:activator="{ on, attrs }">
                     <span v-bind="attrs" v-on="on">N=3</span>
@@ -61,13 +61,13 @@
                       <v-overflow-btn
                         persistent-hint
                         :items="layer"
-                        v-model="layerDefault"
+                        v-model="search_simple_1_layer"
                         label="Layer"
                         item-value="text"
                       ></v-overflow-btn>
                     </v-col>
                     <v-col cols="10" style="margin-top:7px">
-                      <v-text-field label="Suchausdruck..."></v-text-field>
+                      <v-text-field label="Suchausdruck..." v-model="search_simple_1_value"></v-text-field>
                     </v-col>
                   </v-row>
                 </v-card>
@@ -79,25 +79,25 @@
                       <v-overflow-btn
                         persistent-hint
                         :items="layer"
-                        v-model="layerDefault"
+                        v-model="search_simple_1_layer"
                         label="Layer"
                         item-value="text"
                       ></v-overflow-btn>
                     </v-col>
                     <v-col cols="4">
-                      <v-text-field label="Suchausdruck..."></v-text-field>
+                      <v-text-field label="Suchausdruck..." v-model="search_simple_1_value"></v-text-field>
                     </v-col>
                     <v-col cols="2">
                       <v-overflow-btn
                         persistent-hint
                         :items="layer"
-                        v-model="layerDefault"
+                        v-model="search_simple_2_layer"
                         label="Layer"
                         item-value="text"
                       ></v-overflow-btn>
                     </v-col>
                     <v-col cols="4">
-                      <v-text-field label="Suchausdruck..."></v-text-field>
+                      <v-text-field label="Suchausdruck..." v-model="search_simple_2_value"></v-text-field>
                     </v-col>
                   </v-row>
                 </v-card>
@@ -109,37 +109,37 @@
                       <v-overflow-btn
                         persistent-hint
                         :items="layer"
-                        v-model="layerDefault"
+                        v-model="search_simple_1_layer"
                         label="Layer"
                         item-value="text"
                       ></v-overflow-btn>
                     </v-col>
                     <v-col cols="2">
-                      <v-text-field label="Suchausdruck..."></v-text-field>
+                      <v-text-field label="Suchausdruck..." v-model="search_simple_1_value"></v-text-field>
                     </v-col>
                     <v-col cols="2">
                       <v-overflow-btn
                         persistent-hint
                         :items="layer"
-                        v-model="layerDefault"
+                        v-model="search_simple_2_layer"
                         label="Layer"
                         item-value="text"
                       ></v-overflow-btn>
                     </v-col>
                     <v-col cols="2">
-                      <v-text-field label="Suchausdruck..."></v-text-field>
+                      <v-text-field label="Suchausdruck..." v-model="search_simple_2_value"></v-text-field>
                     </v-col>
                     <v-col cols="2">
                       <v-overflow-btn
                         persistent-hint
                         :items="layer"
-                        v-model="layerDefault"
+                        v-model="search_simple_3_layer"
                         label="Layer"
                         item-value="text"
                       ></v-overflow-btn>
                     </v-col>
                     <v-col cols="2">
-                      <v-text-field label="Suchausdruck..."></v-text-field>
+                      <v-text-field label="Suchausdruck..." v-model="search_simple_3_value"></v-text-field>
                     </v-col>
                   </v-row>
                 </v-card>
@@ -162,7 +162,7 @@
         <v-row>
           <v-col>
             <v-tabs>
-              <v-tab>
+              <v-tab @click="search_complex_index_change(1)">
                 <v-tooltip right>
                   <template v-slot:activator="{ on, attrs }">
                     <span v-bind="attrs" v-on="on">N=1</span>
@@ -176,7 +176,7 @@
                   </span>
                 </v-tooltip>
               </v-tab>
-              <v-tab>
+              <v-tab @click="search_complex_index_change(2)">
                 <v-tooltip right>
                   <template v-slot:activator="{ on, attrs }">
                     <span v-bind="attrs" v-on="on">N=2</span>
@@ -191,7 +191,7 @@
                   </span>
                 </v-tooltip>
               </v-tab>
-              <v-tab>
+              <v-tab @click="search_complex_index_change(3)">
                 <v-tooltip right>
                   <template v-slot:activator="{ on, attrs }">
                     <span v-bind="attrs" v-on="on">N=3</span>
@@ -237,60 +237,44 @@
               <v-tab-item>
                 <v-card flat>
                   <v-row>
-                    <v-col cols="2"> </v-col>
-                    <v-col cols="5">
+                    <v-col>
                       <p style="text-align:center">
                         (1. Position)
                       </p>
                     </v-col>
-                    <v-col cols="5">
+                    <v-col>
                       <p style="text-align:center">
                         (2. Position)
                       </p>
                     </v-col>
                   </v-row>
                   <v-row>
-                    <v-col cols="2">
-                      <p style="margin-top:30px; margin-left:15px">
-                        Wortform
-                      </p>
-                    </v-col>
-                    <v-col cols="5">
+                    <v-col>
                       <v-text-field
                         label="Wortform (1. Position)"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="5">
+                    <v-col>
                       <v-text-field
                         label="Wortform (2. Position)"
                       ></v-text-field>
                     </v-col>
                   </v-row>
                   <v-row>
-                    <v-col cols="2">
-                      <p style="margin-top:30px; margin-left:15px">
-                        Lemma
-                      </p>
-                    </v-col>
-                    <v-col cols="5">
+                    <v-col>
                       <v-text-field label="Lemma (1. Position)"></v-text-field>
                     </v-col>
-                    <v-col cols="5">
+                    <v-col>
                       <v-text-field label="Lemma (2. Position)"></v-text-field>
                     </v-col>
                   </v-row>
                   <v-row>
-                    <v-col cols="2">
-                      <p style="margin-top:30px; margin-left:15px">
-                        POS-Tag
-                      </p>
-                    </v-col>
-                    <v-col cols="5">
+                    <v-col>
                       <v-text-field
                         label="POS-Tag (1. Position)"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="5">
+                    <v-col>
                       <v-text-field
                         label="POS-Tag (2. Position)"
                       ></v-text-field>
@@ -301,78 +285,62 @@
               <v-tab-item>
                 <v-card flat>
                   <v-row cols="11">
-                    <v-col cols="2"> </v-col>
-                    <v-col cols="3">
+                    <v-col>
                       <p style="text-align:center">
                         (1. Position)
                       </p>
                     </v-col>
-                    <v-col cols="3">
+                    <v-col>
                       <p style="text-align:center">
                         (2. Position)
                       </p>
                     </v-col>
-                    <v-col cols="3">
+                    <v-col>
                       <p style="text-align:center">
                         (3. Position)
                       </p>
                     </v-col>
                   </v-row>
                   <v-row cols="11">
-                    <v-col cols="2">
-                      <p style="margin-top:30px; margin-left:15px">
-                        Wortform
-                      </p>
-                    </v-col>
-                    <v-col cols="3">
+                    <v-col>
                       <v-text-field
                         label="Wortform (1. Position)"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="3">
+                    <v-col>
                       <v-text-field
                         label="Wortform (2. Position)"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="3">
+                    <v-col>
                       <v-text-field
                         label="Wortform (3. Position)"
                       ></v-text-field>
                     </v-col>
                   </v-row>
-                  <v-row cols="11">
-                    <v-col cols="2">
-                      <p style="margin-top:30px; margin-left:15px">
-                        Lemma
-                      </p>
-                    </v-col>
-                    <v-col cols="3">
+                  <v-row>
+                    <v-col>
                       <v-text-field label="Lemma (1. Position)"></v-text-field>
                     </v-col>
-                    <v-col cols="3">
+                    <v-col>
                       <v-text-field label="Lemma (2. Position)"></v-text-field>
                     </v-col>
-                    <v-col cols="3">
+                    <v-col>
                       <v-text-field label="Lemma (3. Position)"></v-text-field>
                     </v-col>
                   </v-row>
-                  <v-row cols="11">
-                    <v-col cols="2">
-                      <p style="margin-top:30px; margin-left:15px">
-                        POS-Tag
-                      </p>
-                    </v-col>
-                    <v-col cols="3">
+                  <v-row>
+                    <v-col>
                       <v-text-field
                         label="POS-Tag (1. Position)"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="3">
+                    <v-col>
                       <v-text-field
                         label="POS-Tag (2. Position)"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="3">
+                    <v-col>
                       <v-text-field
                         label="POS-Tag (3. Position)"
                       ></v-text-field>
@@ -394,17 +362,31 @@
 </template>
 
 <script>
-export default {
+ export default {
   name: "Search",
 
   data: () => {
     return {
       layer: [{ text: "Wortform" }, { text: "Lemma" }, { text: "POS" }],
       layerDefault: { text: "Wortform" },
+      search_simple_1_layer: { text: "Wortform" },
+      search_simple_2_layer: { text: "Wortform" },
+      search_simple_3_layer: { text: "Wortform" },
+      search_simple_1_value: "",
+      search_simple_2_value: "",
+      search_simple_3_value: "",
+      search_simple_index: 1,
+      search_complex_index: 1,
       name: "world",
     };
   },
   methods: {
+    search_simple_index_change: function(num){
+      this.$data.search_simple_index = num;
+    },
+    search_complex_index_change: function(num){
+      this.$data.search_complex_index = num;
+    },
     greet: function() {
       this.$store.commit("increment");
       alert("Hello " + this.$data + " (" + this.$store.state.count + ")!");
