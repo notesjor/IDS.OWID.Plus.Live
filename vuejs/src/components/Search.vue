@@ -423,7 +423,7 @@ export default {
 
   data: () => {
     return {
-      layer: ["Wortform", "Lemma", "POS" ],
+      layer: ["Wortform", "Lemma", "POS"],
       search_simple_1_layer: "Wortform",
       search_simple_2_layer: "Wortform",
       search_simple_3_layer: "Wortform",
@@ -443,7 +443,7 @@ export default {
       this.$data.search_complex_n = n;
     },
     search_simple: function() {
-      var items = [
+      var queryItems = [
         {
           layer: this.$data.layer.indexOf(this.$data.search_simple_1_layer),
           position: 0,
@@ -451,23 +451,51 @@ export default {
         },
       ];
       if (this.$data.search_simple_n > 1)
-        items.push({
+        queryItems.push({
           layer: this.$data.layer.indexOf(this.$data.search_simple_2_layer),
           position: 1,
           token: this.$data.search_simple_2_value,
         });
       if (this.$data.search_simple_n > 2)
-        items.push({
+        queryItems.push({
           layer: this.$data.layer.indexOf(this.$data.search_simple_3_layer),
           position: 2,
           token: this.$data.search_simple_3_value,
         });
 
-      this.$store.commit("search", {
-        n: this.$data.search_simple_n,
-        queryItems: items,
+      var store = this.$store;
+      var n = this.$data.search_simple_n;
+
+      var data = JSON.stringify({
+        N: n,
+        Items: queryItems,
       });
-       this.$store.commit("calculate");
+
+      var xhr = new XMLHttpRequest();
+      xhr.addEventListener("readystatechange", function() {
+        if (this.readyState === 4) {
+          var xhr2 = new XMLHttpRequest();
+          xhr2.addEventListener("readystatechange", function() {
+            if (this.readyState === 4) {
+              store.commit("search", {
+                n: n,
+                items: JSON.parse(this.responseText),
+              });
+              store.commit("calculate");
+            }
+          });
+
+          xhr2.open("POST", store.state.baseUrl + "/pull");
+          xhr2.setRequestHeader("Content-Type", "application/json");
+
+          xhr2.send(this.responseText);
+        }
+      });
+
+      xhr.open("POST", store.state.baseUrl + "/find");
+      xhr.setRequestHeader("Content-Type", "application/json");
+
+      xhr.send(data);
     },
     search_complex: function() {
       this.$store.commit("search");

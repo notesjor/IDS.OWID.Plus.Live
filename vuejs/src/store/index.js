@@ -13,6 +13,7 @@ export default new Vuex.Store({
     baseUrl: "http://81.30.156.64:9731",
 
     norm: null,
+    dates: null,
 
     current: null,
     currentN: 0,
@@ -28,78 +29,17 @@ export default new Vuex.Store({
     sumFunction: avgFloat,
   },
   mutations: {
-    init(state) {
-      norm = [];
-
-      // N1
-      var xhr = new XMLHttpRequest();
-      xhr.withCredentials = true;
-
-      xhr.addEventListener("readystatechange", function() {
-        if (this.readyState === 4) {
-          state.norm.push(JSON.parse(this.responseText));
-        }
+    init(state, payload) {
+      state.norm = payload;
+      state.dates = [];
+      Object.keys(payload[0]).forEach(function(key) {
+        state.dates.push({ key });
       });
-
-      xhr.open("GET", state.baseUrl + "/norm?n=1");
-      xhr.send();
-
-      // N2
-      xhr = new XMLHttpRequest();
-      xhr.withCredentials = true;
-
-      xhr.addEventListener("readystatechange", function() {
-        if (this.readyState === 4) {
-          state.norm.push(JSON.parse(this.responseText));
-        }
-      });
-
-      xhr.open("GET", state.baseUrl + "/norm?n=2");
-      xhr.send();
-
-      // N3
-      xhr = new XMLHttpRequest();
-      xhr.withCredentials = true;
-
-      xhr.addEventListener("readystatechange", function() {
-        if (this.readyState === 4) {
-          state.norm.push(JSON.parse(this.responseText));
-        }
-      });
-
-      xhr.open("GET", state.baseUrl + "/norm?n=3");
-      xhr.send();
     },
 
-    search(state, { n, queryItems }) {
+    search(state, { n, items }) {
       state.currentN = n;
-
-      var data = JSON.stringify({
-        N: n,
-        Items: queryItems,
-      });
-
-      var xhr = new XMLHttpRequest();
-      xhr.addEventListener("readystatechange", function() {
-        if (this.readyState === 4) {
-          var xhr2 = new XMLHttpRequest();
-          xhr2.addEventListener("readystatechange", function() {
-            if (this.readyState === 4) {
-              state.current = JSON.parse(this.responseText);
-            }
-          });
-
-          xhr2.open("POST", state.baseUrl + "/pull");
-          xhr2.setRequestHeader("Content-Type", "application/json");
-
-          xhr2.send(this.responseText);
-        }
-      });
-
-      xhr.open("POST", state.baseUrl + "/find");
-      xhr.setRequestHeader("Content-Type", "application/json");
-
-      xhr.send(data);
+      state.current = items;
     },
 
     store(state) {
@@ -111,6 +51,16 @@ export default new Vuex.Store({
       state.result = state.current; // TODO: Merge mit stored
 
       state.resultGrid = [];
+      if (state.merge) {
+        var sumSerieTmp = {};
+        state.dates.forEach((x) => (sumSerieTmp[x] = 0.0));
+        state.resultSeries = [sumSerieTmp];
+      } else {
+        state.resultSeries = [];
+      }
+
+      console.log(state.resultSeries);
+
       Object.keys(state.result).forEach(function(key) {
         var tokens = key.split("µ");
         var dates = state.result[key];
@@ -121,7 +71,6 @@ export default new Vuex.Store({
           p: tokens[2],
 
           d: dates.length,
-          
         });
       });
     },

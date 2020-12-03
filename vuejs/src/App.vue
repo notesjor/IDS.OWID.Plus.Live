@@ -38,7 +38,7 @@
             <MainChart />
           </v-col>
         </v-row>
-         <v-row class="text-center">
+        <v-row class="text-center">
           <v-col>
             <VizOptions />
           </v-col>
@@ -48,7 +48,7 @@
             <DataGrid />
           </v-col>
         </v-row>
-         <v-row class="text-center">
+        <v-row class="text-center">
           <v-col>
             <Export />
           </v-col>
@@ -80,8 +80,18 @@ export default {
     //
   }),
 
-  mounted(){
-    this.$store.commit("init");
-  }
+  mounted() {
+    var xhr = new XMLHttpRequest();
+    var store = this.$store;
+
+    xhr.addEventListener("readystatechange", function() {
+      if (this.readyState === 4) {
+        store.commit("init", JSON.parse(this.responseText));
+      }
+    });
+
+    xhr.open("GET", this.$store.state.baseUrl + "/norm");
+    xhr.send(this.$store);
+  },
 };
 </script>

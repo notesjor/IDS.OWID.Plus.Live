@@ -24,7 +24,7 @@ export default {
     let option = {
       xAxis: {
         type: "category",
-        data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        data: this.$store.state.dates,
       },
       yAxis: {
         type: "value",
