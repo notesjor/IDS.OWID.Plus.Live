@@ -38,9 +38,19 @@
             <MainChart />
           </v-col>
         </v-row>
-        <v-row class="text-center" cols="12">
+         <v-row class="text-center">
+          <v-col>
+            <VizOptions />
+          </v-col>
+        </v-row>
+        <v-row class="text-center">
           <v-col>
             <DataGrid />
+          </v-col>
+        </v-row>
+         <v-row class="text-center">
+          <v-col>
+            <Export />
           </v-col>
         </v-row>
       </v-container>
@@ -51,7 +61,9 @@
 <script>
 import DataGrid from "./components/DataGrid";
 import MainChart from "./components/MainChart";
+import VizOptions from "./components/VizOptions";
 import Search from "./components/Search";
+import Export from "./components/Export";
 
 export default {
   name: "App",
@@ -59,11 +71,17 @@ export default {
   components: {
     DataGrid,
     MainChart,
+    VizOptions,
     Search,
+    Export
   },
 
   data: () => ({
     //
   }),
+
+  mounted(){
+    this.$store.commit("init");
+  }
 };
 </script>

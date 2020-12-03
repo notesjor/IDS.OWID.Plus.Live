@@ -13,7 +13,7 @@
       :headers="headers"
       :items="data_items"
       :search="search"
-      :single-select="singleSelect"
+      :single-select="true"
       v-model="selected"
       item-key="key"
       mutli-sort
