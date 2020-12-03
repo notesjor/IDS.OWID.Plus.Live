@@ -19,6 +19,36 @@
       mutli-sort
       show-select
     >
+      <!-- eslint-disable -->
+      <template v-slot:item.spark="x">
+        <v-sparkline
+          :value="x.item.spark"
+          :gradient="['#f72047', '#ffd200', '#1feaea']"
+          :smooth="true"
+          :padding="0"
+          :stroke-linecap="lineCap"
+          :gradient-direction="top"
+          :fill="fill"
+          :type="type"
+          :auto-line-width="autoLineWidth"
+          auto-draw
+        ></v-sparkline>
+      </template>
+      <template v-slot:item.sparkNorm="x">
+        <v-sparkline
+          :value="x.item.spark"
+          :gradient="['#f72047', '#ffd200', '#1feaea']"
+          :smooth="true"
+          :padding="0"
+          :stroke-linecap="lineCap"
+          :gradient-direction="top"
+          :fill="fill"
+          :type="type"
+          :auto-line-width="autoLineWidth"
+          auto-draw
+        ></v-sparkline>
+      </template>
+      <!-- eslint-enable -->
     </v-data-table>
   </v-card>
 </template>
@@ -39,6 +69,8 @@ export default {
         { text: "Erfasst an Tagen", value: "d" },
         { text: "Summe", value: "s" },
         { text: "Summe (rel.)", value: "sRel" },
+        { text: "Frequenzkurve", value: "spark" },
+        { text: "Frequenzkurve (rel.)", value: "sparkNorm" },
       ],
     };
   },

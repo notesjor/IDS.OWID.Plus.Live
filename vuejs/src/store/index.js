@@ -72,6 +72,16 @@ export default new Vuex.Store({
         var d = Object.keys(dates).length;
         var s = Object.values(dates).reduce((a, b) => a + b);
 
+        var norm = state.norm[state.currentN];
+        var spark = [];
+        var sparkNorm = [];
+        for(var i in norm){
+          var n = norm[i];
+          var v = (i in dates) ? dates[i] : 0;
+          spark.push(v);
+          sparkNorm.push(Math.round(v / n * 1000000.0));
+        }
+
         state.resultGrid.push({
           key: key,
 
@@ -81,7 +91,9 @@ export default new Vuex.Store({
 
           d: d,
           s: s,
-          sRel: (s / state.normTotal).toFixed(2)
+          sRel: (s / state.normTotal).toFixed(2),
+          spark: spark,
+          sparkNorm: sparkNorm
         });
       });
     },
