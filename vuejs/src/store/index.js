@@ -15,6 +15,9 @@ export default new Vuex.Store({
     norm: null,
     dates: null,
 
+    sumTotal: 0,
+    normTotal: 0,
+
     current: null,
     currentN: 0,
     stored: null,
@@ -32,9 +35,13 @@ export default new Vuex.Store({
     init(state, payload) {
       state.norm = payload;
       state.dates = [];
+      var sum = 0.0;
       Object.keys(payload[0]).forEach(function(key) {
         state.dates.push({ key });
+        sum += payload[0][key];
       });
+      state.sumTotal = sum;
+      state.normTotal = sum / 1000000.0;
     },
 
     search(state, { n, items }) {
@@ -59,18 +66,22 @@ export default new Vuex.Store({
         state.resultSeries = [];
       }
 
-      console.log(state.resultSeries);
-
       Object.keys(state.result).forEach(function(key) {
         var tokens = key.split("µ");
         var dates = state.result[key];
+        var d = Object.keys(dates).length;
+        var s = Object.values(dates).reduce((a, b) => a + b);
 
         state.resultGrid.push({
+          key: key,
+
           w: tokens[0],
           l: tokens[1],
           p: tokens[2],
 
-          d: dates.length,
+          d: d,
+          s: s,
+          sRel: (s / state.normTotal).toFixed(2)
         });
       });
     },

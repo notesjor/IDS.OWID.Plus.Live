@@ -24,7 +24,6 @@
 </template>
 
 <script>
-
 export default {
   name: "DataGrid",
   data: () => {
@@ -33,17 +32,30 @@ export default {
 
       selected: [],
       search: "",
-      headers:[
-        {text: "Name", value:"name"},
-        {text: "Wert", value:"amount"},
+      headers: [
+        { text: "Wortform", value: "w" },
+        { text: "Lemma", value: "l" },
+        { text: "POS-Tag", value: "p" },
+        { text: "Erfasst an Tagen", value: "d" },
+        { text: "Summe", value: "s" },
+        { text: "Summe (rel.)", value: "sRel" },
       ],
-      data_items: [
-        {key:"key1", name:"x", amount:5},
-        {key:"key2", name:"y", amount:4},
-        {key:"key3", name:"z", amount:6},
-        {key:"key4", name:"a", amount:8}
-      ]
     };
+  },
+  computed: {
+    data_items: {
+      get() {
+        try {
+          return this.$store === null ||
+            this.$store.state === null ||
+            this.$store.state.resultGrid === null
+            ? []
+            : this.$store.state.resultGrid;
+        } catch (error) {
+          return [];
+        }
+      },
+    },
   },
   // define methods under the `methods` object
   methods: {
