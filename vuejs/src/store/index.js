@@ -11,6 +11,7 @@ function avgFloat(serie) {
 export default new Vuex.Store({
   state: {
     baseUrl: "http://81.30.156.64:9731",
+    status: 'init',
 
     norm: null,
     dates: null,
@@ -42,6 +43,10 @@ export default new Vuex.Store({
       });
       state.sumTotal = sum;
       state.normTotal = sum / 1000000.0;
+    },
+
+    updateStatus(state, status) {
+      Vue.set(state, 'status', status);
     },
 
     search(state, { n, items }) {

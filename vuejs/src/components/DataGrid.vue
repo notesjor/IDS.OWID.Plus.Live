@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card v-if="status === 'success'">
     <v-card-title>
       <v-text-field
         v-model="search"
@@ -13,53 +13,97 @@
       :headers="headers"
       :items="data_items"
       :search="search"
-      :single-select="true"
+      :single-select="false"
       v-model="selected"
       item-key="key"
       mutli-sort
       show-select
+      show-expand
+      :single-expand="true"
+      :expanded.sync="expanded"
     >
       <!-- eslint-disable -->
       <template v-slot:item.spark="x">
         <v-sparkline
           :value="x.item.spark"
-          :gradient="['#f72047', '#ffd200', '#1feaea']"
+          :gradient="gradient"
           :smooth="true"
           :padding="0"
-          :stroke-linecap="lineCap"
-          :gradient-direction="top"
-          :fill="fill"
+          :gradient-direction="gradientDirection"
+          :fill="false"
           :type="type"
-          :auto-line-width="autoLineWidth"
+          :auto-line-width="true"
           auto-draw
         ></v-sparkline>
       </template>
       <template v-slot:item.sparkNorm="x">
         <v-sparkline
           :value="x.item.spark"
-          :gradient="['#f72047', '#ffd200', '#1feaea']"
+          :gradient="gradient"
           :smooth="true"
           :padding="0"
-          :stroke-linecap="lineCap"
-          :gradient-direction="top"
-          :fill="fill"
+          :gradient-direction="gradientDirection"
+          :fill="false"
           :type="type"
-          :auto-line-width="autoLineWidth"
+          :auto-line-width="true"
           auto-draw
         ></v-sparkline>
+      </template>
+      <template v-slot:expanded-item="{ headers, item }">
+        <td :colspan="headers.length">
+          <h3 style="margin-top:10px">Absoluter Frequenzverlauf</h3>
+          <v-sparkline
+            :value="item.spark"
+            :gradient="gradient"
+            :smooth="true"
+            :padding="0"
+            :gradient-direction="gradientDirection"
+            :fill="false"
+            :type="type"
+            :line-width="1"
+            auto-draw
+          ></v-sparkline>
+          <h3 style="margin-top:10px">Relativer Frequenzverlauf</h3>
+          <v-sparkline
+            :value="item.sparkNorm"
+            :gradient="gradient"
+            :smooth="true"
+            :padding="0"
+            :gradient-direction="gradientDirection"
+            :fill="false"
+            :type="type"
+            :line-width="1"
+            auto-draw
+          ></v-sparkline>
+        </td>
       </template>
       <!-- eslint-enable -->
     </v-data-table>
   </v-card>
+  <v-card v-else-if="status === 'init'">
+  </v-card>
+  <v-card v-else>
+    <v-data-table
+      loading
+      loading-text="Daten werden abgerufen..."
+    ></v-data-table>
+  </v-card>
 </template>
 
 <script>
+//import * as echarts from "../assets/echarts.min.js";
+
 export default {
   name: "DataGrid",
   data: () => {
     return {
       name: "world",
 
+      gradient: ["#f72047", "#ffd200", "#1feaea"],
+      gradientDirection: "top",
+      type: "trend",
+
+      expanded: [],
       selected: [],
       search: "",
       headers: [
@@ -86,6 +130,11 @@ export default {
         } catch (error) {
           return [];
         }
+      },
+    },
+    status: {
+      get() {
+        return this.$store.state.status;
       },
     },
   },

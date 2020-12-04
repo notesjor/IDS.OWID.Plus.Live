@@ -1,16 +1,30 @@
 <template>
-  <v-theme-provider>
-    <v-container>
-      <v-row>
-        <v-col>
-          <div
-            id="chart"
-            style="width: 120%; height: 100vh; margin-left:-10%"
-          ></div>
-        </v-col>
-      </v-row>
-    </v-container>
-  </v-theme-provider>
+  <v-carousel>
+    <v-carousel-item>
+      <v-container>
+        <v-row>
+          <v-col>
+            <div
+              id="chart"
+              style="width: 110%; height: 68vh; margin: -50px 0px 0px -40px"
+            ></div>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-carousel-item>
+    <v-carousel-item>
+      <v-container>
+        <v-row>
+          <v-col>
+            <div style="color:black;"><p>Hello</p></div>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-carousel-item>
+    <v-carousel-item>
+      <h1 style="color:black;"> Hello Hello Hello Hello Hello</h1>
+    </v-carousel-item>
+  </v-carousel>
 </template>
 
 <script>
@@ -18,6 +32,7 @@ import * as echarts from "../assets/echarts.min.js";
 
 export default {
   name: "MainChart",
+  theme: { dark: false },
   mounted() {
     var chart = document.getElementById("chart");
     var myChart = echarts.init(chart);

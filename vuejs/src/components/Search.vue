@@ -418,6 +418,36 @@
 </template>
 
 <script>
+function sendSearchRequest(store, n, data) {
+  store.commit("updateStatus", "pending");
+  var xhr = new XMLHttpRequest();
+  xhr.addEventListener("readystatechange", function() {
+    if (this.readyState === 4) {
+      var xhr2 = new XMLHttpRequest();
+      xhr2.addEventListener("readystatechange", function() {
+        if (this.readyState === 4) {
+          store.commit("search", {
+            n: n,
+            items: JSON.parse(this.responseText),
+          });
+          store.commit("calculate");
+          store.commit("updateStatus", "success");
+        }
+      });
+
+      xhr2.open("POST", store.state.baseUrl + "/pull");
+      xhr2.setRequestHeader("Content-Type", "application/json");
+
+      xhr2.send(this.responseText);
+    }
+  });
+
+  xhr.open("POST", store.state.baseUrl + "/find");
+  xhr.setRequestHeader("Content-Type", "application/json");
+
+  xhr.send(data);
+}
+
 export default {
   name: "Search",
 
@@ -463,42 +493,42 @@ export default {
           token: this.$data.search_simple_3_value,
         });
 
-      var store = this.$store;
       var n = this.$data.search_simple_n;
-
       var data = JSON.stringify({
         N: n,
         Items: queryItems,
       });
 
-      var xhr = new XMLHttpRequest();
-      xhr.addEventListener("readystatechange", function() {
-        if (this.readyState === 4) {
-          var xhr2 = new XMLHttpRequest();
-          xhr2.addEventListener("readystatechange", function() {
-            if (this.readyState === 4) {
-              store.commit("search", {
-                n: n,
-                items: JSON.parse(this.responseText),
-              });
-              store.commit("calculate");
-            }
-          });
-
-          xhr2.open("POST", store.state.baseUrl + "/pull");
-          xhr2.setRequestHeader("Content-Type", "application/json");
-
-          xhr2.send(this.responseText);
-        }
-      });
-
-      xhr.open("POST", store.state.baseUrl + "/find");
-      xhr.setRequestHeader("Content-Type", "application/json");
-
-      xhr.send(data);
+      sendSearchRequest(this.$store, n, data);
     },
     search_complex: function() {
-      this.$store.commit("search");
+      var queryItems = [
+        {
+          layer: this.$data.layer.indexOf(this.$data.search_simple_1_layer),
+          position: 0,
+          token: this.$data.search_simple_1_value,
+        },
+      ];
+      if (this.$data.search_simple_n > 1)
+        queryItems.push({
+          layer: this.$data.layer.indexOf(this.$data.search_simple_2_layer),
+          position: 1,
+          token: this.$data.search_simple_2_value,
+        });
+      if (this.$data.search_simple_n > 2)
+        queryItems.push({
+          layer: this.$data.layer.indexOf(this.$data.search_simple_3_layer),
+          position: 2,
+          token: this.$data.search_simple_3_value,
+        });
+
+      var n = this.$data.search_complex_n;
+      var data = JSON.stringify({
+        N: n,
+        Items: queryItems,
+      });
+      
+      sendSearchRequest(this.$store, n, data);
     },
     validate_notEmpty: function(value) {
       return value === "" || value == "*"
