@@ -11,7 +11,7 @@ function avgFloat(serie) {
 export default new Vuex.Store({
   state: {
     baseUrl: "http://81.30.156.64:9731",
-    status: 'init',
+    status: "init",
 
     norm: null,
     dates: null,
@@ -46,7 +46,7 @@ export default new Vuex.Store({
     },
 
     updateStatus(state, status) {
-      Vue.set(state, 'status', status);
+      Vue.set(state, "status", status);
     },
 
     search(state, { n, items }) {
@@ -80,11 +80,20 @@ export default new Vuex.Store({
         var norm = state.norm[state.currentN];
         var spark = [];
         var sparkNorm = [];
-        for(var i in norm){
+
+        for (var i in norm) {
           var n = norm[i];
-          var v = (i in dates) ? dates[i] : 0;
+          var v = i in dates ? dates[i] : 0;
           spark.push(v);
-          sparkNorm.push(Math.round(v / n * 1000000.0));
+          sparkNorm.push(Math.round((v / n) * 1000000.0));
+
+          // easyFreq
+          state.resultSeries = [
+            {
+              type: "line",
+              data: sparkNorm,
+            },
+          ];
         }
 
         state.resultGrid.push({
@@ -98,7 +107,7 @@ export default new Vuex.Store({
           s: s,
           sRel: (s / state.normTotal).toFixed(2),
           spark: spark,
-          sparkNorm: sparkNorm
+          sparkNorm: sparkNorm,
         });
       });
     },
