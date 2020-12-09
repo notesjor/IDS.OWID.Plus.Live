@@ -26,6 +26,7 @@ export default new Vuex.Store({
     result: null,
     resultSeries: null,
     resultGrid: null,
+    resultCalendar: null,
 
     normalize: true,
     merge: true,
@@ -81,20 +82,32 @@ export default new Vuex.Store({
         var spark = [];
         var sparkNorm = [];
 
+        // easyCal
+        var easyCal = [];
+
         for (var i in norm) {
           var n = norm[i];
           var v = i in dates ? dates[i] : 0;
           spark.push(v);
-          sparkNorm.push(Math.round((v / n) * 1000000.0));
-
-          // easyFreq
-          state.resultSeries = [
-            {
-              type: "line",
-              data: sparkNorm,
-            },
-          ];
+          sparkNorm.push(Math.round((v / n) * 1000000.0));   
+          
+          // easyCal >>>
+          easyCal.push([
+            i.replace("T00:00:00", ""),
+            Math.round((v / n) * 1000000.0)
+          ])
+          // <<<
         }
+
+        // easyFreq >>>
+        state.resultSeries = [
+          {
+            type: "line",
+            data: sparkNorm,
+          },
+        ];
+        // <<<        
+        state.resultCalendar = easyCal; // easyCal
 
         state.resultGrid.push({
           key: key,

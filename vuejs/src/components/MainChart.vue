@@ -20,20 +20,17 @@
           <v-col>
             <div
               id="calendar"
-              style="width: 110%; height: 68vh; margin: -50px 0px 0px -40px"
+              style="width: 100%; height: 65vh; margin: -50px 0px 0px -40px"
             ></div>
           </v-col>
         </v-row>
       </v-container>
     </v-carousel-item>
-    <v-carousel-item>
-      <h1 style="color:black;">Hello Hello Hello Hello Hello</h1>
-    </v-carousel-item>
   </v-carousel>
 </template>
 
 <script>
-import * as echarts from "../assets/echarts.min.js";
+import * as echarts from  "echarts";
 
 export default {
   name: "MainChart",
@@ -47,6 +44,7 @@ export default {
         // CHART
         var chart = document.getElementById("chart");
         var myChart = echarts.init(chart);
+
         let myChartOption = {
           xAxis: {
             type: "category",
@@ -62,19 +60,35 @@ export default {
         myChart.setOption(myChartOption);
 
         // CALENDAR
-        var calendar = document.getElementById("calendar");
+        var calendar = document.getElementById("calendar");        
         var myCalendar = echarts.init(calendar);
+
         let myCalendarOption = {
-          xAxis: {
-            type: "category",
-            data: this.$store.state.dates.map((x) =>
-              x.key.replace("T00:00:00", "")
-            ),
+          tooltip: {
+            position: "top",
           },
-          yAxis: {
-            type: "value",
+          visualMap: {
+            min: Math.min(...this.$store.state.resultCalendar.map(o => o[1]), 0),
+            max: Math.max(...this.$store.state.resultCalendar.map(o => o[1]), 0),
+            calculable: true,
+            orient: "horizontal",
+            left: "center",
+            top: "bottom",
           },
-          series: this.$store.state.resultSeries,
+          calendar: [
+            {
+              range: "2020",
+              cellSize: ["auto", 20],
+            },
+          ],
+          series: [
+            {
+              type: "heatmap",
+              coordinateSystem: "calendar",
+              calendarIndex: 0,
+              data: this.$store.state.resultCalendar,
+            },
+          ]
         };
         myCalendar.setOption(myCalendarOption);
 

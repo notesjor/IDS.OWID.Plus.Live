@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "core-js": "^3.8.1",
+    "echarts": "^5.0.0",
     "vue": "^2.6.11",
     "vuetify": "^2.3.19",
     "vuex": "^3.6.0"
