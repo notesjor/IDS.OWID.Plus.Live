@@ -1,5 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import * as echarts from "echarts"; // TODO: REMOVE
 
 Vue.use(Vuex);
 
@@ -89,13 +90,13 @@ export default new Vuex.Store({
           var n = norm[i];
           var v = i in dates ? dates[i] : 0;
           spark.push(v);
-          sparkNorm.push(Math.round((v / n) * 1000000.0));   
-          
+          sparkNorm.push(Math.round((v / n) * 1000000.0));
+
           // easyCal >>>
           easyCal.push([
             i.replace("T00:00:00", ""),
-            Math.round((v / n) * 1000000.0)
-          ])
+            Math.round((v / n) * 1000000.0),
+          ]);
           // <<<
         }
 
@@ -104,9 +105,25 @@ export default new Vuex.Store({
           {
             type: "line",
             data: sparkNorm,
+            lineStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                {
+                  offset: 0,
+                  color: "rgba(247, 32, 71)",
+                },
+                {
+                  offset: 0.5,
+                  color: "rgba(255, 210, 0)",
+                },
+                {
+                  offset: 1,
+                  color: "rgba(31, 234, 234)",
+                },
+              ]),
+            },
           },
         ];
-        // <<<        
+        // <<<
         state.resultCalendar = easyCal; // easyCal
 
         state.resultGrid.push({

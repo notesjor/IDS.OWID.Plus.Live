@@ -1,5 +1,5 @@
 <template>
-  <v-carousel>
+  <v-carousel @change="updateViewport">
     <v-carousel-item>
       <v-container>
         <v-row>
@@ -21,7 +21,9 @@
             <div
               id="calendar"
               style="width: 100%; height: 65vh; margin: -50px 0px 0px -40px"
-            ></div>
+            >
+              {{ update }}
+            </div>
           </v-col>
         </v-row>
       </v-container>
@@ -35,6 +37,11 @@ import * as echarts from "echarts";
 export default {
   name: "MainChart",
   theme: { dark: false },
+  methods: {
+    updateViewport: function() {
+      this.$forceUpdate();
+    },
+  },
   computed: {
     update: {
       get() {
@@ -91,6 +98,9 @@ export default {
               orient: "horizontal",
               left: "center",
               top: "bottom",
+              inRange: {
+                color: ["#1feaea", "#ffd200", "#f72047"]
+              },
             },
             calendar: [
               {
@@ -103,7 +113,7 @@ export default {
                 type: "heatmap",
                 coordinateSystem: "calendar",
                 calendarIndex: 0,
-                data: this.$store.state.resultCalendar,
+                data: this.$store.state.resultCalendar
               },
             ],
           };
