@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import * as echarts from  "echarts";
+import * as echarts from "echarts";
 
 export default {
   name: "MainChart",
@@ -43,54 +43,72 @@ export default {
 
         // CHART
         var chart = document.getElementById("chart");
-        var myChart = echarts.init(chart);
+        if (chart != null) {
+          try {
+            var myChart = echarts.init(chart);
+          } catch {
+            // ignore
+          }
 
-        let myChartOption = {
-          xAxis: {
-            type: "category",
-            data: this.$store.state.dates.map((x) =>
-              x.key.replace("T00:00:00", "")
-            ),
-          },
-          yAxis: {
-            type: "value",
-          },
-          series: this.$store.state.resultSeries,
-        };
-        myChart.setOption(myChartOption);
+          let myChartOption = {
+            xAxis: {
+              type: "category",
+              data: this.$store.state.dates.map((x) =>
+                x.key.replace("T00:00:00", "")
+              ),
+            },
+            yAxis: {
+              type: "value",
+            },
+            series: this.$store.state.resultSeries,
+          };
+          myChart.setOption(myChartOption);
+        }
 
         // CALENDAR
-        var calendar = document.getElementById("calendar");        
-        var myCalendar = echarts.init(calendar);
+        var calendar = document.getElementById("calendar");
+        if (calendar != null) {
+          try {
+            var myCalendar = echarts.init(calendar);
+          } catch {
+            // ignore
+          }
 
-        let myCalendarOption = {
-          tooltip: {
-            position: "top",
-          },
-          visualMap: {
-            min: Math.min(...this.$store.state.resultCalendar.map(o => o[1]), 0),
-            max: Math.max(...this.$store.state.resultCalendar.map(o => o[1]), 0),
-            calculable: true,
-            orient: "horizontal",
-            left: "center",
-            top: "bottom",
-          },
-          calendar: [
-            {
-              range: "2020",
-              cellSize: ["auto", 20],
+          let myCalendarOption = {
+            tooltip: {
+              position: "top",
             },
-          ],
-          series: [
-            {
-              type: "heatmap",
-              coordinateSystem: "calendar",
-              calendarIndex: 0,
-              data: this.$store.state.resultCalendar,
+            visualMap: {
+              min: Math.min(
+                ...this.$store.state.resultCalendar.map((o) => o[1]),
+                0
+              ),
+              max: Math.max(
+                ...this.$store.state.resultCalendar.map((o) => o[1]),
+                0
+              ),
+              calculable: true,
+              orient: "horizontal",
+              left: "center",
+              top: "bottom",
             },
-          ]
-        };
-        myCalendar.setOption(myCalendarOption);
+            calendar: [
+              {
+                range: "2020",
+                cellSize: ["auto", 20],
+              },
+            ],
+            series: [
+              {
+                type: "heatmap",
+                coordinateSystem: "calendar",
+                calendarIndex: 0,
+                data: this.$store.state.resultCalendar,
+              },
+            ],
+          };
+          myCalendar.setOption(myCalendarOption);
+        }
 
         return "";
       },
