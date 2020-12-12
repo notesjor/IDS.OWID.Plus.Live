@@ -105,6 +105,8 @@ export default new Vuex.Store({
           {
             type: "line",
             data: sparkNorm,
+            symbolSize: 10,
+            line:{marker:{enable:false}},
             lineStyle: {
               color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                 {

@@ -68,6 +68,15 @@ export default {
               type: "value",
             },
             series: this.$store.state.resultSeries,
+            dataZoom: [
+              { type: "slider", show: true },
+              { type: "inside", show: true },
+            ],
+            tooltip: {
+              axisPointer: {
+                type: "cross",
+              },
+            },
           };
           myChart.setOption(myChartOption);
         }
@@ -99,7 +108,7 @@ export default {
               left: "center",
               top: "bottom",
               inRange: {
-                color: ["#1feaea", "#ffd200", "#f72047"]
+                color: ["#1feaea", "#ffd200", "#f72047"],
               },
             },
             calendar: [
@@ -113,7 +122,7 @@ export default {
                 type: "heatmap",
                 coordinateSystem: "calendar",
                 calendarIndex: 0,
-                data: this.$store.state.resultCalendar
+                data: this.$store.state.resultCalendar,
               },
             ],
           };
