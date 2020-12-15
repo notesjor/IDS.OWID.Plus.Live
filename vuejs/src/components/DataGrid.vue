@@ -111,6 +111,7 @@ export default {
         { text: "Lemma", value: "l" },
         { text: "POS-Tag", value: "p" },
         { text: "Erfasst an Tagen", value: "d" },
+        { text: "Erfasst an Tagen (in %)", value: "dRel" },
         { text: "Summe", value: "s" },
         { text: "Summe (rel.)", value: "sRel" },
         { text: "Frequenzkurve", value: "spark" },
@@ -124,9 +125,9 @@ export default {
         try {
           return this.$store === null ||
             this.$store.state === null ||
-            this.$store.state.resultGrid === null
+            this.$store.state.currentGrid === null
             ? []
-            : this.$store.state.resultGrid;
+            : this.$store.state.currentGrid;
         } catch (error) {
           return [];
         }
@@ -144,6 +145,7 @@ export default {
       this.$store.commit("increment");
       alert("Hello " + this.$data + " (" + this.$store.state.count + ")!");
     },
+
   },
 };
 </script>

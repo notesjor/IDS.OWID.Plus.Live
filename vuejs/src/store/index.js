@@ -22,11 +22,12 @@ export default new Vuex.Store({
 
     current: null,
     currentN: 0,
+    currentGrid: null,
+
     stored: null,
 
     result: null,
-    resultSeries: null,
-    resultGrid: null,
+    resultSeries: null,    
     resultCalendar: null,
 
     normalize: true,
@@ -54,6 +55,41 @@ export default new Vuex.Store({
     search(state, { n, items }) {
       state.currentN = n;
       state.current = items;
+
+      state.currentGrid = [];
+      Object.keys(state.current).forEach(function(key) {
+        var tokens = key.split("µ");
+        
+        var dates = state.current[key];
+        var norm = state.norm[state.currentN];
+
+        var d = Object.keys(dates).length;
+        var s = Object.values(dates).reduce((a, b) => a + b);
+
+        var spark = [];
+        var sparkNorm = [];
+        for (var i in norm) {
+          var n = norm[i];
+          var v = i in dates ? dates[i] : 0;
+          spark.push(v);
+          sparkNorm.push(Math.round((v / n) * 1000000.0));
+        }
+
+        state.currentGrid.push({
+          key: key,
+
+          w: tokens[0],
+          l: tokens[1],
+          p: tokens[2],
+
+          d: d,
+          dRel: (d / state.dates.length * 100.0).toFixed(2),
+          s: s,
+          sRel: (s / state.normTotal).toFixed(2),
+          spark: spark,
+          sparkNorm: sparkNorm,
+        });
+      });
     },
 
     store(state) {
@@ -62,9 +98,18 @@ export default new Vuex.Store({
     },
 
     calculate(state) {
+      
+
+      
+
+
+
+
+
+      // nice
       state.result = state.current; // TODO: Merge mit stored
 
-      state.resultGrid = [];
+      
       if (state.merge) {
         var sumSerieTmp = {};
         state.dates.forEach((x) => (sumSerieTmp[x] = 0.0));
@@ -74,10 +119,8 @@ export default new Vuex.Store({
       }
 
       Object.keys(state.result).forEach(function(key) {
-        var tokens = key.split("µ");
+        
         var dates = state.result[key];
-        var d = Object.keys(dates).length;
-        var s = Object.values(dates).reduce((a, b) => a + b);
 
         var norm = state.norm[state.currentN];
         var spark = [];
@@ -126,21 +169,7 @@ export default new Vuex.Store({
           },
         ];
         // <<<
-        state.resultCalendar = easyCal; // easyCal
-
-        state.resultGrid.push({
-          key: key,
-
-          w: tokens[0],
-          l: tokens[1],
-          p: tokens[2],
-
-          d: d,
-          s: s,
-          sRel: (s / state.normTotal).toFixed(2),
-          spark: spark,
-          sparkNorm: sparkNorm,
-        });
+        state.resultCalendar = easyCal; // easyCal        
       });
     },
   },
