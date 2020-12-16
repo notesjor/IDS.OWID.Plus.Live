@@ -1,98 +1,69 @@
 <template>
-  <v-card v-if="status === 'success'">
-    <v-card-title>
-      <v-text-field
-        v-model="search"
-        append-icon="mdi-magnify"
-        label="Daten durchsuchen..."
-        single-line
-        hide-details
-      ></v-text-field>
-    </v-card-title>
-    <v-data-table
-      :headers="headers"
-      :items="data_items"
-      :search="search"
-      :single-select="false"
-      v-model="selected"
-      item-key="key"
-      mutli-sort
-      show-select
-      show-expand
-      :single-expand="true"
-      :expanded.sync="expanded"
-    >
-      <!-- eslint-disable -->
-      <template v-slot:item.spark="x">
-        <v-sparkline
-          :value="x.item.spark"
-          :gradient="gradient"
-          :smooth="true"
-          :padding="0"
-          :gradient-direction="gradientDirection"
-          :fill="false"
-          :type="type"
-          :auto-line-width="true"
-          auto-draw
-        ></v-sparkline>
-      </template>
-      <template v-slot:item.sparkNorm="x">
-        <v-sparkline
-          :value="x.item.spark"
-          :gradient="gradient"
-          :smooth="true"
-          :padding="0"
-          :gradient-direction="gradientDirection"
-          :fill="false"
-          :type="type"
-          :auto-line-width="true"
-          auto-draw
-        ></v-sparkline>
-      </template>
-      <template v-slot:expanded-item="{ headers, item }">
-        <td :colspan="headers.length">
-          <h3 style="margin-top:10px">Absoluter Frequenzverlauf</h3>
-          <v-sparkline
-            :value="item.spark"
-            :gradient="gradient"
-            :smooth="true"
-            :padding="0"
-            :gradient-direction="gradientDirection"
-            :fill="false"
-            :type="type"
-            :line-width="1"
-            auto-draw
-          ></v-sparkline>
-          <h3 style="margin-top:10px">Relativer Frequenzverlauf</h3>
-          <v-sparkline
-            :value="item.sparkNorm"
-            :gradient="gradient"
-            :smooth="true"
-            :padding="0"
-            :gradient-direction="gradientDirection"
-            :fill="false"
-            :type="type"
-            :line-width="1"
-            auto-draw
-          ></v-sparkline>
-        </td>
-      </template>
-      <!-- eslint-enable -->
-    </v-data-table>
-  </v-card>
-  <v-card v-else-if="status === 'init'">
-  </v-card>
-  <v-card v-else>
-    <v-data-table
-      loading
-      loading-text="Daten werden abgerufen..."
-    ></v-data-table>
-  </v-card>
+    <v-expansion-panels :value="0">
+    <v-expansion-panel>
+      <v-expansion-panel-header>
+        <div><v-icon>mdi-pencil</v-icon><span style="margin-left:10px">VERFEINERN: Daten der aktuellen Suche</span></div>
+      </v-expansion-panel-header>
+      <v-expansion-panel-content v-if="status === 'success'">
+        <v-data-table
+          :headers="headers"
+          :items="data_items"
+          :search="search"
+          :single-select="false"
+          v-model="selected"
+          item-key="key"
+          mutli-sort
+          show-select
+        >
+          <!-- eslint-disable -->
+          <template v-slot:item.spark="x">
+            <v-sparkline
+              :value="x.item.spark"
+              :gradient="gradient"
+              :smooth="true"
+              :padding="0"
+              :gradient-direction="gradientDirection"
+              :fill="false"
+              :type="type"
+              :auto-line-width="true"
+              auto-draw
+            ></v-sparkline>
+          </template>
+          <template v-slot:item.sparkNorm="x">
+            <v-sparkline
+              :value="x.item.spark"
+              :gradient="gradient"
+              :smooth="true"
+              :padding="0"
+              :gradient-direction="gradientDirection"
+              :fill="false"
+              :type="type"
+              :auto-line-width="true"
+              auto-draw
+            ></v-sparkline>
+          </template>
+          <!-- eslint-enable -->
+        </v-data-table>      
+      </v-expansion-panel-content>
+      <v-expansion-panel-content v-if="status === 'init'">
+        <p>Bitte führen Sie zuerst eine Suche aus!</p>
+      </v-expansion-panel-content>
+    </v-expansion-panel>
+    <v-expansion-panel>
+      <v-expansion-panel-header class="justify-self-start">
+        <div><v-icon>mdi-compare-horizontal</v-icon><span style="margin-left:10px">VERGLEICHEN: Mit vorangeganenen Suchen / Suchverlauf</span></div>
+      </v-expansion-panel-header>
+      <v-expansion-panel-content v-if="status === 'success'">
+        <v-data-table> </v-data-table>
+      </v-expansion-panel-content>
+      <v-expansion-panel-content v-if="status === 'init'">
+        <p>Bitte führen Sie zuerst eine Suche aus!</p>
+      </v-expansion-panel-content>
+    </v-expansion-panel>
+  </v-expansion-panels>
 </template>
 
 <script>
-//import * as echarts from "../assets/echarts.min.js";
-
 export default {
   name: "DataGrid",
   data: () => {
@@ -110,28 +81,26 @@ export default {
         { text: "Wortform", value: "w" },
         { text: "Lemma", value: "l" },
         { text: "POS-Tag", value: "p" },
-        { text: "Erfasst an Tagen", value: "d" },
-        { text: "Erfasst an Tagen (in %)", value: "dRel" },
+        { text: "Erfasst (Tage)", value: "d" },
+        { text: "Erfasst (%-Tage)", value: "dRel" },
         { text: "Summe", value: "s" },
         { text: "Summe (rel.)", value: "sRel" },
         { text: "Frequenzkurve", value: "spark" },
         { text: "Frequenzkurve (rel.)", value: "sparkNorm" },
-      ],
+      ]
     };
   },
   computed: {
-    data_items: {
-      get() {
-        try {
-          return this.$store === null ||
-            this.$store.state === null ||
-            this.$store.state.currentGrid === null
-            ? []
-            : this.$store.state.currentGrid;
-        } catch (error) {
-          return [];
-        }
-      },
+    data_items: function() {
+      try {
+        return this.$store === null ||
+          this.$store.state === null ||
+          this.$store.state.currentGrid === null
+          ? []
+          : this.$store.state.currentGrid;
+      } catch (error) {
+        return [];
+      }
     },
     status: {
       get() {
@@ -139,13 +108,16 @@ export default {
       },
     },
   },
-  // define methods under the `methods` object
-  methods: {
-    greet: function() {
-      this.$store.commit("increment");
-      alert("Hello " + this.$data + " (" + this.$store.state.count + ")!");
+  watch: {
+    data_items: function() {
+      this.$data.selected = this.$store.state.currentGrid;
     },
-
-  },
+    selected: function() {
+      this.$store.state.currentGridSelect = [];
+      for (var i in this.$data.selected)
+        this.$store.state.currentGridSelect.push(this.$data.selected[i].key);
+      console.log(this.$store.state.currentGridSelect);
+    },
+  }
 };
 </script>

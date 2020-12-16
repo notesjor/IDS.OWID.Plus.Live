@@ -1,34 +1,69 @@
 <template>
-  <v-carousel @change="updateViewport">
-    <v-carousel-item>
-      <v-container>
-        <v-row>
-          <v-col>
-            <div
-              id="chart"
-              style="width: 110%; height: 68vh; margin: -50px 0px 0px -40px"
-            >
-              {{ update }}
-            </div>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-carousel-item>
-    <v-carousel-item>
-      <v-container>
-        <v-row>
-          <v-col>
-            <div
-              id="calendar"
-              style="width: 100%; height: 65vh; margin: -50px 0px 0px -40px"
-            >
-              {{ update }}
-            </div>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-carousel-item>
-  </v-carousel>
+  <v-tabs vertical @change="updateViewport">
+    <v-tab>
+      <v-icon left>
+        mdi-chart-line
+      </v-icon>
+    </v-tab>
+    <v-tab>
+      <v-icon left>
+        mdi-calendar-multiselect
+      </v-icon>
+    </v-tab>
+    <v-tab>
+      <v-icon left>
+        mdi-access-point
+      </v-icon>
+    </v-tab>
+    <v-tab>
+      <v-icon left>
+        mdi-access-point
+      </v-icon>
+    </v-tab>
+
+    <v-tab-item>
+      <v-row>
+        <v-col>
+          <div
+            id="chart"
+            style="width: 110%; height: 68vh; margin: -50px 0px 0px -40px"
+          >
+            {{ update }}
+          </div>
+        </v-col>
+      </v-row>
+    </v-tab-item>
+    <v-tab-item>
+      <v-row>
+        <v-col>
+          <div
+            id="calendar"
+            style="width: 100%; height: 65vh; margin: -50px 0px 0px -40px"
+          >
+            {{ update }}
+          </div>
+        </v-col>
+      </v-row>
+    </v-tab-item>
+    <v-tab-item>
+      <v-card flat>
+        <v-card-text>
+          <p>
+            Lorem IPSUM
+          </p>
+        </v-card-text>
+      </v-card>
+    </v-tab-item>
+    <v-tab-item>
+      <v-card flat>
+        <v-card-text>
+          <p>
+            Lorem IPSUM
+          </p>
+        </v-card-text>
+      </v-card>
+    </v-tab-item>
+  </v-tabs>
 </template>
 
 <script>
@@ -39,6 +74,7 @@ export default {
   theme: { dark: false },
   methods: {
     updateViewport: function() {
+      this.$store.commit("calculate");
       this.$forceUpdate();
     },
   },
@@ -75,6 +111,9 @@ export default {
             tooltip: {
               axisPointer: {
                 type: "cross",
+              },
+              formatter: function(params) {
+                return params.name + ": " + params.value.toString().replace(".", ",") + " (pro Mio. Token)";
               },
             },
           };

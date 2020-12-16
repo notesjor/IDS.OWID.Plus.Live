@@ -1,8 +1,8 @@
 <template>
   <v-expansion-panels :value="0">
     <v-expansion-panel>
-      <v-expansion-panel-header>
-        Einfache Suche
+      <v-expansion-panel-header class="justify-self-start">
+        <div><v-icon left>search</v-icon><span>SUCHEN: Einfache Suche</span></div>
       </v-expansion-panel-header>
       <v-expansion-panel-content>
         <v-row>
@@ -168,15 +168,15 @@
         <v-row>
           <v-col>
             <v-btn block @click="search_simple">
-              <v-icon>search</v-icon>Suchen
+              <v-icon>search</v-icon>Suche ausführen
             </v-btn>
           </v-col>
         </v-row>
       </v-expansion-panel-content>
     </v-expansion-panel>
     <v-expansion-panel>
-      <v-expansion-panel-header>
-        Erweiterte Suche
+       <v-expansion-panel-header class="justify-self-start">
+        <div><v-icon left>search</v-icon><span>SUCHEN: Erweiterte Tiefen-Suche</span></div>
       </v-expansion-panel-header>
       <v-expansion-panel-content>
         <v-row>
@@ -418,6 +418,8 @@
 </template>
 
 <script>
+import { mdiMagnifyPlus } from '@mdi/js';
+
 function sendSearchRequest(store, n, data) {
   store.commit("updateStatus", "pending");
   var xhr = new XMLHttpRequest();
@@ -463,6 +465,8 @@ export default {
       search_simple_n: 1,
       search_complex_n: 1,
       name: "world",
+
+      iconSeachExt: mdiMagnifyPlus
     };
   },
   methods: {
@@ -527,7 +531,7 @@ export default {
         N: n,
         Items: queryItems,
       });
-      
+
       sendSearchRequest(this.$store, n, data);
     },
     validate_notEmpty: function(value) {

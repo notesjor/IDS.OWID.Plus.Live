@@ -3,7 +3,10 @@
     <v-container>
       <v-row>
         <v-col class="d-flex justify-left" style="margin-top:-15px;">
-          <v-switch v-model="relativeFrequency" label="Relative Frequenz"></v-switch>
+          <v-switch
+            v-model="relativeFrequency"
+            label="Relative Frequenz"
+          ></v-switch>
         </v-col>
       </v-row>
       <v-row>
@@ -47,6 +50,14 @@
 </template>
 
 <script>
+function commit() {
+  var r = this.$data.relativeFrequency;
+  var s = this.$data.smoothValue;
+  var g = this.$data.granulationValue;
+
+  this.$store.commit("vizOption", { r, s, g });
+}
+
 export default {
   name: "VizOptions",
 
@@ -58,6 +69,11 @@ export default {
       granulationValue: 1,
       granulationLabels: ["Tag", "Woche", "Monat", "Quartal", "Jahr"],
     };
+  },
+  watch: {
+    relativeFrequency: commit,
+    smoothValue: commit,
+    granulationValue: commit,
   },
   methods: {
     greet: function() {

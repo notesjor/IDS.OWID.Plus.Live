@@ -23,6 +23,11 @@ export default new Vuex.Store({
     current: null,
     currentN: 0,
     currentGrid: null,
+    currentGridSelect: [],
+
+    vizOptionRelative: true,
+    vizOptionGranulatioon: 1,
+    vizOptionSmoothing: 7,
 
     stored: null,
 
@@ -95,6 +100,12 @@ export default new Vuex.Store({
     store(state) {
       if (state.stored == null) state.stored = [state.current];
       else state.stored.push(state.current);
+    },
+
+    vizOption(state, payload){
+      state.vizOptionRelative = payload.r;
+      state.vizOptionGranulatioon = payload.g;
+      state.vizOptionSmoothing = payload.s;
     },
 
     calculate(state) {
