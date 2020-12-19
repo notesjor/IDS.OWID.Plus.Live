@@ -2,6 +2,169 @@ import Vue from "vue";
 import Vuex from "vuex";
 import * as echarts from "echarts"; // TODO: REMOVE
 
+Number.prototype.pad = function(size) {
+  var s = String(this);
+  while (s.length < (size || 2)) {
+    s = "0" + s;
+  }
+  return s;
+};
+
+// SOURCE: https://weeknumber.net/how-to/javascript >>>
+Date.prototype.getWeek = function() {
+  this.setHours(0, 0, 0, 0);
+  // Thursday in current week decides the year.
+  this.setDate(this.getDate() + 3 - ((this.getDay() + 6) % 7));
+  // January 4 is always in week 1.
+  var week1 = new Date(this.getFullYear(), 0, 4);
+  // Adjust to Thursday in week 1 and count number of weeks from date to week1.
+  return (
+    1 +
+    Math.round(
+      ((this.getTime() - week1.getTime()) / 86400000 -
+        3 +
+        ((week1.getDay() + 6) % 7)) /
+        7
+    )
+  );
+};
+// <<<
+
+Date.prototype.getYearWeek = function() {
+  return this.getFullYear() + "-" + this.getWeek().pad(2);
+};
+Date.prototype.getYearQuarter = function() {
+  return this.getFullYear() + "-" + (Math.floor(this.getMonth() / 3) + 1);
+};
+
+class OwidLiveStorageTimeItem {
+  #Key;
+  #Dates;
+  #IsSelected;  
+
+  constructor(key, dates) {
+    this.#Key = key;
+    this.#Dates = dates;
+    this.#IsSelected = true;
+  }
+
+  get Key() {
+    return this.#Key;
+  }
+
+  get Dates() {
+    return this.#IsSelected ? this.#Dates : null;
+  }
+
+  get IsSelected() {
+    return this.#IsSelected;
+  }
+
+  set IsSelected(bool) {
+    if (typeof bool === "boolean") this.#IsSelected = bool;
+  }
+
+  get Weeks() {
+    return this.#IsSelected
+      ? this.calculateGranulation(function(x) {
+          return x.getYearWeek();
+        })
+      : null;
+  }
+
+  get Month() {
+    return this.#IsSelected
+      ? this.calculateGranulation(function(x) {
+          return x.getMonth();
+        })
+      : null;
+  }
+
+  get Quarter() {
+    return this.#IsSelected
+      ? this.calculateGranulation(function(x) {
+          return x.getYearQuarter();
+        })
+      : null;
+  }
+
+  get Year() {
+    return this.#IsSelected
+      ? this.calculateGranulation(function(x) {
+          return x.getFullYear();
+        })
+      : null;
+  }
+
+  calculateGranulation(func) {
+    var dates = this.Dates();
+    var res = {};
+    dates.forEach((d) => {
+      var key = func(d);
+      if (key in res) res[key] += dates[d];
+      else res[key] = dates[d];
+    });
+    return res;
+  }
+}
+
+class OwidLiveSearchItems {
+  #N;
+  #Key;
+  #Request;
+  #OwidLiveStorageTimeItems;
+  #IsSelected;
+
+  constructor(n, request, items) {
+    this.#N = n;
+    this.#Request = request;
+
+    var key = "";
+    request.forEach((x) => {
+      key += x.toString();
+    });
+    this.#Key = key.trim();
+
+    this.#Request = request;
+    this.#OwidLiveStorageTimeItems = items;
+    this.#IsSelected = true;
+  }
+
+  get N() {
+    return this.#N;
+  }
+
+  get Key() {
+    return this.#Key;
+  }
+
+  get OwidLiveStorageItems() {
+    return this.#OwidLiveStorageTimeItems;
+  }
+
+  get IsSelected() {
+    return this.#IsSelected;
+  }
+
+  set IsSelected(bool) {
+    if (typeof bool === "boolean") this.#IsSelected = bool;
+  }
+}
+
+class OwidLiveStorage {
+  #OwidLiveSearchItems;
+
+  constructor() {
+    this.#OwidLiveSearchItems = {};
+  }
+
+  get OwidLiveSearchItems() {
+    return this.#OwidLiveSearchItems;
+  }
+
+  addOwidLiveSearchItem(item) {}
+}
+
 Vue.use(Vuex);
 
 function avgFloat(serie) {
@@ -20,6 +183,8 @@ export default new Vuex.Store({
     sumTotal: 0,
     normTotal: 0,
 
+    owidStorage: new OwidLiveStorage(),
+
     current: null,
     currentN: 0,
     currentGrid: null,
@@ -32,7 +197,7 @@ export default new Vuex.Store({
     stored: null,
 
     result: null,
-    resultSeries: null,    
+    resultSeries: null,
     resultCalendar: null,
 
     normalize: true,
@@ -64,7 +229,7 @@ export default new Vuex.Store({
       state.currentGrid = [];
       Object.keys(state.current).forEach(function(key) {
         var tokens = key.split("µ");
-        
+
         var dates = state.current[key];
         var norm = state.norm[state.currentN];
 
@@ -88,7 +253,7 @@ export default new Vuex.Store({
           p: tokens[2],
 
           d: d,
-          dRel: (d / state.dates.length * 100.0).toFixed(2),
+          dRel: ((d / state.dates.length) * 100.0).toFixed(2),
           s: s,
           sRel: (s / state.normTotal).toFixed(2),
           spark: spark,
@@ -102,25 +267,16 @@ export default new Vuex.Store({
       else state.stored.push(state.current);
     },
 
-    vizOption(state, payload){
+    vizOption(state, payload) {
       state.vizOptionRelative = payload.r;
       state.vizOptionGranulatioon = payload.g;
       state.vizOptionSmoothing = payload.s;
     },
 
     calculate(state) {
-      
-
-      
-
-
-
-
-
       // nice
       state.result = state.current; // TODO: Merge mit stored
 
-      
       if (state.merge) {
         var sumSerieTmp = {};
         state.dates.forEach((x) => (sumSerieTmp[x] = 0.0));
@@ -130,7 +286,6 @@ export default new Vuex.Store({
       }
 
       Object.keys(state.result).forEach(function(key) {
-        
         var dates = state.result[key];
 
         var norm = state.norm[state.currentN];
@@ -160,7 +315,7 @@ export default new Vuex.Store({
             type: "line",
             data: sparkNorm,
             symbolSize: 10,
-            line:{marker:{enable:false}},
+            line: { marker: { enable: false } },
             lineStyle: {
               color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                 {
@@ -180,7 +335,7 @@ export default new Vuex.Store({
           },
         ];
         // <<<
-        state.resultCalendar = easyCal; // easyCal        
+        state.resultCalendar = easyCal; // easyCal
       });
     },
   },

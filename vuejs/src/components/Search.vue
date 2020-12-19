@@ -2,7 +2,9 @@
   <v-expansion-panels :value="0">
     <v-expansion-panel>
       <v-expansion-panel-header class="justify-self-start">
-        <div><v-icon left>search</v-icon><span>SUCHEN: Einfache Suche</span></div>
+        <div>
+          <v-icon left>search</v-icon><span>SUCHEN: Einfache Suche</span>
+        </div>
       </v-expansion-panel-header>
       <v-expansion-panel-content>
         <v-row>
@@ -175,8 +177,11 @@
       </v-expansion-panel-content>
     </v-expansion-panel>
     <v-expansion-panel>
-       <v-expansion-panel-header class="justify-self-start">
-        <div><v-icon left>search</v-icon><span>SUCHEN: Erweiterte Tiefen-Suche</span></div>
+      <v-expansion-panel-header class="justify-self-start">
+        <div>
+          <v-icon left>search</v-icon
+          ><span>SUCHEN: Erweiterte Tiefen-Suche</span>
+        </div>
       </v-expansion-panel-header>
       <v-expansion-panel-content>
         <v-row>
@@ -418,7 +423,27 @@
 </template>
 
 <script>
-import { mdiMagnifyPlus } from '@mdi/js';
+import { mdiMagnifyPlus } from "@mdi/js";
+
+var global_layers = ["Wortform", "Lemma", "POS"];
+
+class queryItem {
+  layer;
+  position;
+  token;
+
+  constructor(layer, position, token) {
+    this.layer = layer;
+    this.position = position;
+    this.token = token;
+  }
+
+  toString() {
+    return (
+      this.position + ". " + global_layers[this.layer] + " = " + this.token
+    );
+  }
+}
 
 function sendSearchRequest(store, n, data) {
   store.commit("updateStatus", "pending");
@@ -455,7 +480,7 @@ export default {
 
   data: () => {
     return {
-      layer: ["Wortform", "Lemma", "POS"],
+      layer: global_layers,
       search_simple_1_layer: "Wortform",
       search_simple_2_layer: "Wortform",
       search_simple_3_layer: "Wortform",
@@ -466,7 +491,7 @@ export default {
       search_complex_n: 1,
       name: "world",
 
-      iconSeachExt: mdiMagnifyPlus
+      iconSeachExt: mdiMagnifyPlus,
     };
   },
   methods: {
@@ -478,24 +503,28 @@ export default {
     },
     search_simple: function() {
       var queryItems = [
-        {
-          layer: this.$data.layer.indexOf(this.$data.search_simple_1_layer),
-          position: 0,
-          token: this.$data.search_simple_1_value,
-        },
+        new queryItem(
+          this.$data.layer.indexOf(this.$data.search_simple_1_layer),
+          0,
+          this.$data.search_simple_1_value
+        ),
       ];
       if (this.$data.search_simple_n > 1)
-        queryItems.push({
-          layer: this.$data.layer.indexOf(this.$data.search_simple_2_layer),
-          position: 1,
-          token: this.$data.search_simple_2_value,
-        });
+        queryItems.push(
+          new queryItem(
+            this.$data.layer.indexOf(this.$data.search_simple_2_layer),
+            1,
+            this.$data.search_simple_2_value
+          )
+        );
       if (this.$data.search_simple_n > 2)
-        queryItems.push({
-          layer: this.$data.layer.indexOf(this.$data.search_simple_3_layer),
-          position: 2,
-          token: this.$data.search_simple_3_value,
-        });
+        queryItems.push(
+          new queryItem(
+            this.$data.layer.indexOf(this.$data.search_simple_3_layer),
+            2,
+            this.$data.search_simple_3_value
+          )
+        );
 
       var n = this.$data.search_simple_n;
       var data = JSON.stringify({
@@ -506,25 +535,109 @@ export default {
       sendSearchRequest(this.$store, n, data);
     },
     search_complex: function() {
-      var queryItems = [
-        {
-          layer: this.$data.layer.indexOf(this.$data.search_simple_1_layer),
-          position: 0,
-          token: this.$data.search_simple_1_value,
-        },
-      ];
-      if (this.$data.search_simple_n > 1)
-        queryItems.push({
-          layer: this.$data.layer.indexOf(this.$data.search_simple_2_layer),
-          position: 1,
-          token: this.$data.search_simple_2_value,
-        });
-      if (this.$data.search_simple_n > 2)
-        queryItems.push({
-          layer: this.$data.layer.indexOf(this.$data.search_simple_3_layer),
-          position: 2,
-          token: this.$data.search_simple_3_value,
-        });
+      var queryItems = [];
+      if (this.$data.search_complex_n === 1) {
+        queryItems = [
+          new queryItem(
+            "Wort",
+            0,
+            document.getElementById("search_complex_1_1_w").value 
+          ),
+          new queryItem(
+            "Lemma",
+            0,
+            document.getElementById("search_complex_1_1_l").value 
+          ),
+          new queryItem(
+            "Wort",
+            0,
+            document.getElementById("search_complex_1_1_p").value 
+          ),
+        ];
+      }else if (this.$data.search_complex_n === 2) {
+        queryItems = [
+          new queryItem(
+            "Wort",
+            0,
+            document.getElementById("search_complex_2_1_w").value 
+          ),
+          new queryItem(
+            "Lemma",
+            0,
+            document.getElementById("search_complex_2_1_l").value 
+          ),
+          new queryItem(
+            "Wort",
+            0,
+            document.getElementById("search_complex_2_1_p").value 
+          ),
+          new queryItem(
+            "Wort",
+            0,
+            document.getElementById("search_complex_2_2_w").value 
+          ),
+          new queryItem(
+            "Lemma",
+            0,
+            document.getElementById("search_complex_2_2_l").value 
+          ),
+          new queryItem(
+            "Wort",
+            0,
+            document.getElementById("search_complex_2_2_p").value 
+          ),
+        ];
+      }else if (this.$data.search_complex_n === 3) {
+        queryItems = [
+          new queryItem(
+            "Wort",
+            0,
+            document.getElementById("search_comple_3_1_w").value 
+          ),
+          new queryItem(
+            "Lemma",
+            0,
+            document.getElementById("search_comple_3_1_l").value 
+          ),
+          new queryItem(
+            "Wort",
+            0,
+            document.getElementById("search_comple_3_1_p").value 
+          ),
+          new queryItem(
+            "Wort",
+            0,
+            document.getElementById("search_comple_3_2_w").value 
+          ),
+          new queryItem(
+            "Lemma",
+            0,
+            document.getElementById("search_comple_3_2_l").value 
+          ),
+          new queryItem(
+            "Wort",
+            0,
+            document.getElementById("search_comple_3_2_p").value 
+          ),
+          new queryItem(
+            "Wort",
+            0,
+            document.getElementById("search_comple_3_3_w").value 
+          ),
+          new queryItem(
+            "Lemma",
+            0,
+            document.getElementById("search_comple_3_3_l").value 
+          ),
+          new queryItem(
+            "Wort",
+            0,
+            document.getElementById("search_comple_3_3_p").value 
+          ),
+        ]
+      }
+
+      console.log(queryItems);
 
       var n = this.$data.search_complex_n;
       var data = JSON.stringify({
