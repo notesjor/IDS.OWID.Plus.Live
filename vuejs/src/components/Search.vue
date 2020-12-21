@@ -445,7 +445,7 @@ class queryItem {
   }
 }
 
-function sendSearchRequest(store, n, data) {
+function sendSearchRequest(store, n, queryItems) {
   store.commit("updateStatus", "pending");
   var xhr = new XMLHttpRequest();
   xhr.addEventListener("readystatechange", function() {
@@ -455,6 +455,7 @@ function sendSearchRequest(store, n, data) {
         if (this.readyState === 4) {
           store.commit("search", {
             n: n,
+            queryItems: queryItems,
             items: JSON.parse(this.responseText),
           });
           store.commit("calculate");
@@ -472,7 +473,12 @@ function sendSearchRequest(store, n, data) {
   xhr.open("POST", store.state.baseUrl + "/find");
   xhr.setRequestHeader("Content-Type", "application/json");
 
-  xhr.send(data);
+  xhr.send(
+    JSON.stringify({
+      N: n,
+      Items: queryItems,
+    })
+  );
 }
 
 export default {
@@ -526,13 +532,7 @@ export default {
           )
         );
 
-      var n = this.$data.search_simple_n;
-      var data = JSON.stringify({
-        N: n,
-        Items: queryItems,
-      });
-
-      sendSearchRequest(this.$store, n, data);
+      sendSearchRequest(this.$store, this.$data.search_simple_n, queryItems);
     },
     search_complex: function() {
       var queryItems = [];
@@ -541,111 +541,103 @@ export default {
           new queryItem(
             "Wort",
             0,
-            document.getElementById("search_complex_1_1_w").value 
+            document.getElementById("search_complex_1_1_w").value
           ),
           new queryItem(
             "Lemma",
             0,
-            document.getElementById("search_complex_1_1_l").value 
+            document.getElementById("search_complex_1_1_l").value
           ),
           new queryItem(
             "Wort",
             0,
-            document.getElementById("search_complex_1_1_p").value 
+            document.getElementById("search_complex_1_1_p").value
           ),
         ];
-      }else if (this.$data.search_complex_n === 2) {
+      } else if (this.$data.search_complex_n === 2) {
         queryItems = [
           new queryItem(
             "Wort",
             0,
-            document.getElementById("search_complex_2_1_w").value 
+            document.getElementById("search_complex_2_1_w").value
           ),
           new queryItem(
             "Lemma",
             0,
-            document.getElementById("search_complex_2_1_l").value 
+            document.getElementById("search_complex_2_1_l").value
           ),
           new queryItem(
             "Wort",
             0,
-            document.getElementById("search_complex_2_1_p").value 
+            document.getElementById("search_complex_2_1_p").value
           ),
           new queryItem(
             "Wort",
             0,
-            document.getElementById("search_complex_2_2_w").value 
+            document.getElementById("search_complex_2_2_w").value
           ),
           new queryItem(
             "Lemma",
             0,
-            document.getElementById("search_complex_2_2_l").value 
+            document.getElementById("search_complex_2_2_l").value
           ),
           new queryItem(
             "Wort",
             0,
-            document.getElementById("search_complex_2_2_p").value 
+            document.getElementById("search_complex_2_2_p").value
           ),
         ];
-      }else if (this.$data.search_complex_n === 3) {
+      } else if (this.$data.search_complex_n === 3) {
         queryItems = [
           new queryItem(
             "Wort",
             0,
-            document.getElementById("search_comple_3_1_w").value 
+            document.getElementById("search_comple_3_1_w").value
           ),
           new queryItem(
             "Lemma",
             0,
-            document.getElementById("search_comple_3_1_l").value 
+            document.getElementById("search_comple_3_1_l").value
           ),
           new queryItem(
             "Wort",
             0,
-            document.getElementById("search_comple_3_1_p").value 
+            document.getElementById("search_comple_3_1_p").value
           ),
           new queryItem(
             "Wort",
             0,
-            document.getElementById("search_comple_3_2_w").value 
+            document.getElementById("search_comple_3_2_w").value
           ),
           new queryItem(
             "Lemma",
             0,
-            document.getElementById("search_comple_3_2_l").value 
+            document.getElementById("search_comple_3_2_l").value
           ),
           new queryItem(
             "Wort",
             0,
-            document.getElementById("search_comple_3_2_p").value 
+            document.getElementById("search_comple_3_2_p").value
           ),
           new queryItem(
             "Wort",
             0,
-            document.getElementById("search_comple_3_3_w").value 
+            document.getElementById("search_comple_3_3_w").value
           ),
           new queryItem(
             "Lemma",
             0,
-            document.getElementById("search_comple_3_3_l").value 
+            document.getElementById("search_comple_3_3_l").value
           ),
           new queryItem(
             "Wort",
             0,
-            document.getElementById("search_comple_3_3_p").value 
+            document.getElementById("search_comple_3_3_p").value
           ),
-        ]
+        ];
       }
 
-      console.log(queryItems);
-
-      var n = this.$data.search_complex_n;
-      var data = JSON.stringify({
-        N: n,
-        Items: queryItems,
-      });
-
-      sendSearchRequest(this.$store, n, data);
+      sendSearchRequest(this.$store, this.$data.search_complex_n, queryItems);
     },
     validate_notEmpty: function(value) {
       return value === "" || value == "*"
