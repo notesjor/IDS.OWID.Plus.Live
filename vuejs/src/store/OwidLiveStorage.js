@@ -6,14 +6,12 @@ export class OwidLiveStorage {
   #Norm;
   #Dates;
   #Total;
-  #DetailKey;
-  #RefineGrid = null;
 
   constructor(norm) {
     this.#Norm = norm;
     this.#Dates = [];
     var sum = 0.0;
-    Object.keys(norm[0]).forEach(function (key) {
+    Object.keys(norm[0]).forEach(function(key) {
       this.#Dates.push({ key });
       sum += norm[0][key];
     });
@@ -47,17 +45,20 @@ export class OwidLiveStorage {
     return this.#Total / 1000000.0;
   }
 
-  get DetailKey() {
-    return this.#DetailKey;
+  GetSearchHistory(n) {
+    var res = [];
+    this.#OwidLiveSearches.forEach((key) => {
+      var current = this.#OwidLiveSearches[key];
+      if (current.N === n) res.push(current);
+    });
+    return res;
   }
 
-  set DetailKey(key) {
-    this.#DetailKey = key;
-
+  GetSearchHistoryItem(key){
     var data = this.#OwidLiveSearches[key];
 
-    this.#RefineGrid = [];
-    Object.keys(data.OwidLiveStorageItems).forEach(function (key) {
+    var res = [];
+    Object.keys(data.OwidLiveStorageItems).forEach(function(key) {
       var tokens = key.split("µ");
 
       var dates = this.#OwidLiveSearches[key];
@@ -75,7 +76,7 @@ export class OwidLiveStorage {
         sparkNorm.push(Math.round((v / n) * 1000000.0));
       }
 
-      this.#RefineGrid.push({
+      res.push({
         key: key,
 
         w: tokens[0],
@@ -90,6 +91,8 @@ export class OwidLiveStorage {
         sparkNorm: sparkNorm,
       });
     });
+
+    return res;
   }
 
   NormDates(n) {
@@ -97,25 +100,25 @@ export class OwidLiveStorage {
   }
 
   NormWeeks(n) {
-    return this.calculateGranulation(n, function (x) {
+    return this.calculateGranulation(n, function(x) {
       return x.getYearWeek();
     });
   }
 
   NormMonth(n) {
-    return this.calculateGranulation(n, function (x) {
+    return this.calculateGranulation(n, function(x) {
       return x.getMonth();
     });
   }
 
   NormQuarter(n) {
-    return this.calculateGranulation(n, function (x) {
+    return this.calculateGranulation(n, function(x) {
       return x.getYearQuarter();
     });
   }
 
   NormYear(n) {
-    return this.calculateGranulation(n, function (x) {
+    return this.calculateGranulation(n, function(x) {
       return x.getFullYear();
     });
   }
@@ -125,10 +128,8 @@ export class OwidLiveStorage {
     var res = {};
     dates.forEach((d) => {
       var key = func(d);
-      if (key in res)
-        res[key] += dates[d];
-      else
-        res[key] = dates[d];
+      if (key in res) res[key] += dates[d];
+      else res[key] = dates[d];
     });
     return res;
   }

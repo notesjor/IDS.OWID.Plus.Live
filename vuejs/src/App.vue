@@ -35,7 +35,7 @@
         </v-row>
         <v-row class="text-center">
           <v-col>
-            <MainChart />
+            <VizPanel />
           </v-col>
         </v-row>
         <v-row class="text-center">
@@ -60,7 +60,7 @@
 
 <script>
 import DataGrid from "./components/DataGrid";
-import MainChart from "./components/MainChart";
+import VizPanel from "./components/VizPanel";
 import VizOptions from "./components/VizOptions";
 import Search from "./components/Search";
 import Export from "./components/Export";
@@ -70,7 +70,7 @@ export default {
 
   components: {
     DataGrid,
-    MainChart,
+    VizPanel,
     VizOptions,
     Search,
     Export
