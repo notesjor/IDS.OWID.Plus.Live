@@ -1,4 +1,3 @@
-import * as echarts from "echarts"; // TODO: REMOVE
 import Vue from "vue";
 import Vuex from "vuex";
 import { OwidLiveStorage } from "./OwidLiveStorage";
@@ -13,8 +12,10 @@ export default new Vuex.Store({
     owid: null,
 
     vizOptionRelative: true,
-    vizOptionGranulatioon: 1,
+    vizOptionGranulation: 1,
     vizOptionSmoothing: 7,
+
+    vizData: {},
   },
   mutations: {
     init(state, payload) {
@@ -36,74 +37,47 @@ export default new Vuex.Store({
 
     vizOption(state, payload) {
       state.vizOptionRelative = payload.r;
-      state.vizOptionGranulatioon = payload.g;
+      state.vizOptionGranulation = payload.g;
       state.vizOptionSmoothing = payload.s;
     },
 
     calculate(state) {
-      // nice
-      state.result = state.current; // TODO: Merge mit stored
+      state.vizData = {};
+      var res = {};
+console.log(state.owid);
+      Object.keys(state.owid.OwidLiveSearches).forEach((s) => {
+        var search = state.owid.OwidLiveSearches[s];
 
-      if (state.merge) {
-        var sumSerieTmp = {};
-        state.dates.forEach((x) => (sumSerieTmp[x] = 0.0));
-        state.resultSeries = [sumSerieTmp];
-      } else {
-        state.resultSeries = [];
-      }
+        var subItems = {};
+        Object.keys(search.OwidLiveStorageItems).forEach((i) => {
+          var item = search.OwidLiveStorageItems[i];
+          var sitem;
+          if (state.vizOptionGranulation === 1) sitem = item.Weeks;
+          else if (state.vizOptionGranulation === 2) sitem = item.Month;
+          else if (state.vizOptionGranulation === 3) sitem = item.Quarter;
+          else if (state.vizOptionGranulation === 4) sitem = item.Year;
+          else sitem = item.Dates;
 
-      Object.keys(state.result).forEach(function(key) {
-        var dates = state.result[key];
+          subItems[item.Name] = { name: item.Name, data: sitem, items: null };
+        });
 
-        var norm = state.norm[state.currentN];
-        var spark = [];
-        var sparkNorm = [];
+        if (search.IsSelected) {
+          var sgrp;
+          if (state.vizOptionGranulation === 1) sgrp = search.Weeks;
+          else if (state.vizOptionGranulation === 2) sgrp = search.Month;
+          else if (state.vizOptionGranulation === 3) sgrp = search.Quarter;
+          else if (state.vizOptionGranulation === 4) sgrp = search.Year;
+          else sgrp = search.Dates;
 
-        // easyCal
-        var easyCal = [];
-
-        for (var i in norm) {
-          var n = norm[i];
-          var v = i in dates ? dates[i] : 0;
-          spark.push(v);
-          sparkNorm.push(Math.round((v / n) * 1000000.0));
-
-          // easyCal >>>
-          easyCal.push([
-            i.replace("T00:00:00", ""),
-            Math.round((v / n) * 1000000.0),
-          ]);
-          // <<<
+          res[search.Name] = { name: search.Name, data: sgrp, items: subItems };
+        }else{
+          subItems.forEach(x => {
+            res[x] = subItems[x];
+          });
         }
-
-        // easyFreq >>>
-        state.resultSeries = [
-          {
-            type: "line",
-            data: sparkNorm,
-            symbolSize: 10,
-            line: { marker: { enable: false } },
-            lineStyle: {
-              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                {
-                  offset: 0,
-                  color: "rgba(247, 32, 71)",
-                },
-                {
-                  offset: 0.5,
-                  color: "rgba(255, 210, 0)",
-                },
-                {
-                  offset: 1,
-                  color: "rgba(31, 234, 234)",
-                },
-              ]),
-            },
-          },
-        ];
-        // <<<
-        state.resultCalendar = easyCal; // easyCal
       });
+
+      state.vizData = res;
     },
   },
   actions: {},
