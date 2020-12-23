@@ -44,34 +44,33 @@ export default new Vuex.Store({
     calculate(state) {
       state.vizData = {};
       var res = {};
-console.log(state.owid);
+
       Object.keys(state.owid.OwidLiveSearches).forEach((s) => {
         var search = state.owid.OwidLiveSearches[s];
 
         var subItems = {};
-        Object.keys(search.OwidLiveStorageItems).forEach((i) => {
-          var item = search.OwidLiveStorageItems[i];
+        search.OwidLiveStorageTimeItems.forEach(item => {          
           var sitem;
-          if (state.vizOptionGranulation === 1) sitem = item.Weeks;
+          if (state.vizOptionGranulation === 1) sitem = item.Week;
           else if (state.vizOptionGranulation === 2) sitem = item.Month;
           else if (state.vizOptionGranulation === 3) sitem = item.Quarter;
           else if (state.vizOptionGranulation === 4) sitem = item.Year;
-          else sitem = item.Dates;
+          else sitem = item.Date;
 
           subItems[item.Name] = { name: item.Name, data: sitem, items: null };
         });
 
         if (search.IsSelected) {
           var sgrp;
-          if (state.vizOptionGranulation === 1) sgrp = search.Weeks;
+          if (state.vizOptionGranulation === 1) sgrp = search.Week;
           else if (state.vizOptionGranulation === 2) sgrp = search.Month;
           else if (state.vizOptionGranulation === 3) sgrp = search.Quarter;
           else if (state.vizOptionGranulation === 4) sgrp = search.Year;
-          else sgrp = search.Dates;
+          else sgrp = search.Date;
 
           res[search.Name] = { name: search.Name, data: sgrp, items: subItems };
-        }else{
-          subItems.forEach(x => {
+        } else {
+          subItems.forEach((x) => {
             res[x] = subItems[x];
           });
         }

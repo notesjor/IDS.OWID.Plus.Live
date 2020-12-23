@@ -20,8 +20,8 @@
           <v-slider
             id="granulation"
             v-model="granulationValue"
-            min="1"
-            max="5"
+            min="0"
+            max="4"
             ticks="always"
             :tick-labels="granulationLabels"
             step="1"
@@ -66,7 +66,7 @@ export default {
       name: "world",
       relativeFrequency: true,
       smoothValue: 7,
-      granulationValue: 1,
+      granulationValue: 0,
       granulationLabels: ["Tag", "Woche", "Monat", "Quartal", "Jahr"],
     };
   },

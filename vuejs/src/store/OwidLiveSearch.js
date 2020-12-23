@@ -29,7 +29,6 @@ export class OwidLiveSearch {
       olsti.push(new OwidLiveStorageTimeItem(item, items[item]));
     });
     this.#OwidLiveStorageTimeItems = olsti;
-    console.log(olsti);
 
     this.#IsSelected = true;
   }
@@ -54,11 +53,11 @@ export class OwidLiveSearch {
   get Name() {
     var cnt = 0;
     this.#OwidLiveStorageTimeItems.forEach((i) => {
-      if (this.#OwidLiveStorageTimeItems[i].IsSelected) cnt++;
+      if (i.IsSelected) cnt++;
     });
 
     return (
-      this.#Key + " (" + cnt + " / " + this.#OwidLiveStorageTimeItems.length + ")"
+      this.#Key + " [" + cnt + " / " + this.#OwidLiveStorageTimeItems.length + "]"
     );
   }
 
@@ -98,21 +97,21 @@ export class OwidLiveSearch {
   /**
    * If this.IsSelected than you recived the sum of all sub items (see OwidLiveStorageItems) otherwise null
    */
-  get Dates() {
+  get Date() {
     return this.#IsSelected
       ? this.Sum(function(x) {
-          return x.Dates();
+          return x.Date;
         })
       : null;
   }
 
   /**
-   * If this.IsSelected than you recived the sum of all sub items (see OwidLiveStorageItems) grouped by weeks otherwise null
+   * If this.IsSelected than you recived the sum of all sub items (see OwidLiveStorageItems) grouped by week otherwise null
    */
-  get Weeks() {
+  get Week() {
     return this.#IsSelected
       ? this.Sum(function(x) {
-          return x.Weeks();
+          return x.Week;
         })
       : null;
   }
@@ -123,7 +122,7 @@ export class OwidLiveSearch {
   get Month() {
     return this.#IsSelected
       ? this.Sum(function(x) {
-          return x.Month();
+          return x.Month;
         })
       : null;
   }
@@ -134,7 +133,7 @@ export class OwidLiveSearch {
   get Quarter() {
     return this.#IsSelected
       ? this.Sum(function(x) {
-          return x.Quarter();
+          return x.Quarter;
         })
       : null;
   }
@@ -145,23 +144,24 @@ export class OwidLiveSearch {
   get Year() {
     return this.#IsSelected
       ? this.Sum(function(x) {
-          return x.Year();
+          return x.Year;
         })
       : null;
   }
 
   /**
-   * HELPER-Function: Used by Dates, Weeks, Month, Quarter and Year
+   * HELPER-Function: Used by Dates, Week, Month, Quarter and Year
    * @param  {function} func the functions describes how-to sum up the selected sub items (see OwidLiveStorageItems)
    */
   Sum(func) {
     var res = {};
     this.#OwidLiveStorageTimeItems.forEach((x) => {
-      var items = func(this.#OwidLiveStorageTimeItems[x]);
-      items.forEach((item) => {
-        if (item in res) res[item] += items[item];
-        else res[item] = items[item];
+      var items = func(x);
+      Object.keys(items).forEach(key => {
+        if (key in res) res[key] += items[key];
+        else res[key] = items[key];
       });
     });
+    return res;
   }
 }

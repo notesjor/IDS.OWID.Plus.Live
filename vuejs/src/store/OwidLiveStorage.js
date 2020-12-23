@@ -128,14 +128,14 @@ export class OwidLiveStorage {
   /**
    * @param  {number} n get the norm date values for N(-Gram)
    */
-  NormDates(n) {
+  NormDate(n) {
     return this.#Norm[n];
   }
 
   /**
    * @param  {number} n get the norm weeks values for N(-Gram)
    */
-  NormWeeks(n) {
+  NormWeek(n) {
     return this.calculateGranulation(n, function(x) {
       return x.getYearWeek();
     });

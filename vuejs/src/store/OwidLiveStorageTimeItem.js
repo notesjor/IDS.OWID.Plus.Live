@@ -4,7 +4,7 @@ export class OwidLiveStorageTimeItem {
   #Name;
   #Dates;
   #IsSelected;
-  
+
   /**
    * @param  {string} key the key of the search-result
    * @param  {array} dates all matched dates
@@ -41,7 +41,7 @@ export class OwidLiveStorageTimeItem {
   /**
    * All matched dates
    */
-  get Dates() {
+  get Date() {
     return this.#IsSelected ? this.#Dates : null;
   }
 
@@ -56,18 +56,17 @@ export class OwidLiveStorageTimeItem {
    * @param  {boolean} bool select for visualization?
    */
   set IsSelected(bool) {
-    if (typeof bool === "boolean")
-      this.#IsSelected = bool;
+    if (typeof bool === "boolean") this.#IsSelected = bool;
   }
 
   /**
    * All matched weeks
    */
-  get Weeks() {
+  get Week() {
     return this.#IsSelected
-      ? this.calculateGranulation(function (x) {
-        return x.getYearWeek();
-      })
+      ? this.calculateGranulation(function(x) {
+          return x.getYearWeek();
+        })
       : null;
   }
 
@@ -76,9 +75,9 @@ export class OwidLiveStorageTimeItem {
    */
   get Month() {
     return this.#IsSelected
-      ? this.calculateGranulation(function (x) {
-        return x.getMonth();
-      })
+      ? this.calculateGranulation(function(x) {
+          return x.getFullYear() + "-" + x.getMonth().pad(2);
+        })
       : null;
   }
 
@@ -87,9 +86,9 @@ export class OwidLiveStorageTimeItem {
    */
   get Quarter() {
     return this.#IsSelected
-      ? this.calculateGranulation(function (x) {
-        return x.getYearQuarter();
-      })
+      ? this.calculateGranulation(function(x) {
+          return x.getYearQuarter();
+        })
       : null;
   }
 
@@ -98,9 +97,9 @@ export class OwidLiveStorageTimeItem {
    */
   get Year() {
     return this.#IsSelected
-      ? this.calculateGranulation(function (x) {
-        return x.getFullYear();
-      })
+      ? this.calculateGranulation(function(x) {
+          return x.getFullYear();
+        })
       : null;
   }
 
@@ -109,14 +108,12 @@ export class OwidLiveStorageTimeItem {
    * @param  {function} func the function describes how-to group the dates
    */
   calculateGranulation(func) {
-    var dates = this.Dates();
     var res = {};
-    dates.forEach((d) => {
+    Object.keys(this.#Dates).forEach((k) => {
+      var d = new Date(k);
       var key = func(d);
-      if (key in res)
-        res[key] += dates[d];
-      else
-        res[key] = dates[d];
+      if (key in res) res[key] += this.#Dates[k];
+      else res[key] = this.#Dates[k];
     });
     return res;
   }

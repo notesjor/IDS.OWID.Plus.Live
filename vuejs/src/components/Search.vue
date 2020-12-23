@@ -440,7 +440,7 @@ class queryItem {
 
   toString() {
     return (
-      this.position + ". " + global_layers[this.layer] + " = " + this.token
+      (this.position + 1) + ". " + global_layers[this.layer] + " = " + this.token
     );
   }
 }
