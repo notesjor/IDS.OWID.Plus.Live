@@ -16,8 +16,7 @@ export default {
   computed: {
     update: {
       get() {
-        if (this.$store.state.dates === null) return;
-        if (this.$store.state.resultSeries === null) return;
+        if (this.$store.vizData === null) return;
 
         // CHART
         var chart = document.getElementById("chart");

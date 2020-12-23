@@ -22,8 +22,7 @@ export default {
   computed: {
     update: {
       get() {
-        if (this.$store.state.dates === null) return;
-        if (this.$store.state.resultSeries === null) return;
+        if (this.$store.vizData === null) return;
 
         var calendar = document.getElementById("calendar");
         if (calendar != null) {

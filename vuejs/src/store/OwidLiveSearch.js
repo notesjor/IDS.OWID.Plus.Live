@@ -158,7 +158,10 @@ export class OwidLiveSearch {
     this.#OwidLiveStorageTimeItems.forEach((x) => {
       var items = func(x);
       Object.keys(items).forEach(key => {
-        if (key in res) res[key] += items[key];
+        if (key in res){
+           res[key].value += items[key].value;
+           res[key].dates = new Set([...res[key].dates, ...items[key].dates]);
+        }
         else res[key] = items[key];
       });
     });

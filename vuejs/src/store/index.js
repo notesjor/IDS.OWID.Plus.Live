@@ -12,10 +12,10 @@ export default new Vuex.Store({
     owid: null,
 
     vizOptionRelative: true,
-    vizOptionGranulation: 1,
+    vizOptionGranulation: 0,
     vizOptionSmoothing: 7,
 
-    vizData: {},
+    vizData: null,
   },
   mutations: {
     init(state, payload) {
@@ -49,7 +49,7 @@ export default new Vuex.Store({
         var search = state.owid.OwidLiveSearches[s];
 
         var subItems = {};
-        search.OwidLiveStorageTimeItems.forEach(item => {          
+        search.OwidLiveStorageTimeItems.forEach((item) => {
           var sitem;
           if (state.vizOptionGranulation === 1) sitem = item.Week;
           else if (state.vizOptionGranulation === 2) sitem = item.Month;
@@ -75,6 +75,19 @@ export default new Vuex.Store({
           });
         }
       });
+
+      var sumAll = {};
+      Object.keys(res).forEach((key) => {
+        var item = res[key];
+        Object.keys(item.data).forEach((subKey) => {
+          if (subKey in sumAll) {
+            sumAll[subKey].value += item.data[subKey].value;
+            sumAll[subKey].dates = new Set([...sumAll[subKey].dates, ...item.data[subKey].dates]);
+          }
+          else sumAll[subKey] = item.data[subKey];
+        });
+      });
+      res["ALLE"] = sumAll;
 
       state.vizData = res;
     },

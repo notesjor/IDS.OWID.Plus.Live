@@ -42,7 +42,17 @@ export class OwidLiveStorageTimeItem {
    * All matched dates
    */
   get Date() {
-    return this.#IsSelected ? this.#Dates : null;
+    return this.#IsSelected
+      ? this.calculateGranulation(function(x) {
+          return (
+            x.getFullYear() +
+            "-" +
+            (x.getMonth() + 1).pad(2) +
+            "-" +
+            x.getDate().pad(2)
+          );
+        })
+      : null;
   }
 
   /**
@@ -112,8 +122,15 @@ export class OwidLiveStorageTimeItem {
     Object.keys(this.#Dates).forEach((k) => {
       var d = new Date(k);
       var key = func(d);
-      if (key in res) res[key] += this.#Dates[k];
-      else res[key] = this.#Dates[k];
+      if (key in res) {
+        res[key].value += this.#Dates[k];
+        res[key].dates.add(k);
+      } else {
+        var nset = new Set();
+        nset.add(k);
+
+        res[key] = { dates: nset, value: this.#Dates[k] };
+      }
     });
     return res;
   }
