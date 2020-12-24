@@ -38,7 +38,7 @@ export class OwidLiveStorage {
    */
   addOwidLiveSearchItem(n, request, items) {
     var x = new OwidLiveSearch(n, request, items);
-    this.#OwidLiveSearches[n.Key] = x;
+    this.#OwidLiveSearches[x.Key] = x;
   }
 
   /**

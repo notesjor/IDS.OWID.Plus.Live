@@ -27,7 +27,7 @@ export default new Vuex.Store({
     },
 
     search(state, { n, queryItems, items }) {
-      state.owid.addOwidLiveSearchItem(n, queryItems, items);
+      state.owid.addOwidLiveSearchItem(n, queryItems, items);      
     },
 
     store(state) {
