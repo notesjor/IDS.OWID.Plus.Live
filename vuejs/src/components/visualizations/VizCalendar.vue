@@ -1,9 +1,5 @@
 <template>
-  <div
-    id="calendar"
-    style="width: 110%; height: 68vh;"
-  >
-  </div>
+  <div id="calendar" style="width: 100%; height: 68vh;"></div>
 </template>
 
 <script>
@@ -53,6 +49,13 @@ export default {
           {
             range: "2020",
             cellSize: ["auto", 20],
+            dayLabel: {
+              firstDay: 1,
+              nameMap: ["So.", "Mo.", "Di.", "Mi.", "Do.", "Fr.", "Sa."],
+            },
+            monthLabel: {
+              nameMap: ["JAN", "FEB", "MÄR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEZ"],
+            },
           },
         ],
         series: [
