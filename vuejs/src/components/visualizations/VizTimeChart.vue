@@ -1,8 +1,5 @@
 <template>
-  <div
-    id="chart"
-    style="width: 110%; height: 68vh; margin: -50px 0px 0px -40px"
-  >
+  <div id="timechart" style="width: 110%; height: 68vh; margin:-20px 0px 0px -50px">
     {{ update }}
   </div>
 </template>
@@ -13,19 +10,30 @@ import * as echarts from "echarts";
 export default {
   name: "VizTimeChart",
   theme: { dark: false },
+  data() {
+    return {
+      component: null,
+    };
+  },
+  mounted() {
+    var component = document.getElementById("timechart");
+    if (component != null) {
+      try {
+        this.$data.component = echarts.init(component);
+      } catch {
+        // ignore
+      }
+    }
+
+    this.$store.commit("updateViewport", {
+      w: component.clientWidth,
+      h: component.clientHeight,
+    });
+  },
   computed: {
     update: {
       get() {
         if (this.$store.state.vizData === null) return;
-        
-        var chart = document.getElementById("chart");
-        if (chart != null) {
-          try {
-            var myChart = echarts.init(chart);
-          } catch {
-            // ignore
-          }
-        }
 
         var categories = new Set();
 
@@ -41,7 +49,7 @@ export default {
           const data = this.$store.state.vizData[key];
 
           var values = [];
-          categories.forEach(c => {
+          categories.forEach((c) => {
             values.push(c in data.data ? data.data[c] : 0);
           });
 
@@ -97,7 +105,7 @@ export default {
             },
           },
         };
-        myChart.setOption(myChartOption);
+        this.$data.component.setOption(myChartOption);
 
         return "";
       },

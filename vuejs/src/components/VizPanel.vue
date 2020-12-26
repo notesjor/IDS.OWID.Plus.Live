@@ -40,21 +40,21 @@
         </v-col>
       </v-row>
     </v-tab-item>
-    <v-tab-item>
+    <v-tab-item :eager="true">
       <v-row>
         <v-col>
           <VizBoxplot></VizBoxplot>
         </v-col>
       </v-row>
     </v-tab-item>
-    <v-tab-item>
+    <v-tab-item :eager="true">
       <v-row>
         <v-col>
           <VizSankey></VizSankey>
         </v-col>
       </v-row>
     </v-tab-item>
-    <v-tab-item>
+    <v-tab-item :eager="true">
       <v-row>
         <v-col>
           <VizBubble></VizBubble>
@@ -79,7 +79,7 @@ export default {
     VizCalendar,
     VizBoxplot,
     VizSankey,
-    VizBubble
-  } 
+    VizBubble,
+  },
 };
 </script>

@@ -1,13 +1,21 @@
 <template>
-  <div id="calendar" style="width: 100%; height: 68vh;">
+  <div
+    id="ecalendar"
+    v-bind:style="
+      'margin-left: -20px; min-width:' +
+        this.$store.state.vizViewportWidth +
+        'px; min-height:' +
+        this.$store.state.vizViewportHeight +
+        'px'
+    "
+  >
     {{ update }}
   </div>
 </template>
 
 <script>
 import * as echarts from "echarts";
-
-var myCalendar;
+var ecalendar;
 
 export default {
   name: "VizCalendar",
@@ -16,16 +24,14 @@ export default {
     update: {
       get() {
         if (this.$store.state.vizData === null) return;
-
-        var calendar = document.getElementById("calendar");
-        if (calendar != null) {
-          try {
-            myCalendar = echarts.init(calendar);
-          } catch {
-            // ignore
-          }
+        var component = document.getElementById("ecalendar");
+        if (component === null) return;
+        try {
+          ecalendar = echarts.init(component);
+        } catch {
+          // ignore
         }
-
+console.log(ecalendar);
         var all = this.$store.state.vizData["ALLE"];
         var res = [];
 
@@ -87,26 +93,10 @@ export default {
             },
           ],
         };
-        myCalendar.setOption(myCalendarOption);
-
+        ecalendar.setOption(myCalendarOption);
         return "";
       },
     },
-  },
-  updated() {
-    var calendar = document.getElementById("calendar");
-    if (calendar === null) {
-      this.$forceUpdate();
-      calendar = document.getElementById("calendar");
-    }
-    console.log(calendar);
-    if (calendar != null) {
-      try {
-        myCalendar = echarts.init(calendar);
-      } catch {
-        // ignore
-      }
-    }
   },
 };
 </script>

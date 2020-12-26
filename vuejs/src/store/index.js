@@ -15,11 +15,19 @@ export default new Vuex.Store({
     vizOptionGranulation: 0,
     vizOptionSmoothing: 7,
 
+    vizViewportWidth: 1200,
+    vizViewportHeight: 500,
+
     vizData: null,
   },
   mutations: {
     init(state, payload) {
       state.owid = new OwidLiveStorage(payload);
+    },
+
+    updateViewport(state, {w, h}){
+      state.vizViewportWidth = w / 110 * 100;
+      state.vizViewportHeight = h;
     },
 
     updateStatus(state, status) {
