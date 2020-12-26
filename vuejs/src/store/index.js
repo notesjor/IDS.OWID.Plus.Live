@@ -79,7 +79,7 @@ export default new Vuex.Store({
           res[search.Name] = { name: search.Name, data: sgrp, items: subItems };
         } else {
           subItems.forEach((x) => {
-            res[x] = subItems[x];
+            res[x] = {name: subItems[x].name, data: subItems[x].data, items: [subItems[x]]};
           });
         }
       });

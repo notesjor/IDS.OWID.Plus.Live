@@ -12,7 +12,7 @@ export class OwidLiveStorageTimeItem {
   constructor(key, dates) {
     this.#Key = key;
     this.#Token = key.split("µ");
-    this.#Name = this.#Token.join(" ");
+    this.#Name = key.split("µ")[0];
     this.#Dates = dates;
     this.#IsSelected = true;
   }

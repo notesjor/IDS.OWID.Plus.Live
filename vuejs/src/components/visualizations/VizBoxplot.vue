@@ -1,6 +1,6 @@
 <template>
   <div
-    id="chart"
+    id="boxplot"
     style="width: 110%; height: 68vh; margin: -50px 0px 0px -40px"
   >
     {{ update }}

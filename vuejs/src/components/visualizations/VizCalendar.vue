@@ -31,7 +31,7 @@ export default {
         } catch {
           // ignore
         }
-console.log(ecalendar);
+        
         var all = this.$store.state.vizData["ALLE"];
         var res = [];
 
