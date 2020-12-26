@@ -18,7 +18,8 @@ export class OwidLiveStorage {
       dates.push({ key });
       sum += norm[0][key];
     });
-    this.#Dates = dates;
+    
+    this.#Dates = dates.sort();
     this.#Total = sum;
     this.#OwidLiveSearches = {};
   }
