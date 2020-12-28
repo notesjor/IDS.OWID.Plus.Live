@@ -15,6 +15,7 @@
         mdi-view-dashboard-variant
       </v-icon>
     </v-tab>
+    <!--
     <v-tab>
       <v-icon left>
         mdi-distribute-vertical-center
@@ -25,6 +26,7 @@
         mdi-chart-bubble
       </v-icon>
     </v-tab>
+    -->
 
     <v-tab-item>
       <v-row>
@@ -47,6 +49,7 @@
         </v-col>
       </v-row>
     </v-tab-item>
+    <!--
     <v-tab-item>
       <v-row>
         <v-col>
@@ -61,15 +64,16 @@
         </v-col>
       </v-row>
     </v-tab-item>
+    -->
   </v-tabs>
 </template>
 
 <script>
 import VizTimeChart from "./visualizations/VizTimeChart";
 import VizCalendar from "./visualizations/VizCalendar";
-import VizBoxplot from "./visualizations/VizBoxplot";
 import VizSankey from "./visualizations/VizSankey";
-import VizBubble from "./visualizations/VizBubble";
+//import VizBoxplot from "./visualizations/VizBoxplot";
+//import VizBubble from "./visualizations/VizBubble";
 
 export default {
   name: "VizPanel",
@@ -77,9 +81,9 @@ export default {
   components: {
     VizTimeChart,
     VizCalendar,
-    VizBoxplot,
     VizSankey,
-    VizBubble,
+    //VizBoxplot,    
+    //VizBubble,
   },
 };
 </script>
