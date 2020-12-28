@@ -95,6 +95,8 @@ export default {
       res.push({label: "test1", grid:[{w:"w",l:"l",p:"p",d:5,dRel:1,s:5,sRel:1,spark:[],sparkNorm:[]}]});
       res.push({label: "test2", grid:[]});
 
+      console.log(this.$store.state.vizData);
+
       return res;
     },
   },

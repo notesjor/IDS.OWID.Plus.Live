@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar app dark>
+    <v-app-bar app dark class="d-print-none">
       <div class="d-flex align-center">
         <v-img
           alt="Vuetify Logo"
@@ -12,6 +12,18 @@
         />
       </div>
 
+      <v-spacer></v-spacer>
+      <a>
+      <div style="min-width:350px">
+        <v-icon style="font-size:48px; float:left; margin-right:5px">mdi-help-circle-outline</v-icon>
+        <div class="d-none d-sm-flex">
+        <span style="font-size:14px; line-height:1; font-weight:200; margin-top:10px; color:white">
+          <p><strong>Schnelle Hilfe</strong><br/>
+          Tutorial / Dokumentation / Tipps&amp;Tricks anzeigen</p>
+        </span>
+        </div>
+      </div>
+      </a>
       <v-spacer></v-spacer>
 
       <div class="d-flex align-center">
@@ -64,7 +76,7 @@ import VizPanel from "./components/VizPanel";
 import VizOptions from "./components/VizOptions";
 import Search from "./components/Search";
 import Export from "./components/Export";
-import Clipboard from './components/Clipboard.vue';
+import Clipboard from "./components/Clipboard.vue";
 
 export default {
   name: "App",
@@ -75,7 +87,7 @@ export default {
     VizOptions,
     Search,
     Export,
-    Clipboard
+    Clipboard,
   },
 
   data: () => ({

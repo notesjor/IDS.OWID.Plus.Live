@@ -4,7 +4,7 @@
       <div>
         <v-icon>mdi-export</v-icon
         ><span style="margin-left:10px; font-size:15px"
-          >EXPORT: Analyse-Daten für Weiterverarbeitung exportieren</span
+          >EXPORT: Visualisierung &amp; Daten für Weiterverarbeitung exportieren</span
         >
       </div>
     </v-card-title>

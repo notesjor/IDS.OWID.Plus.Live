@@ -18,7 +18,7 @@ export class OwidLiveSearch {
 
     var key = "(N = " + n.toString() + "): ";
     request.forEach((x) => {
-      key += x.toString();
+      key += x.toString() + " ";
     });
     this.#Key = key.trim();
 
