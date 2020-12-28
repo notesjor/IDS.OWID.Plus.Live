@@ -45,7 +45,7 @@
         </v-row>
         <v-row class="text-center">
           <v-col>
-            <DataGrid />
+            <Clipboard />
           </v-col>
         </v-row>
         <v-row class="text-center">
@@ -59,21 +59,23 @@
 </template>
 
 <script>
-import DataGrid from "./components/DataGrid";
+//import DataGrid from "./components/DataGrid";
 import VizPanel from "./components/VizPanel";
 import VizOptions from "./components/VizOptions";
 import Search from "./components/Search";
 import Export from "./components/Export";
+import Clipboard from './components/Clipboard.vue';
 
 export default {
   name: "App",
 
   components: {
-    DataGrid,
+    //DataGrid,
     VizPanel,
     VizOptions,
     Search,
-    Export
+    Export,
+    Clipboard
   },
 
   data: () => ({

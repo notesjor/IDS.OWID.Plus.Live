@@ -1,5 +1,5 @@
 <template>
-  <v-tabs vertical>
+  <v-tabs vertical @change="tabChange">
     <v-tab>
       <v-icon left>
         mdi-chart-line
@@ -85,5 +85,10 @@ export default {
     //VizBoxplot,    
     //VizBubble,
   },
+  methods:{
+    tabChange: function(){
+      this.$forceUpdate();
+    }
+  }
 };
 </script>

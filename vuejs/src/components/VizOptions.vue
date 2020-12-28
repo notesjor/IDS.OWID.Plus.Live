@@ -1,8 +1,16 @@
 <template>
   <v-card style="pagging-bottom:-15px">
+    <v-card-title>
+      <div>
+        <v-icon>mdi-eye-outline</v-icon
+        ><span style="margin-left:10px; font-size:15px"
+          >ANPASSEN: Einstellungen für Visualisierung ändern</span
+        >
+      </div>
+    </v-card-title>
     <v-container>
       <v-row>
-        <v-col class="d-flex justify-left" style="margin-top:-15px;">
+        <v-col class="d-flex justify-left" style="margin-top:-30px; margin-bottom:10px">
           <v-switch
             v-model="relativeFrequency"
             label="Relative Frequenz"

@@ -1,7 +1,12 @@
 <template>
   <v-card>
     <v-card-title>
-      Export
+      <div>
+        <v-icon>mdi-export</v-icon
+        ><span style="margin-left:10px; font-size:15px"
+          >EXPORT: Analyse-Daten für Weiterverarbeitung exportieren</span
+        >
+      </div>
     </v-card-title>
     <v-card-text style="text-align:left;">
       <v-btn>CSV</v-btn>

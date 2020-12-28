@@ -72,6 +72,7 @@ export default {
         console.log(links);
 
         var sankeyOptions = {
+          animation: false,
           tooltip: {
             trigger: "item",
             triggerOn: "mousemove",
