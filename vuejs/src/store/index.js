@@ -10,6 +10,7 @@ export default new Vuex.Store({
     status: "init",
 
     owid: null,
+    N: 0,
 
     vizOptionRelative: true,
     vizOptionGranulation: 0,
@@ -28,6 +29,10 @@ export default new Vuex.Store({
     updateViewport(state, {w, h}){
       state.vizViewportWidth = w / 110 * 100;
       state.vizViewportHeight = h;
+    },
+
+    updateN(state, N) {
+      state.N = N;
     },
 
     updateStatus(state, status) {

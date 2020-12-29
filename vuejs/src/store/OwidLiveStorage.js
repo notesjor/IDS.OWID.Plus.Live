@@ -18,7 +18,7 @@ export class OwidLiveStorage {
       dates.push({ key });
       sum += norm[0][key];
     });
-    
+
     this.#Dates = dates.sort();
     this.#Total = sum;
     this.#OwidLiveSearches = {};
@@ -75,49 +75,55 @@ export class OwidLiveStorage {
    */
   GetSearchHistory(n) {
     var res = [];
-    this.#OwidLiveSearches.forEach((key) => {
+    if (Object.keys(this.#OwidLiveSearches).length == 0) return res;
+
+    Object.keys(this.#OwidLiveSearches).forEach((key) => {
       var current = this.#OwidLiveSearches[key];
-      if (current.N === n) res.push(current);
+      if (current.N === (n + 1)) res.push(key);
     });
+
     return res;
   }
 
   /**
    * @param  {string} key Get the specific table of the search (history) entry. Used by components/Clipboard
    */
-  GetSearchHistoryItem(key) {
+  GetSearchHistoryItem(key, N) {
     var data = this.#OwidLiveSearches[key];
+    var dates = this.Dates;    
+    var normd = this.Norm;
+    var total = this.Total;
 
     var res = [];
-    Object.keys(data.OwidLiveStorageItems).forEach(function(key) {
-      var tokens = key.split("µ");
+    data.OwidLiveStorageTimeItems.forEach(function(item) {
+      var tokens = item.Key.split("µ");
 
-      var dates = this.#OwidLiveSearches[key];
-      var norm = this.NormDates;
-
-      var d = Object.keys(dates).length;
-      var s = Object.values(dates).reduce((a, b) => a + b);
+      var d = Object.keys(item.Date).length;
+      var s = 0;
+      Object.keys(item.Date).forEach(key=>{
+        s += item.Date[key].value;
+      });
 
       var spark = [];
       var sparkNorm = [];
-      for (var i in norm) {
-        var n = norm[i];
-        var v = i in dates ? dates[i] : 0;
+      for (var i in normd[N]) {
+        console.log(i);
+        var v = i in item.Date ? item.Date[i] : 0;
         spark.push(v);
-        sparkNorm.push(Math.round((v / n) * 1000000.0));
+        sparkNorm.push(Math.round((v / normd[N][i]) * 1000000.0));
       }
-
+console.log(item.Date);
       res.push({
-        key: key,
+        key: item.Key,
 
         w: tokens[0],
         l: tokens[1],
         p: tokens[2],
 
         d: d,
-        dRel: ((d / this.Dates.length) * 100.0).toFixed(2),
+        dRel: ((d / dates.length) * 100.0).toFixed(2),
         s: s,
-        sRel: (s / this.NormTotal).toFixed(2),
+        sRel: ((s / total) * 1000000.0).toFixed(2),
         spark: spark,
         sparkNorm: sparkNorm,
       });

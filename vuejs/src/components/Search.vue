@@ -503,9 +503,11 @@ export default {
   methods: {
     search_simple_n_change: function(n) {
       this.$data.search_simple_n = n;
+      this.$store.commit("updateN", n);
     },
     search_complex_n_change: function(n) {
       this.$data.search_complex_n = n;
+      this.$store.commit("updateN", n);
     },
     search_simple: function() {
       var queryItems = [
@@ -592,47 +594,47 @@ export default {
           new queryItem(
             "Wort",
             0,
-            document.getElementById("search_comple_3_1_w").value
+            document.getElementById("search_complex_3_1_w").value
           ),
           new queryItem(
             "Lemma",
             0,
-            document.getElementById("search_comple_3_1_l").value
+            document.getElementById("search_complex_3_1_l").value
           ),
           new queryItem(
             "Wort",
             0,
-            document.getElementById("search_comple_3_1_p").value
+            document.getElementById("search_complex_3_1_p").value
           ),
           new queryItem(
             "Wort",
             0,
-            document.getElementById("search_comple_3_2_w").value
+            document.getElementById("search_complex_3_2_w").value
           ),
           new queryItem(
             "Lemma",
             0,
-            document.getElementById("search_comple_3_2_l").value
+            document.getElementById("search_complex_3_2_l").value
           ),
           new queryItem(
             "Wort",
             0,
-            document.getElementById("search_comple_3_2_p").value
+            document.getElementById("search_complex_3_2_p").value
           ),
           new queryItem(
             "Wort",
             0,
-            document.getElementById("search_comple_3_3_w").value
+            document.getElementById("search_complex_3_3_w").value
           ),
           new queryItem(
             "Lemma",
             0,
-            document.getElementById("search_comple_3_3_l").value
+            document.getElementById("search_complex_3_3_l").value
           ),
           new queryItem(
             "Wort",
             0,
-            document.getElementById("search_comple_3_3_p").value
+            document.getElementById("search_complex_3_3_p").value
           ),
         ];
       }
