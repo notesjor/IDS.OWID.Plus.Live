@@ -8,15 +8,21 @@
         >
       </div>
     </v-card-title>
-    <v-expansion-panels accordion>
-      <v-expansion-panel v-for="i in entries" :key="i">
-        <v-expansion-panel-header>{{ i.label }}</v-expansion-panel-header>
+    <v-expansion-panels multiple>
+      <v-expansion-panel v-for="i in entries" :key="i.label">
+        <v-expansion-panel-header
+          ><v-checkbox
+            :value="i.checked"
+            :label="i.label"
+            style="max-height:10px; margin-top:-10px; margin-bottom:10px"
+          ></v-checkbox
+        ></v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-data-table
             :headers="headers"
             :items="i.grid"
             :search="search"
-            :single-select="true"
+            :single-select="false"
             v-model="selected"
             item-key="key"
             mutli-sort
@@ -81,25 +87,37 @@ export default {
         { text: "Frequenzkurve", value: "spark" },
         { text: "Frequenzkurve (rel.)", value: "sparkNorm" },
       ],
+      entries: [],
     };
   },
 
-  computed: {
-    entries: function() {
-      if (this.$store.state.owid === null) return;
+  created() {
+    this.$store.watch(
+      () => {
+        return this.$store.state.version;
+      },
+      () => {
+        if (this.$store.state.owid === null) return;
 
-      var res = [];
-      this.$store.state.owid
-        .GetSearchHistory(this.$store.state.N)
-        .forEach((key) => {
-          res.push({
-            label: key,
-            grid: this.$store.state.owid.GetSearchHistoryItem(key, this.$store.state.N),
+        var res = [];
+        this.$store.state.owid
+          .GetSearchHistory(this.$store.state.N)
+          .forEach((key) => {
+            res.push({
+              label: key,
+              grid: this.$store.state.owid.GetSearchHistoryItem(
+                key,
+                this.$store.state.N
+              ),
+            });
           });
-        });
-console.log("1");
-      return res;
-    },
+
+        this._data.entries = res;
+      },
+      {
+        deep: true,
+      }
+    );
   },
 };
 </script>

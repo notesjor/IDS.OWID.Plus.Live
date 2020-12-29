@@ -10,7 +10,7 @@ export default new Vuex.Store({
     status: "init",
 
     owid: null,
-    N: 0,
+    version: 0,
 
     vizOptionRelative: true,
     vizOptionGranulation: 0,
@@ -24,15 +24,18 @@ export default new Vuex.Store({
   mutations: {
     init(state, payload) {
       state.owid = new OwidLiveStorage(payload);
+      state.version++;
     },
 
-    updateViewport(state, {w, h}){
-      state.vizViewportWidth = w / 110 * 100;
+    updateViewport(state, { w, h }) {
+      state.vizViewportWidth = (w / 110) * 100;
       state.vizViewportHeight = h;
+      state.version++;
     },
 
     updateN(state, N) {
-      state.N = N;
+      state.owid.N = N;
+      state.version++;
     },
 
     updateStatus(state, status) {
@@ -40,18 +43,15 @@ export default new Vuex.Store({
     },
 
     search(state, { n, queryItems, items }) {
-      state.owid.addOwidLiveSearchItem(n, queryItems, items);      
-    },
-
-    store(state) {
-      if (state.stored == null) state.stored = [state.current];
-      else state.stored.push(state.current);
+      state.owid.addOwidLiveSearchItem(n, queryItems, items);
+      state.version++;
     },
 
     vizOption(state, payload) {
       state.vizOptionRelative = payload.r;
       state.vizOptionGranulation = payload.g;
       state.vizOptionSmoothing = payload.s;
+      state.version++;
     },
 
     calculate(state) {
@@ -64,27 +64,55 @@ export default new Vuex.Store({
         var subItems = {};
         search.OwidLiveStorageTimeItems.forEach((item) => {
           var sitem;
-          if (state.vizOptionGranulation === 1) sitem = item.Week;
-          else if (state.vizOptionGranulation === 2) sitem = item.Month;
-          else if (state.vizOptionGranulation === 3) sitem = item.Quarter;
-          else if (state.vizOptionGranulation === 4) sitem = item.Year;
-          else sitem = item.Date;
+          switch (state.vizOptionGranulation) {
+            case 1:
+              sitem = item.Week;
+              break;
+            case 2:
+              sitem = item.Month;
+              break;
+            case 3:
+              sitem = item.Quarter;
+              break;
+            case 4:
+              sitem = item.Year;
+              break;
+            default:
+              sitem = item.Date;
+              break;
+          }
 
           subItems[item.Name] = { name: item.Name, data: sitem, items: null };
         });
 
         if (search.IsSelected) {
           var sgrp;
-          if (state.vizOptionGranulation === 1) sgrp = search.Week;
-          else if (state.vizOptionGranulation === 2) sgrp = search.Month;
-          else if (state.vizOptionGranulation === 3) sgrp = search.Quarter;
-          else if (state.vizOptionGranulation === 4) sgrp = search.Year;
-          else sgrp = search.Date;
+          switch (state.vizOptionGranulation) {
+            case 1:
+              sgrp = search.Week;
+              break;
+            case 2:
+              sgrp = search.Month;
+              break;
+            case 3:
+              sgrp = search.Quarter;
+              break;
+            case 4:
+              sgrp = search.Year;
+              break;
+            default:
+              sgrp = search.Date;
+              break;
+          }
 
           res[search.Name] = { name: search.Name, data: sgrp, items: subItems };
         } else {
           subItems.forEach((x) => {
-            res[x] = {name: subItems[x].name, data: subItems[x].data, items: [subItems[x]]};
+            res[x] = {
+              name: subItems[x].name,
+              data: subItems[x].data,
+              items: [subItems[x]],
+            };
           });
         }
       });
@@ -95,14 +123,17 @@ export default new Vuex.Store({
         Object.keys(item.data).forEach((subKey) => {
           if (subKey in sumAll) {
             sumAll[subKey].value += item.data[subKey].value;
-            sumAll[subKey].dates = new Set([...sumAll[subKey].dates, ...item.data[subKey].dates]);
-          }
-          else sumAll[subKey] = item.data[subKey];
+            sumAll[subKey].dates = new Set([
+              ...sumAll[subKey].dates,
+              ...item.data[subKey].dates,
+            ]);
+          } else sumAll[subKey] = item.data[subKey];
         });
       });
       res["ALLE"] = sumAll;
 
       state.vizData = res;
+      state.version++;
     },
   },
   actions: {},

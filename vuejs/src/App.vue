@@ -67,6 +67,14 @@
         </v-row>
       </v-container>
     </v-main>
+
+    <v-overlay :value="overlay">
+      <v-progress-circular
+        indeterminate
+        size="64"
+      ></v-progress-circular>
+      <h3 style="margin-left:-25px;margin-top:10px">Bitte warten...</h3>
+    </v-overlay>
   </v-app>
 </template>
 
@@ -91,7 +99,7 @@ export default {
   },
 
   data: () => ({
-    //
+    overlay: false
   }),
 
   mounted() {
@@ -106,6 +114,20 @@ export default {
 
     xhr.open("GET", this.$store.state.baseUrl + "/norm");
     xhr.send(this.$store);
+  },
+
+  created() {
+    this.$store.watch(
+      () => {
+        return this.$store.state.status;
+      },
+      (status) => {
+        this._data.overlay = status === "pending";
+      },
+      {
+        deep: true,
+      }
+    );
   },
 };
 </script>

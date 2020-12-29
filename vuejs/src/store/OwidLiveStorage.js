@@ -6,6 +6,7 @@ export class OwidLiveStorage {
   #Norm;
   #Dates;
   #Total;
+  #N;
 
   /**
    * @param  {array} norm array from GET: owidAPI/norm
@@ -22,6 +23,7 @@ export class OwidLiveStorage {
     this.#Dates = dates.sort();
     this.#Total = sum;
     this.#OwidLiveSearches = {};
+    this.#N =0;
   }
 
   /**
@@ -50,6 +52,20 @@ export class OwidLiveStorage {
   }
 
   /**
+   * Return the current N(-gram)
+   */
+  get N(){
+    return this.#N;
+  }
+
+  /**
+   * @param  {number} n set the current N(-gram)
+   */
+  set N(n){
+    this.#N = n;
+  }
+
+  /**
    * Return all available dates
    */
   get Dates() {
@@ -71,15 +87,15 @@ export class OwidLiveStorage {
   }
 
   /**
-   * @param  {number} n Get the search history for N(-Gram). Used by components/Clipboard
+   * Get the search history for N(-Gram). Used by components/Clipboard
    */
-  GetSearchHistory(n) {
+  GetSearchHistory() {
     var res = [];
     if (Object.keys(this.#OwidLiveSearches).length == 0) return res;
 
     Object.keys(this.#OwidLiveSearches).forEach((key) => {
       var current = this.#OwidLiveSearches[key];
-      if (current.N === (n + 1)) res.push(key);
+      if (current.N === (this.#N + 1)) res.push(key);
     });
 
     return res;
@@ -87,12 +103,30 @@ export class OwidLiveStorage {
 
   /**
    * @param  {string} key Get the specific table of the search (history) entry. Used by components/Clipboard
+   * @param  {number} granulation Set the granulation for calculation (0=day, 1=week, 2=month, 3=quarter, 4=year)
    */
-  GetSearchHistoryItem(key, N) {
+  GetSearchHistoryItem(key, granulation) {
     var data = this.#OwidLiveSearches[key];
-    var dates = this.Dates;    
-    var normd = this.Norm;
-    var total = this.Total;
+    var dates = this.#Dates;    
+    var total = this.#Total;
+    var normd = null; 
+    switch (granulation) {
+      case 1:
+        normd = this.NormWeek;
+        break;
+      case 2:
+        normd = this.NormMonth;
+        break;
+      case 3:
+        normd = this.NormQuarter;
+        break;
+      case 4:
+        normd = this.NormYear;
+        break;
+      default:
+        normd = this.NormDate;
+        break;
+    }
 
     var res = [];
     data.OwidLiveStorageTimeItems.forEach(function(item) {
@@ -106,13 +140,12 @@ export class OwidLiveStorage {
 
       var spark = [];
       var sparkNorm = [];
-      for (var i in normd[N]) {
-        console.log(i);
+      for (var i in normd) {
         var v = i in item.Date ? item.Date[i] : 0;
         spark.push(v);
-        sparkNorm.push(Math.round((v / normd[N][i]) * 1000000.0));
+        sparkNorm.push(Math.round((v / normd[i]) * 1000000.0));
       }
-console.log(item.Date);
+
       res.push({
         key: item.Key,
 
@@ -133,58 +166,65 @@ console.log(item.Date);
   }
 
   /**
-   * @param  {number} n get the norm date values for N(-Gram)
+   * get the norm date values for N(-Gram)
    */
-  NormDate(n) {
-    return this.#Norm[n];
+  get NormDate() {
+    return this.calculateGranulation(function(x) {
+      return (
+        x.getFullYear() +
+        "-" +
+        (x.getMonth() + 1).pad(2) +
+        "-" +
+        x.getDate().pad(2)
+      );
+    });
   }
 
   /**
-   * @param  {number} n get the norm weeks values for N(-Gram)
+   * get the norm weeks values for N(-Gram)
    */
-  NormWeek(n) {
-    return this.calculateGranulation(n, function(x) {
+  get NormWeek() {
+    return this.calculateGranulation(function(x) {
       return x.getYearWeek();
     });
   }
 
   /**
-   * @param  {number} n get the norm month values for N(-Gram)
+   * get the norm month values for N(-Gram)
    */
-  NormMonth(n) {
-    return this.calculateGranulation(n, function(x) {
-      return x.getMonth();
+  get NormMonth() {
+    return this.calculateGranulation(function(x) {
+      return x.getFullYear() + "-" + x.getMonth().pad(2);
     });
   }
 
   /**
-   * @param  {number} n get the norm quarters values for N(-Gram)
+   * get the norm quarters values for N(-Gram)
    */
-  NormQuarter(n) {
-    return this.calculateGranulation(n, function(x) {
+  get NormQuarter() {
+    return this.calculateGranulation(function(x) {
       return x.getYearQuarter();
     });
   }
 
   /**
-   * @param  {number} n get the norm years values for N(-Gram)
+   * get the norm years values for N(-Gram)
    */
-  NormYear(n) {
-    return this.calculateGranulation(n, function(x) {
+  get NormYear() {
+    return this.calculateGranulation(function(x) {
       return x.getFullYear();
     });
   }
 
   /**
    * HELPER-Function: Used by NormDate, NormWeek, NormMonth, NormQuarter and NormYear (see above)
-   * @param  {number} n N(-Gram)
    * @param  {function} func the functions needs to describe how-to find the dateTime-Key
    */
-  calculateGranulation(n, func) {
-    var dates = this.#Norm[n];
+  calculateGranulation(func) {
+    var dates = this.#Norm[this.#N];
     var res = {};
-    dates.forEach((d) => {
-      var key = func(d);
+    Object.keys(dates).forEach((d) => {
+      var key = func(new Date(d));
       if (key in res) res[key] += dates[d];
       else res[key] = dates[d];
     });
