@@ -13,7 +13,8 @@
     "echarts": "^5.0.0",
     "vue": "^2.6.11",
     "vuetify": "^2.4.0",
-    "vuex": "^3.6.0"
+    "vuex": "^3.6.0",
+    "highlight.js": ">=10.4.1"
   },
   "devDependencies": {
     "@mdi/font": "^5.8.55",
