@@ -105,13 +105,14 @@ export default {
           .forEach((key) => {
             res.push({
               label: key,
+              checked: this.$store.state.owid.OwidLiveSearches[key].IsSelected,
               grid: this.$store.state.owid.GetSearchHistoryItem(
                 key,
                 this.$store.state.N
               ),
             });
           });
-
+          
         this._data.entries = res;
       },
       {

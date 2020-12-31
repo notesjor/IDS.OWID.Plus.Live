@@ -1,5 +1,5 @@
 <template>
-  <div id="timechart" style="width: 110%; height: 68vh; margin:-20px 0px 0px -50px">
+  <div id="timechart" style="width: 110%; height: 68vh; margin:-20px 0px 0px -20px">
     {{ update }}
   </div>
 </template>
@@ -35,13 +35,13 @@ export default {
       get() {
         if (this.$store.state.vizData === null) return;
 
-        var categories = new Set();
+        var availableDates = new Set();
 
-        Object.keys(this.$store.state.vizData["ALLE"]).forEach((key) => {
-          categories.add(key);
+        Object.keys(this.$store.state.vizData["ALLE"].data).forEach((key) => {
+          availableDates.add(key);
         });
-        categories = Array.from(categories);
-        categories.sort();
+        availableDates = Array.from(availableDates);
+        availableDates.sort();
 
         var series = [];
         for (const key in this.$store.state.vizData) {
@@ -49,7 +49,7 @@ export default {
           const data = this.$store.state.vizData[key];
 
           var values = [];
-          categories.forEach((c) => {
+          availableDates.forEach((c) => {
             values.push(c in data.data ? data.data[c] : 0);
           });
 
@@ -81,7 +81,7 @@ export default {
         let myChartOption = {
           xAxis: {
             type: "category",
-            data: categories,
+            data: availableDates,
           },
           yAxis: {
             type: "value",

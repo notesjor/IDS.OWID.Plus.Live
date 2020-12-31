@@ -35,8 +35,8 @@ export default {
         var all = this.$store.state.vizData["ALLE"];
         var res = [];
 
-        Object.keys(all).forEach((k) => {
-          var entry = all[k];
+        Object.keys(all.data).forEach((k) => {
+          var entry = all.data[k];
           var dates = Array.from(entry.dates).sort();
           dates.forEach((d) => {
             res.push([d.substring(0, 10), entry.value]);

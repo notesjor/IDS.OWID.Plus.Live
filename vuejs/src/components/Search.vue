@@ -432,15 +432,31 @@ class queryItem {
   position;
   token;
 
-  constructor(layer, position, token) {
+  constructor(layer, position, element, upperCase) {
     this.layer = layer;
     this.position = position;
-    this.token = token;
+
+    if (typeof element === "string")
+      this.token = upperCase
+        ? element.toUpperCase()
+        : element.toLowerCase();
+    else {
+      element.value = upperCase
+        ? element.value.toUpperCase()
+        : element.value.toLowerCase();
+      this.token = element.value;
+    }
+    console.log(this.token);
   }
 
   toString() {
     return (
-      "[" + (this.position + 1) + ". " + global_layers[this.layer] + "] = " + this.token
+      "[" +
+      (this.position + 1) +
+      ". " +
+      global_layers[this.layer] +
+      "] = " +
+      this.token
     );
   }
 }
@@ -514,7 +530,8 @@ export default {
         new queryItem(
           this.$data.layer.indexOf(this.$data.search_simple_1_layer),
           0,
-          this.$data.search_simple_1_value
+          this.$data.search_simple_1_value,
+          this.$data.layer.indexOf(this.$data.search_simple_1_layer) === 2
         ),
       ];
       if (this.$data.search_simple_n > 1)
@@ -522,7 +539,8 @@ export default {
           new queryItem(
             this.$data.layer.indexOf(this.$data.search_simple_2_layer),
             1,
-            this.$data.search_simple_2_value
+            this.$data.search_simple_2_value,
+            this.$data.layer.indexOf(this.$data.search_simple_2_layer) === 2
           )
         );
       if (this.$data.search_simple_n > 2)
@@ -530,7 +548,8 @@ export default {
           new queryItem(
             this.$data.layer.indexOf(this.$data.search_simple_3_layer),
             2,
-            this.$data.search_simple_3_value
+            this.$data.search_simple_3_value,
+            this.$data.layer.indexOf(this.$data.search_simple_3_layer) === 2
           )
         );
 
@@ -540,102 +559,30 @@ export default {
       var queryItems = [];
       if (this.$data.search_complex_n === 1) {
         queryItems = [
-          new queryItem(
-            "Wort",
-            0,
-            document.getElementById("search_complex_1_1_w").value
-          ),
-          new queryItem(
-            "Lemma",
-            0,
-            document.getElementById("search_complex_1_1_l").value
-          ),
-          new queryItem(
-            "Wort",
-            0,
-            document.getElementById("search_complex_1_1_p").value
-          ),
+          new queryItem(0, 0, document.getElementById("search_complex_1_1_w")),
+          new queryItem(1, 0, document.getElementById("search_complex_1_1_l")),
+          new queryItem(2, 0, document.getElementById("search_complex_1_1_p")),
         ];
       } else if (this.$data.search_complex_n === 2) {
         queryItems = [
-          new queryItem(
-            "Wort",
-            0,
-            document.getElementById("search_complex_2_1_w").value
-          ),
-          new queryItem(
-            "Lemma",
-            0,
-            document.getElementById("search_complex_2_1_l").value
-          ),
-          new queryItem(
-            "Wort",
-            0,
-            document.getElementById("search_complex_2_1_p").value
-          ),
-          new queryItem(
-            "Wort",
-            0,
-            document.getElementById("search_complex_2_2_w").value
-          ),
-          new queryItem(
-            "Lemma",
-            0,
-            document.getElementById("search_complex_2_2_l").value
-          ),
-          new queryItem(
-            "Wort",
-            0,
-            document.getElementById("search_complex_2_2_p").value
-          ),
+          new queryItem(0, 0, document.getElementById("search_complex_2_1_w")),
+          new queryItem(1, 0, document.getElementById("search_complex_2_1_l")),
+          new queryItem(2, 0, document.getElementById("search_complex_2_1_p")),
+          new queryItem(0, 1, document.getElementById("search_complex_2_2_w")),
+          new queryItem(1, 1, document.getElementById("search_complex_2_2_l")),
+          new queryItem(2, 1, document.getElementById("search_complex_2_2_p")),
         ];
       } else if (this.$data.search_complex_n === 3) {
         queryItems = [
-          new queryItem(
-            "Wort",
-            0,
-            document.getElementById("search_complex_3_1_w").value
-          ),
-          new queryItem(
-            "Lemma",
-            0,
-            document.getElementById("search_complex_3_1_l").value
-          ),
-          new queryItem(
-            "Wort",
-            0,
-            document.getElementById("search_complex_3_1_p").value
-          ),
-          new queryItem(
-            "Wort",
-            0,
-            document.getElementById("search_complex_3_2_w").value
-          ),
-          new queryItem(
-            "Lemma",
-            0,
-            document.getElementById("search_complex_3_2_l").value
-          ),
-          new queryItem(
-            "Wort",
-            0,
-            document.getElementById("search_complex_3_2_p").value
-          ),
-          new queryItem(
-            "Wort",
-            0,
-            document.getElementById("search_complex_3_3_w").value
-          ),
-          new queryItem(
-            "Lemma",
-            0,
-            document.getElementById("search_complex_3_3_l").value
-          ),
-          new queryItem(
-            "Wort",
-            0,
-            document.getElementById("search_complex_3_3_p").value
-          ),
+          new queryItem(0, 0, document.getElementById("search_complex_3_1_w")),
+          new queryItem(1, 0, document.getElementById("search_complex_3_1_l")),
+          new queryItem(2, 0, document.getElementById("search_complex_3_1_p")),
+          new queryItem(0, 1, document.getElementById("search_complex_3_2_w")),
+          new queryItem(1, 1, document.getElementById("search_complex_3_2_l")),
+          new queryItem(2, 1, document.getElementById("search_complex_3_2_p")),
+          new queryItem(0, 2, document.getElementById("search_complex_3_3_w")),
+          new queryItem(1, 2, document.getElementById("search_complex_3_3_l")),
+          new queryItem(2, 2, document.getElementById("search_complex_3_3_p")),
         ];
       }
 

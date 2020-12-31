@@ -61,6 +61,7 @@ export default new Vuex.Store({
       Object.keys(state.owid.OwidLiveSearches).forEach((s) => {
         var search = state.owid.OwidLiveSearches[s];
 
+        // Build a serie for any selected StorageTimeItem
         var subItems = {};
         search.OwidLiveStorageTimeItems.forEach((item) => {
           var sitem;
@@ -85,6 +86,7 @@ export default new Vuex.Store({
           subItems[item.Name] = { name: item.Name, data: sitem, items: null };
         });
 
+        // Build a serie for any selected search
         if (search.IsSelected) {
           var sgrp;
           switch (state.vizOptionGranulation) {
@@ -105,8 +107,10 @@ export default new Vuex.Store({
               break;
           }
 
+          // if you had selected a 'search' all subItems will be appended
           res[search.Name] = { name: search.Name, data: sgrp, items: subItems };
         } else {
+          // if you had not selected a 'search' all subItems will be root items
           subItems.forEach((x) => {
             res[x] = {
               name: subItems[x].name,
@@ -116,6 +120,8 @@ export default new Vuex.Store({
           });
         }
       });
+
+      // Build a sum series called "ALLE"
 
       var sumAll = {};
       Object.keys(res).forEach((key) => {
@@ -130,7 +136,41 @@ export default new Vuex.Store({
           } else sumAll[subKey] = item.data[subKey];
         });
       });
-      res["ALLE"] = sumAll;
+      res["ALLE"] = { name: "ALLE", data: sumAll, items: null };
+
+      // relativ Frquency
+      if (state.vizOptionRelative) {
+        var normData;
+        switch (state.vizOptionGranulation) {
+          case 1:
+            normData = state.owid.NormWeek;
+            break;
+          case 2:
+            normData = state.owid.NormMonth;
+            break;
+          case 3:
+            normData = state.owid.NormQuarter;
+            break;
+          case 4:
+            normData = state.owid.NormYear;
+            break;
+          default:
+            normData = state.owid.NormDate;
+            break;
+        }
+
+        Object.keys(res).forEach((key) => {
+          var item = res[key];
+          Object.keys(normData).forEach((date) => {
+            if (date in item.data)
+              item.data[date] = (
+                (item.data[date] / normData[date]) *
+                1000000.0
+              ).toFixed(2);
+            else item.data[date] = 0;
+          });
+        });
+      }
 
       state.vizData = res;
       state.version++;
