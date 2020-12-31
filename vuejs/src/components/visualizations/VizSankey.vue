@@ -8,28 +8,35 @@
         this.$store.state.vizViewportHeight +
         'px'
     "
-  >
-    {{ update }}
-  </div>
+  ></div>
 </template>
 
 <script>
 import * as echarts from "echarts";
-var sankey;
 
 export default {
   name: "VizSankey",
   theme: { dark: false },
-  computed: {
-    update: {
-      get() {
+  data() {
+    return {
+      component: null,
+    };
+  },
+  created() {
+    this.$store.watch(
+      () => {
+        return this.$store.state.version;
+      },
+      () => {
         if (this.$store.state.vizData === null) return;
+
         var component = document.getElementById("sankey");
-        if (component === null) return;
-        try {
-          sankey = echarts.init(component);
-        } catch {
-          // ignore
+        if (component != null && this.$data.component === null) {
+          try {
+            this.$data.component = echarts.init(component);
+          } catch {
+            // ignore
+          }
         }
 
         var tnodes = new Set();
@@ -63,7 +70,7 @@ export default {
         }
 
         var nodes = [];
-        nodes.push({name: "", id: "0>>>"});
+        nodes.push({ name: "", id: "0>>>" });
         Array.from(tnodes).forEach((nt) => {
           nodes.push({ name: nt.substring(1), id: nt });
         });
@@ -76,9 +83,15 @@ export default {
           tooltip: {
             trigger: "item",
             triggerOn: "mousemove",
-            formatter: function(payload){
-              return (payload.data.source === "0>>>" ? "" : payload.data.source.substring(1)) + " > "+ payload.data.target.substring(1);
-            }
+            formatter: function(payload) {
+              return (
+                (payload.data.source === "0>>>"
+                  ? ""
+                  : payload.data.source.substring(1)) +
+                " > " +
+                payload.data.target.substring(1)
+              );
+            },
           },
           series: [
             {
@@ -92,17 +105,21 @@ export default {
                 curveness: 0.5,
               },
               label: {
-                    formatter: function(payload){
-                      return payload.data.name;
-                    }
+                formatter: function(payload) {
+                  return payload.data.name;
                 },
+              },
             },
           ],
         };
-        sankey.setOption(sankeyOptions);
-        return "";
+        this.$data.component.setOption(sankeyOptions);
       },
-    },
+      {
+        deep: true,
+      }
+    );
+
+    this.$store.commit("calculate");
   },
 };
 </script>

@@ -64,6 +64,7 @@ function commit() {
   var g = this.$data.granulationValue;
 
   this.$store.commit("vizOption", { r, s, g });
+  this.$store.commit("calculate");
 }
 
 export default {

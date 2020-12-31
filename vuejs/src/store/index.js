@@ -24,18 +24,15 @@ export default new Vuex.Store({
   mutations: {
     init(state, payload) {
       state.owid = new OwidLiveStorage(payload);
-      state.version++;
     },
 
     updateViewport(state, { w, h }) {
       state.vizViewportWidth = (w / 110) * 100;
       state.vizViewportHeight = h;
-      state.version++;
     },
 
     updateN(state, N) {
       state.owid.N = N;
-      state.version++;
     },
 
     updateStatus(state, status) {
@@ -44,19 +41,23 @@ export default new Vuex.Store({
 
     search(state, { n, queryItems, items }) {
       state.owid.addOwidLiveSearchItem(n, queryItems, items);
-      state.version++;
     },
 
     vizOption(state, payload) {
       state.vizOptionRelative = payload.r;
       state.vizOptionGranulation = payload.g;
       state.vizOptionSmoothing = payload.s;
-      state.version++;
     },
 
     calculate(state) {
+      if(state.owid === null || state.owid.OwidLiveSearches === null)
+      {
+        state.vizData = null;
+        return;
+      }
+
       state.vizData = {};
-      var res = {};
+      var res = {};      
 
       Object.keys(state.owid.OwidLiveSearches).forEach((s) => {
         var search = state.owid.OwidLiveSearches[s];
@@ -163,11 +164,12 @@ export default new Vuex.Store({
           var item = res[key];
           Object.keys(normData).forEach((date) => {
             if (date in item.data)
-              item.data[date] = (
-                (item.data[date] / normData[date]) *
-                1000000.0
-              ).toFixed(2);
-            else item.data[date] = 0;
+              item.data[date].value = parseFloat(
+                ((item.data[date].value / normData[date]) * 1000000.0).toFixed(
+                  2
+                )
+              );
+            else item.data[date] = { dates: new Set(), value: 0.0 };
           });
         });
       }

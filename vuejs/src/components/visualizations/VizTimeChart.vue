@@ -1,6 +1,5 @@
 <template>
   <div id="timechart" style="width: 110%; height: 68vh; margin:-20px 0px 0px -20px">
-    {{ update }}
   </div>
 </template>
 
@@ -16,6 +15,7 @@ export default {
     };
   },
   mounted() {
+    // VizTimeChart is the first Visualization, so the component must me initialized in mounted (otherwise in created > $store.watch)
     var component = document.getElementById("timechart");
     if (component != null) {
       try {
@@ -25,14 +25,19 @@ export default {
       }
     }
 
+    // init the Viewport - usefull for other visualizations
     this.$store.commit("updateViewport", {
       w: component.clientWidth,
       h: component.clientHeight,
     });
+    this.$store.commit("calculate");
   },
-  computed: {
-    update: {
-      get() {
+  created() {
+    this.$store.watch(
+      () => {
+        return this.$store.state.version;
+      },
+      () => {
         if (this.$store.state.vizData === null) return;
 
         var availableDates = new Set();
@@ -79,6 +84,7 @@ export default {
         }
 
         let myChartOption = {
+          animation: false,
           xAxis: {
             type: "category",
             data: availableDates,
@@ -106,10 +112,11 @@ export default {
           },
         };
         this.$data.component.setOption(myChartOption);
-
-        return "";
       },
-    },
+      {
+        deep: true,
+      }
+    );
   },
 };
 </script>

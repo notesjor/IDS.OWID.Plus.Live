@@ -8,30 +8,37 @@
         this.$store.state.vizViewportHeight +
         'px'
     "
-  >
-    {{ update }}
-  </div>
+  ></div>
 </template>
 
 <script>
 import * as echarts from "echarts";
-var ecalendar;
 
 export default {
   name: "VizCalendar",
   theme: { dark: false },
-  computed: {
-    update: {
-      get() {
+  data() {
+    return {
+      component: null,
+    };
+  },
+  created() {
+    this.$store.watch(
+      () => {
+        return this.$store.state.version;
+      },
+      () => {
         if (this.$store.state.vizData === null) return;
+
         var component = document.getElementById("ecalendar");
-        if (component === null) return;
-        try {
-          ecalendar = echarts.init(component);
-        } catch {
-          // ignore
+        if (component != null && this.$data.component === null) {
+          try {
+            this.$data.component = echarts.init(component);
+          } catch {
+            // ignore
+          }
         }
-        
+
         var all = this.$store.state.vizData["ALLE"];
         var res = [];
 
@@ -93,10 +100,14 @@ export default {
             },
           ],
         };
-        ecalendar.setOption(myCalendarOption);
-        return "";
+        this.$data.component.setOption(myCalendarOption);
       },
-    },
+      {
+        deep: true,
+      }
+    );
+
+    this.$store.commit("calculate");
   },
 };
 </script>
