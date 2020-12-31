@@ -30,6 +30,8 @@ export default {
       () => {
         if (this.$store.state.vizData === null) return;
 
+        this.$store.commit("updateStatus", "pending");
+
         var component = document.getElementById("ecalendar");
         if (component != null && this.$data.component === null) {
           try {
@@ -101,12 +103,14 @@ export default {
           ],
         };
         this.$data.component.setOption(myCalendarOption);
+        this.$store.commit("updateStatus", "success");
       },
       {
         deep: true,
       }
     );
 
+    this.$store.commit("updateStatus", "pending");
     this.$store.commit("calculate");
   },
 };

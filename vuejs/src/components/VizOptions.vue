@@ -10,7 +10,10 @@
     </v-card-title>
     <v-container>
       <v-row>
-        <v-col class="d-flex justify-left" style="margin-top:-30px; margin-bottom:10px">
+        <v-col
+          class="d-flex justify-left"
+          style="margin-top:-30px; margin-bottom:10px"
+        >
           <v-switch
             v-model="relativeFrequency"
             label="Relative Frequenz"
@@ -63,8 +66,10 @@ function commit() {
   var s = this.$data.smoothValue;
   var g = this.$data.granulationValue;
 
+  this.$store.commit("updateStatus", "pending");
   this.$store.commit("vizOption", { r, s, g });
   this.$store.commit("calculate");
+  this.$store.commit("updateStatus", "success");
 }
 
 export default {

@@ -55,7 +55,7 @@ export default new Vuex.Store({
         state.vizData = null;
         return;
       }
-
+      
       state.vizData = {};
       var res = {};      
 

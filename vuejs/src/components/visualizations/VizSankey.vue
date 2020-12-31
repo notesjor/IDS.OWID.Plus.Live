@@ -119,7 +119,9 @@ export default {
       }
     );
 
+    this.$store.commit("updateStatus", "pending");
     this.$store.commit("calculate");
+    this.$store.commit("updateStatus", "success");
   },
 };
 </script>
