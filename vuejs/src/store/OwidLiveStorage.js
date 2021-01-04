@@ -6,6 +6,7 @@ export class OwidLiveStorage {
   #Norm;
   #Dates;
   #Total;
+  #NormTotal;
   #N;
 
   /**
@@ -13,17 +14,29 @@ export class OwidLiveStorage {
    */
   constructor(norm) {
     this.#Norm = norm;
-    var dates = [];
-    var sum = 0.0;
-    Object.keys(norm[0]).forEach(function(key) {
-      dates.push({ key });
-      sum += norm[0][key];
-    });
-
-    this.#Dates = dates.sort();
-    this.#Total = sum;
     this.#OwidLiveSearches = {};
     this.#N = 1;
+
+    var dates = [];
+    var total = [];
+    var notal = [];
+    for (var n = 0; n < norm.length; n++) {
+      if (n === 0)
+        Object.keys(norm[0]).forEach(function(key) {
+          dates.push({ key });
+        });
+
+      var sum = 0.0;
+      Object.keys(norm[n]).forEach(function(key) {
+        sum += norm[n][key];
+      });
+      total.push(sum);
+      notal.push(sum / 1000000.0);
+    }
+
+    this.#Dates = dates.sort();
+    this.#Total = total;    
+    this.#NormTotal = notal;
   }
 
   /**
@@ -83,7 +96,7 @@ export class OwidLiveStorage {
    * Return the relative total (in pro Mio. Token)
    */
   get NormTotal() {
-    return this.#Total / 1000000.0;
+    return this.#NormTotal;
   }
 
   /**
@@ -108,7 +121,7 @@ export class OwidLiveStorage {
   GetSearchHistoryItem(key, granulation) {
     var data = this.#OwidLiveSearches[key];
     var dates = this.#Dates;
-    var total = this.#Total;
+    var total = this.#Total[this.#N - 1];
     var normd = null;
     switch (granulation) {
       case 1:
@@ -160,7 +173,7 @@ export class OwidLiveStorage {
         spark: spark,
         sparkNorm: sparkNorm,
 
-        checked: item.IsSelected
+        checked: item.IsSelected,
       });
     });
 
