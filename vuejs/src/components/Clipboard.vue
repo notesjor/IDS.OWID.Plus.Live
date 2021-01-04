@@ -94,21 +94,21 @@ export default {
   created() {
     this.$store.watch(
       () => {
-        return this.$store.state.version;
+        return this.$store.state.searches;
       },
       () => {
         if (this.$store.state.owid === null) return;
 
         var res = [];
         this.$store.state.owid
-          .GetSearchHistory(this.$store.state.N)
+          .GetSearchHistory()
           .forEach((key) => {
             res.push({
               label: key,
               checked: this.$store.state.owid.OwidLiveSearches[key].IsSelected,
               grid: this.$store.state.owid.GetSearchHistoryItem(
                 key,
-                this.$store.state.N
+                this.$store.state.vizOptionGranulation
               ),
             });
           });

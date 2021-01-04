@@ -11,6 +11,7 @@ export default new Vuex.Store({
 
     owid: null,
     version: 0,
+    searches: 0,
 
     vizOptionRelative: true,
     vizOptionGranulation: 0,
@@ -41,6 +42,7 @@ export default new Vuex.Store({
 
     search(state, { n, queryItems, items }) {
       state.owid.addOwidLiveSearchItem(n, queryItems, items);
+      state.searches = Object.keys(state.owid.OwidLiveSearches).length;
     },
 
     vizOption(state, payload) {
@@ -50,21 +52,23 @@ export default new Vuex.Store({
     },
 
     calculate(state) {
-      if(state.owid === null || state.owid.OwidLiveSearches === null)
-      {
+      if (state.owid === null || state.owid.OwidLiveSearches === null) {
         state.vizData = null;
         return;
       }
-      
-      state.vizData = {};
-      var res = {};      
 
-      Object.keys(state.owid.OwidLiveSearches).forEach((s) => {
-        var search = state.owid.OwidLiveSearches[s];
+      state.vizData = {};
+      var res = {};
+
+      for (var s in state.owid.OwidLiveSearches) {
+        var search = state.owid.OwidLiveSearches[s];console.log(state.owid.N); console.log(search.N);
+        if (search.N != state.owid.N) continue;
 
         // Build a serie for any selected StorageTimeItem
         var subItems = {};
-        search.OwidLiveStorageTimeItems.forEach((item) => {
+        for (var item in search.OwidLiveStorageTimeItems) {
+          if (!item.IsSelected) continue;
+
           var sitem;
           switch (state.vizOptionGranulation) {
             case 1:
@@ -85,7 +89,8 @@ export default new Vuex.Store({
           }
 
           subItems[item.Name] = { name: item.Name, data: sitem, items: null };
-        });
+        }
+        if (Object.keys(subItems).length === 0) continue;
 
         // Build a serie for any selected search
         if (search.IsSelected) {
@@ -120,7 +125,7 @@ export default new Vuex.Store({
             };
           });
         }
-      });
+      }
 
       // Build a sum series called "ALLE"
 

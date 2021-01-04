@@ -23,7 +23,7 @@ export class OwidLiveStorage {
     this.#Dates = dates.sort();
     this.#Total = sum;
     this.#OwidLiveSearches = {};
-    this.#N =0;
+    this.#N = 1;
   }
 
   /**
@@ -54,14 +54,14 @@ export class OwidLiveStorage {
   /**
    * Return the current N(-gram)
    */
-  get N(){
+  get N() {
     return this.#N;
   }
 
   /**
    * @param  {number} n set the current N(-gram)
    */
-  set N(n){
+  set N(n) {
     this.#N = n;
   }
 
@@ -95,7 +95,7 @@ export class OwidLiveStorage {
 
     Object.keys(this.#OwidLiveSearches).forEach((key) => {
       var current = this.#OwidLiveSearches[key];
-      if (current.N === (this.#N + 1)) res.push(key);
+      if (current.N === this.#N) res.push(key);
     });
 
     return res;
@@ -107,9 +107,9 @@ export class OwidLiveStorage {
    */
   GetSearchHistoryItem(key, granulation) {
     var data = this.#OwidLiveSearches[key];
-    var dates = this.#Dates;    
+    var dates = this.#Dates;
     var total = this.#Total;
-    var normd = null; 
+    var normd = null;
     switch (granulation) {
       case 1:
         normd = this.NormWeek;
@@ -134,7 +134,7 @@ export class OwidLiveStorage {
 
       var d = Object.keys(item.Date).length;
       var s = 0;
-      Object.keys(item.Date).forEach(key=>{
+      Object.keys(item.Date).forEach((key) => {
         s += item.Date[key].value;
       });
 
@@ -159,6 +159,8 @@ export class OwidLiveStorage {
         sRel: ((s / total) * 1000000.0).toFixed(2),
         spark: spark,
         sparkNorm: sparkNorm,
+
+        checked: item.IsSelected
       });
     });
 

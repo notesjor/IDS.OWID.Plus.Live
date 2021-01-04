@@ -51,7 +51,7 @@
             v-model="smoothValue"
             thumb-label
             min="1"
-            max="365"
+            :max="smoothMax"
             style="margin-left:10px; margin-top:-27px"
           ></v-slider>
         </v-col>
@@ -65,6 +65,24 @@ function commit() {
   var r = this.$data.relativeFrequency;
   var s = this.$data.smoothValue;
   var g = this.$data.granulationValue;
+
+  switch (g) {
+    case 1:
+      this.$data.smoothMax = 52;
+      break;
+    case 2:
+      this.$data.smoothMax = 24;
+      break;
+    case 3:
+      this.$data.smoothMax = 8;
+      break;
+    case 4:
+      this.$data.smoothMax = 10;
+      break;
+    default:
+      this.$data.smoothMax = 31;
+      break;
+  }
 
   this.$store.commit("updateStatus", "pending");
   this.$store.commit("vizOption", { r, s, g });
@@ -80,6 +98,8 @@ export default {
       name: "world",
       relativeFrequency: true,
       smoothValue: 7,
+      smoothMin: 1,
+      smoothMax: 31,
       granulationValue: 0,
       granulationLabels: ["Tag", "Woche", "Monat", "Quartal", "Jahr"],
     };
@@ -88,11 +108,6 @@ export default {
     relativeFrequency: commit,
     smoothValue: commit,
     granulationValue: commit,
-  },
-  methods: {
-    greet: function() {
-      this.$store.commit("increment");
-    },
   },
 };
 </script>

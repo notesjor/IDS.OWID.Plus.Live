@@ -446,7 +446,6 @@ class queryItem {
         : element.value.toLowerCase();
       this.token = element.value;
     }
-    console.log(this.token);
   }
 
   toString() {
@@ -473,7 +472,7 @@ function sendSearchRequest(store, n, queryItems) {
             n: n,
             queryItems: queryItems,
             items: JSON.parse(this.responseText),
-          });
+          });console.log(queryItems);console.log(n);console.log(JSON.parse(this.responseText));
           store.commit("calculate");
           store.commit("updateStatus", "success");
         }
@@ -561,28 +560,28 @@ export default {
         queryItems = [
           new queryItem(0, 0, document.getElementById("search_complex_1_1_w")),
           new queryItem(1, 0, document.getElementById("search_complex_1_1_l")),
-          new queryItem(2, 0, document.getElementById("search_complex_1_1_p")),
+          new queryItem(2, 0, document.getElementById("search_complex_1_1_p"), true),
         ];
       } else if (this.$data.search_complex_n === 2) {
         queryItems = [
           new queryItem(0, 0, document.getElementById("search_complex_2_1_w")),
           new queryItem(1, 0, document.getElementById("search_complex_2_1_l")),
-          new queryItem(2, 0, document.getElementById("search_complex_2_1_p")),
+          new queryItem(2, 0, document.getElementById("search_complex_2_1_p"), true),
           new queryItem(0, 1, document.getElementById("search_complex_2_2_w")),
           new queryItem(1, 1, document.getElementById("search_complex_2_2_l")),
-          new queryItem(2, 1, document.getElementById("search_complex_2_2_p")),
+          new queryItem(2, 1, document.getElementById("search_complex_2_2_p"), true),
         ];
       } else if (this.$data.search_complex_n === 3) {
         queryItems = [
           new queryItem(0, 0, document.getElementById("search_complex_3_1_w")),
           new queryItem(1, 0, document.getElementById("search_complex_3_1_l")),
-          new queryItem(2, 0, document.getElementById("search_complex_3_1_p")),
+          new queryItem(2, 0, document.getElementById("search_complex_3_1_p"), true),
           new queryItem(0, 1, document.getElementById("search_complex_3_2_w")),
           new queryItem(1, 1, document.getElementById("search_complex_3_2_l")),
-          new queryItem(2, 1, document.getElementById("search_complex_3_2_p")),
+          new queryItem(2, 1, document.getElementById("search_complex_3_2_p"), true),
           new queryItem(0, 2, document.getElementById("search_complex_3_3_w")),
           new queryItem(1, 2, document.getElementById("search_complex_3_3_l")),
-          new queryItem(2, 2, document.getElementById("search_complex_3_3_p")),
+          new queryItem(2, 2, document.getElementById("search_complex_3_3_p"), true),
         ];
       }
 
