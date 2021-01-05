@@ -61,12 +61,14 @@ export default new Vuex.Store({
       var res = {};
 
       for (var s in state.owid.OwidLiveSearches) {
-        var search = state.owid.OwidLiveSearches[s];console.log(state.owid.N); console.log(search.N);
+        var search = state.owid.OwidLiveSearches[s];
         if (search.N != state.owid.N) continue;
 
         // Build a serie for any selected StorageTimeItem
         var subItems = {};
-        for (var item in search.OwidLiveStorageTimeItems) {
+        for (var i in search.OwidLiveStorageTimeItems) {
+          var item = search.OwidLiveStorageTimeItems[i];
+          console.log(item);
           if (!item.IsSelected) continue;
 
           var sitem;
@@ -89,7 +91,7 @@ export default new Vuex.Store({
           }
 
           subItems[item.Name] = { name: item.Name, data: sitem, items: null };
-        }
+        }console.log(subItems);
         if (Object.keys(subItems).length === 0) continue;
 
         // Build a serie for any selected search
@@ -178,7 +180,7 @@ export default new Vuex.Store({
           });
         });
       }
-
+console.log(res);
       state.vizData = res;
       state.version++;
     },

@@ -472,7 +472,7 @@ function sendSearchRequest(store, n, queryItems) {
             n: n,
             queryItems: queryItems,
             items: JSON.parse(this.responseText),
-          });console.log(queryItems);console.log(n);console.log(JSON.parse(this.responseText));
+          });
           store.commit("calculate");
           store.commit("updateStatus", "success");
         }
