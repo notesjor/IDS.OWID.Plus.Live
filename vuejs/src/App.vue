@@ -4,7 +4,7 @@
       <v-app-bar app dark class="d-print-none">
         <div class="d-flex align-center">
           <v-img
-            alt="Vuetify Logo"
+            alt="OWIDplus Logo"
             class="shrink mr-2"
             contain
             src="./assets/owid_plus.png"
@@ -35,7 +35,7 @@
 
         <div class="d-flex align-center">
           <v-img
-            alt="Vuetify Logo"
+            alt="IDS Logo"
             class="shrink mr-2"
             contain
             src="./assets/ids-wbmarke.svg"

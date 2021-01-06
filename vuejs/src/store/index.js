@@ -68,7 +68,7 @@ export default new Vuex.Store({
         var subItems = {};
         for (var i in search.OwidLiveStorageTimeItems) {
           var item = search.OwidLiveStorageTimeItems[i];
-          
+
           if (!item.IsSelected) continue;
 
           var sitem;
@@ -178,6 +178,44 @@ export default new Vuex.Store({
               );
             else item.data[date] = { dates: new Set(), value: 0.0 };
           });
+        });
+      }
+
+      // smoothing
+      if (state.vizOptionSmoothing > 1) {
+        var labelSelector, carret, odd;
+
+        if (state.vizOptionSmoothing % 2 === 0) {
+          carret = state.vizOptionSmoothing / 2;
+          labelSelector = carret;
+          odd = false;
+        } else {
+          carret = (state.vizOptionSmoothing - 1) / 2;
+          labelSelector = carret;
+          odd = true;
+        }
+
+        Object.keys(res).forEach((key) => {
+          var item = res[key].data;
+          var keys = Object.keys(item);
+          var nval = {};
+          for (var i = 0; i < keys.length - state.vizOptionSmoothing; i++) {
+            var dates = new Set();
+            var sum = 0.0;
+            for (var j = 0; j < state.vizOptionSmoothing; j++) {
+              item[keys[i + j]].dates.forEach((d) => dates.add(d));
+
+              if (!odd && (j === 0 || j + 1 === state.vizOptionSmoothing))
+                sum += item[keys[i + j]].value * 0.5;
+              else sum += item[keys[i + j]].value;
+            }
+            sum /= odd
+              ? state.vizOptionSmoothing
+              : state.vizOptionSmoothing - 1;
+            nval[keys[i + labelSelector]] = { dates: dates, value: sum.toFixed(3) };
+          }
+
+          res[key].data = nval;
         });
       }
 
