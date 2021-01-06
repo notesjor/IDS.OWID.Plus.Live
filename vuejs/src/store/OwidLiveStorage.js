@@ -9,6 +9,17 @@ export class OwidLiveStorage {
   #NormTotal;
   #N;
 
+  toJSON(){
+    return {
+      N: this.#N,
+      OwidLiveSearches: this.#OwidLiveSearches,
+      Norm: this.#Norm,
+      Total: this.#Total,
+      NormTotal: this.#NormTotal
+      //Dates: this.#Dates - hide in serized data (only used in view)
+    };
+  }
+
   /**
    * @param  {array} norm array from GET: owidAPI/norm
    */

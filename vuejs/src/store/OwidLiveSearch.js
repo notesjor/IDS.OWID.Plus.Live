@@ -7,6 +7,16 @@ export class OwidLiveSearch {
   #OwidLiveStorageTimeItems;
   #IsSelected;
 
+  toJSON(){
+    return {
+      N: this.#N,
+      Key: this.#Key,
+      Request: this.#Request,
+      OwidLiveStorageTimeItems: this.#OwidLiveStorageTimeItems,
+      IsSelected: this.#IsSelected
+    }
+  }
+
   /**
    * Create a new OwidLiveSearch
    * @param  {number} n of the N-Gram search

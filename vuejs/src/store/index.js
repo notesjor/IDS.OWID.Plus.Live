@@ -8,6 +8,7 @@ export default new Vuex.Store({
   state: {
     baseUrl: "http://81.30.156.64:9731",
     status: "init",
+    sessionKey: null,
 
     owid: null,
     version: 0,
@@ -23,6 +24,10 @@ export default new Vuex.Store({
     vizData: null,
   },
   mutations: {
+    id(state, id) {
+      state.sessionKey = id;
+    },
+
     init(state, payload) {
       state.owid = new OwidLiveStorage(payload);
     },

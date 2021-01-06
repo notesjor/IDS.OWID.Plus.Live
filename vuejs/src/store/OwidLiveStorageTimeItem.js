@@ -5,6 +5,16 @@ export class OwidLiveStorageTimeItem {
   #Dates;
   #IsSelected;
 
+  toJSON(){
+    return {
+      Key: this.#Key,
+      Token: this.#Token,
+      Name: this.#Name,
+      Dates: this.#Dates,
+      IsSelected: this.#IsSelected
+    }
+  }
+
   /**
    * @param  {string} key the key of the search-result
    * @param  {array} dates all matched dates

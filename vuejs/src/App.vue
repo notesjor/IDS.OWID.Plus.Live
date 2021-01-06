@@ -45,6 +45,8 @@
         </div>
       </v-app-bar>
 
+      <v-alert type="error" :value="alert">Achtung: Es konnte keine Verbindung zum Server aufgebaut werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.</v-alert>
+
       <v-main>
         <v-container>
           <v-row>
@@ -110,20 +112,28 @@ export default {
 
   data: () => ({
     overlay: false,
+    alert: false
   }),
 
   mounted() {
-    var xhr = new XMLHttpRequest();
-    var store = this.$store;
+    fetch(this.$store.state.baseUrl + "/init")
+      .then((response) => response.text())
+      .then((response) => {
+        store.commit("id", response);
 
-    xhr.addEventListener("readystatechange", function() {
-      if (this.readyState === 4) {
-        store.commit("init", JSON.parse(this.responseText));
-      }
-    });
+        var xhr = new XMLHttpRequest();
+        var store = this.$store;
 
-    xhr.open("GET", this.$store.state.baseUrl + "/norm");
-    xhr.send(this.$store);
+        xhr.addEventListener("readystatechange", function() {
+          if (this.readyState === 4) {
+            store.commit("init", JSON.parse(this.responseText));
+          }
+        });
+
+        xhr.open("GET", this.$store.state.baseUrl + "/norm");
+        xhr.send(this.$store);
+      })
+      .catch(() => this.$data.alert = true); 
   },
 
   created() {

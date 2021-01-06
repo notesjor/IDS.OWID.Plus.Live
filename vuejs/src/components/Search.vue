@@ -432,6 +432,14 @@ class queryItem {
   position;
   token;
 
+  toJSON(){
+    return {
+      layer: this.layer,
+      position: this.position,
+      token: this.token
+    }
+  }
+
   constructor(layer, position, element, upperCase) {
     this.layer = layer;
     this.position = position;

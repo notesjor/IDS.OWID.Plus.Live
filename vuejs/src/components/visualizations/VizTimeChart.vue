@@ -1,6 +1,8 @@
 <template>
-  <div id="timechart" style="width: 110%; height: 68vh; margin:-20px 0px 0px -20px">
-  </div>
+  <div
+    id="timechart"
+    style="width: 110%; height: 68vh; margin:-20px 0px 0px -20px"
+  ></div>
 </template>
 
 <script>
@@ -19,7 +21,9 @@ export default {
     var component = document.getElementById("timechart");
     if (component != null) {
       try {
-        this.$data.component = echarts.init(component);
+        this.$data.component = echarts.init(component, null, {
+          renderer: "svg",
+        });
       } catch {
         // ignore
       }
