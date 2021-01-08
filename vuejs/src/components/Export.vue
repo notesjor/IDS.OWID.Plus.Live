@@ -1,28 +1,44 @@
 <template>
-  <v-card>
-    <v-card-title>
+  <v-container>
+    <v-card>
+      <v-card-title>
+        <div>
+          <v-icon>mdi-export</v-icon
+          ><span style="margin-left:10px; font-size:15px"
+            >EXPORT: Visualisierung &amp; Daten für Weiterverarbeitung
+            exportieren</span
+          >
+        </div>
+      </v-card-title>
+      <v-card-text style="text-align:left;">
+        <p>
+          <span style="margin:5px 5px 0 0">Rohdaten:</span>
+          <v-btn @click="toTsv">TSV</v-btn>
+          <v-btn @click="toJson">JSON</v-btn>
+          <span style="margin:5px 5px 0 20px">Grafik:</span>
+          <v-btn @click="toPng">PNG</v-btn>
+          <v-btn @click="toSvg">SVG</v-btn>
+          <span style="margin:5px 5px 0 20px">Web:</span>
+          <v-btn @click="toLink">LINK</v-btn>
+          <v-btn @click="toIFrame">IFRAME</v-btn>
+        </p>
+      </v-card-text>
+    </v-card>
+    <v-snackbar v-model="snackbar">
       <div>
-        <v-icon>mdi-export</v-icon
-        ><span style="margin-left:10px; font-size:15px"
-          >EXPORT: Visualisierung &amp; Daten für Weiterverarbeitung
-          exportieren</span
-        >
+        <v-icon @click="toClipboard" style="float:left; margin-right:10px">
+          mdi-content-copy
+        </v-icon>
+        <div id="clipboardText">{{ text }}</div>
       </div>
-    </v-card-title>
-    <v-card-text style="text-align:left;">
-      <p>
-        <span style="margin:5px 5px 0 0">Rohdaten:</span>
-        <v-btn @click="toTsv">TSV</v-btn>
-        <v-btn @click="toJson">JSON</v-btn>
-        <span style="margin:5px 5px 0 20px">Grafik:</span>
-        <v-btn>PNG</v-btn>
-        <v-btn>SVG</v-btn>
-        <span style="margin:5px 5px 0 20px">Web:</span>
-        <v-btn>LINK</v-btn>
-        <v-btn>IFRAME</v-btn>
-      </p>
-    </v-card-text>
-  </v-card>
+
+      <template v-slot:action="{ attrs }">
+        <v-btn text v-bind="attrs" @click="snackbar = false">
+          Ausblenden
+        </v-btn>
+      </template>
+    </v-snackbar>
+  </v-container>
 </template>
 
 <script>
@@ -49,10 +65,17 @@ export default {
 
   data: () => {
     return {
-      name: "world",
+      text: "world",
+      snackbar: true,
     };
   },
   methods: {
+    toClipboard: function() {
+      var copyText = document.createRange();
+      copyText.selectNode(document.getElementById("clipboardText"));
+      window.getSelection().addRange(copyText);
+      document.execCommand("copy");
+    },
     toTsv: function() {
       fetch(this.$store.state.baseUrl + "/down", {
         method: "post",
@@ -86,7 +109,11 @@ export default {
     toSvg: function() {
       fetch(this.$store.state.baseUrl + "/down", {
         method: "post",
-        body: JSON.stringify({ Format: "SVG", Owid: this.$store.state.owid }),
+        body: JSON.stringify({
+          Format: "SVG",
+          Payload: document.getElementById(this.$store.state.vizVizportId)
+            .firstChild.innerHTML,
+        }),
       })
         .then(function(r) {
           return r.arrayBuffer();
@@ -101,7 +128,41 @@ export default {
     toPng: function() {
       fetch(this.$store.state.baseUrl + "/down", {
         method: "post",
-        body: JSON.stringify({ Format: "PNG", Owid: this.$store.state.owid }),
+        body: JSON.stringify({
+          Format: "PNG",
+          Payload: document.getElementById(this.$store.state.vizVizportId)
+            .firstChild.innerHTML,
+        }),
+      })
+        .then(function(r) {
+          return r.arrayBuffer();
+        })
+        .then(function(buffer) {
+          saveBlob(buffer, "image/png", "image.png");
+        })
+        .catch(function(error) {
+          console.log("Request failed", error);
+        });
+    },
+    toLink: function() {
+      fetch(this.$store.state.baseUrl + "/down", {
+        method: "post",
+        body: JSON.stringify({ Format: "LINK", Owid: this.$store.state.owid }),
+      })
+        .then(function(r) {
+          return r.arrayBuffer();
+        })
+        .then(function(buffer) {
+          saveBlob(buffer, "image/png", "image.png");
+        })
+        .catch(function(error) {
+          console.log("Request failed", error);
+        });
+    },
+    toIFrame: function() {
+      fetch(this.$store.state.baseUrl + "/down", {
+        method: "post",
+        body: JSON.stringify({ Format: "LINK", Owid: this.$store.state.owid }),
       })
         .then(function(r) {
           return r.arrayBuffer();

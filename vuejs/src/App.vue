@@ -44,11 +44,14 @@
           />
         </div>
       </v-app-bar>
-
-      <v-alert type="error" :value="alert">Achtung: Es konnte keine Verbindung zum Server aufgebaut werden. Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.</v-alert>
-
       <v-main>
         <v-container>
+          <v-row class="text-center">
+            <v-alert type="error" :value="alert">
+              Achtung: Es konnte keine Verbindung zum Server aufgebaut werden.
+              Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.
+            </v-alert>
+          </v-row>
           <v-row>
             <v-col>
               <Search />
@@ -112,28 +115,31 @@ export default {
 
   data: () => ({
     overlay: false,
-    alert: false
+    alert: false,
   }),
 
   mounted() {
-    fetch(this.$store.state.baseUrl + "/init")
+    var store = this.$store;
+
+    fetch(store.state.baseUrl + "/init")
       .then((response) => response.text())
       .then((response) => {
         store.commit("id", response);
 
         var xhr = new XMLHttpRequest();
-        var store = this.$store;
-
         xhr.addEventListener("readystatechange", function() {
           if (this.readyState === 4) {
             store.commit("init", JSON.parse(this.responseText));
           }
         });
 
-        xhr.open("GET", this.$store.state.baseUrl + "/norm");
-        xhr.send(this.$store);
+        xhr.open("GET", store.state.baseUrl + "/norm");
+        xhr.send(store);
       })
-      .catch(() => this.$data.alert = true); 
+      .catch((ex) => {
+        console.log(ex);
+        this.$data.alert = true;
+      });
   },
 
   created() {

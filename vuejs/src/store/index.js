@@ -6,7 +6,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    baseUrl: "http://81.30.156.64:9731",
+    baseUrl: "https://owidnext.jan-oliver-ruediger.de",
     status: "init",
     sessionKey: null,
 
@@ -20,6 +20,7 @@ export default new Vuex.Store({
 
     vizViewportWidth: 1200,
     vizViewportHeight: 500,
+    vizVizportId: "",
 
     vizData: null,
   },
@@ -35,6 +36,10 @@ export default new Vuex.Store({
     updateViewport(state, { w, h }) {
       state.vizViewportWidth = (w / 110) * 100;
       state.vizViewportHeight = h;
+    },
+
+    updateViewportId(state, id) {
+      state.vizVizportId = id;
     },
 
     updateN(state, N) {

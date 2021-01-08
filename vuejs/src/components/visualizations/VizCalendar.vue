@@ -35,7 +35,9 @@ export default {
         var component = document.getElementById("ecalendar");
         if (component != null && this.$data.component === null) {
           try {
-            this.$data.component = echarts.init(component);
+            this.$data.component = echarts.init(component, null, {
+              renderer: "svg",
+            });
           } catch {
             // ignore
           }
@@ -104,6 +106,7 @@ export default {
         };
         this.$data.component.setOption(myCalendarOption);
         this.$store.commit("updateStatus", "success");
+        this.$store.commit("updateViewportId", "ecalendar");
       },
       {
         deep: true,

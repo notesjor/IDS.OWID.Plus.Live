@@ -116,6 +116,7 @@ export default {
           },
         };
         this.$data.component.setOption(myChartOption);
+        this.$store.commit("updateViewportId", "timechart");
       },
       {
         deep: true,

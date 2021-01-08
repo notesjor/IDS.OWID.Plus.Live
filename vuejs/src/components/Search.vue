@@ -492,9 +492,10 @@ function sendSearchRequest(store, n, queryItems) {
       xhr2.send(this.responseText);
     }
   });
-
+  
   xhr.open("POST", store.state.baseUrl + "/find");
   xhr.setRequestHeader("Content-Type", "application/json");
+  xhr.setRequestHeader("sessionKey", store.state.sessionKey);
 
   xhr.send(
     JSON.stringify({
