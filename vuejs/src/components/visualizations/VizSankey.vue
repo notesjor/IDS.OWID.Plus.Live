@@ -8,11 +8,11 @@
         this.$store.state.vizViewportHeight +
         'px'
     "
-  ></div>
+  ></div>  
 </template>
 
 <script>
-import * as echarts from "echarts";
+import * as echarts from 'echarts';
 
 export default {
   name: "VizSankey",
@@ -33,9 +33,9 @@ export default {
         var component = document.getElementById("sankey");
         if (component != null && this.$data.component === null) {
           try {
-            this.$data.component = echarts.init(component, null, {
+            this.$data.component = echarts.init(component, "shine", {
               renderer: "svg",
-            });
+            });            
           } catch {
             // ignore
           }

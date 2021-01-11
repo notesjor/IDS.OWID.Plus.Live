@@ -1,6 +1,6 @@
 module.exports = {
-  transpileDependencies: ["vuetify"],
+  transpileDependencies: ["vuetify", "vue-echarts", "resize-detector"],
   configureWebpack: {
-    devtool: 'source-map'
-  }
+    devtool: "source-map",
+  },
 };

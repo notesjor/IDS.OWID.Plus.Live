@@ -20,7 +20,6 @@
           <v-btn @click="toSvg">SVG</v-btn>
           <span style="margin:5px 5px 0 20px">Web:</span>
           <v-btn @click="toLink">LINK</v-btn>
-          <v-btn @click="toIFrame">IFRAME</v-btn>
         </p>
       </v-card-text>
     </v-card>
