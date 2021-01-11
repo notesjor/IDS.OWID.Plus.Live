@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import * as echarts from 'echarts';
+import * as echarts from "echarts";
 
 export default {
   name: "VizCalendar",
@@ -54,9 +54,18 @@ export default {
           });
         });
 
+        var unit = this.$store.state.vizOptionRelative
+          ? " (pro Mio. Token)"
+          : " (Token)";
+
         let myCalendarOption = {
           tooltip: {
             position: "top",
+            formatter: function(params) {
+              return (
+                params.value[0] + ": " + params.value[1].toString().replace(",", "'").replace(".", ",")  + unit
+              );
+            },
           },
           visualMap: {
             min: Math.min(...res.map((o) => o[1]), 0),

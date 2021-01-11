@@ -68,6 +68,7 @@ export default {
             data: values,
             symbolSize: 10,
             line: { marker: { enable: false } },
+            /*
             lineStyle: {
               color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
                 {
@@ -84,8 +85,11 @@ export default {
                 },
               ]),
             },
+            */
           });
         }
+
+        var unit = this.$store.state.vizOptionRelative ? " (pro Mio. Token)" : " (Token)";
 
         let myChartOption = {
           animation: false,
@@ -105,12 +109,13 @@ export default {
             axisPointer: {
               type: "cross",
             },
-            formatter: function(params) {
+            formatter: function(params) {console.log(params);
               return (
+                "<strong>"+params.seriesName + "</strong><br/>"+
                 params.name +
                 ": " +
-                params.value.toString().replace(".", ",") +
-                " (pro Mio. Token)"
+                params.value.toString().replace(",", "'").replace(".", ",") +
+                unit
               );
             },
           },

@@ -6,7 +6,7 @@
         this.$store.state.vizViewportWidth +
         'px; min-height:' +
         this.$store.state.vizViewportHeight +
-        'px'
+        'px; height: auto'
     "
   ></div>  
 </template>
@@ -52,7 +52,6 @@ export default {
             var sum = 0;
             Object.keys(data.items[key2].data).forEach((key3) => {
               sum += data.items[key2].data[key3].value;
-              console.log(data.items[key2]);
             });
 
             var tokens = key2.split(" ");
@@ -77,21 +76,21 @@ export default {
           nodes.push({ name: nt.substring(1), id: nt });
         });
 
-        console.log(nodes);
-        console.log(links);
+        var unit = this.$store.state.vizOptionRelative ? " (pro Mio. Token)" : " (Token)";
 
         var sankeyOptions = {
           animation: false,
           tooltip: {
             trigger: "item",
             triggerOn: "mousemove",
-            formatter: function(payload) {
+            formatter: function(params) {
+              console.log(params);
               return (
-                (payload.data.source === "0>>>"
+                (params.data.source === "0>>>"
                   ? ""
-                  : payload.data.source.substring(1)) +
-                " > " +
-                payload.data.target.substring(1)
+                  : params.data.source.substring(1)) +
+                " --" + params.data.value.toString().replace(",", "'").replace(".", ",")  + unit+ "-> " +
+                params.data.target.substring(1)
               );
             },
           },
@@ -107,8 +106,8 @@ export default {
                 curveness: 0.5,
               },
               label: {
-                formatter: function(payload) {
-                  return payload.data.name;
+                formatter: function(params) {
+                  return params.data.name;
                 },
               },
             },
