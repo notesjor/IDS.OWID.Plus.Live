@@ -12,9 +12,11 @@
       <v-expansion-panel v-for="i in entries" :key="i.label">
         <v-expansion-panel-header
           ><v-checkbox
-            :value="i.checked"
+            :input-value="i.checked"
             :label="i.label"
+            :value="i.label"
             style="max-height:10px; margin-top:-10px; margin-bottom:10px"
+            @change="changeSumSelection"
           ></v-checkbox
         ></v-expansion-panel-header>
         <v-expansion-panel-content>
@@ -91,7 +93,23 @@ export default {
     };
   },
 
+  watch: {
+    selected: function(val) {
+      console.log(val);
+    },
+  },
+
+  methods: {
+    changeSumSelection: function(val, item, x){
+      console.log(item);
+      console.log(val);
+      console.log(x);
+    }
+  },
+
   created() {
+    var data = this.$data;
+
     this.$store.watch(
       () => {
         return this.$store.state.searches;
@@ -99,21 +117,26 @@ export default {
       () => {
         if (this.$store.state.owid === null) return;
 
+        var selected = new Set();
         var res = [];
-        this.$store.state.owid
-          .GetSearchHistory()
-          .forEach((key) => {
-            res.push({
-              label: key,
-              checked: this.$store.state.owid.OwidLiveSearches[key].IsSelected,
-              grid: this.$store.state.owid.GetSearchHistoryItem(
-                key,
-                this.$store.state.vizOptionGranulation
-              ),
-            });
+        this.$store.state.owid.GetSearchHistory().forEach((key) => {
+          var grid = this.$store.state.owid.GetSearchHistoryItem(
+            key,
+            this.$store.state.vizOptionGranulation
+          );
+
+          for (var row in grid) if (grid[row].checked) selected.add(grid[row]);
+
+          res.push({
+            label: key,
+            checked: this.$store.state.owid.OwidLiveSearches[key].IsSelected,
+            grid: grid,
           });
-          
-        this._data.entries = res;
+        });
+
+        data.selected = Array.from(selected);
+        console.log(data.selected);
+        data.entries = res;
       },
       {
         deep: true,
