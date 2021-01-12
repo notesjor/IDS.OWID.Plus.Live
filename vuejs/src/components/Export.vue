@@ -25,10 +25,15 @@
     </v-card>
     <v-snackbar v-model="snackbar">
       <div>
-        <v-icon @click="toClipboard" style="float:left; margin-right:10px">
+        <v-icon @click="toClipboard" style="float:left; margin-right:10px; margin-top:10px">
           mdi-content-copy
         </v-icon>
-        <div id="clipboardText">{{ text }}</div>
+        <v-text-field
+            v-model="text"
+            id="clipboardText"
+            label="URL"
+            style="width:250px"
+          ></v-text-field>
       </div>
 
       <template v-slot:action="{ attrs }">
@@ -64,15 +69,16 @@ export default {
 
   data: () => {
     return {
-      text: "world",
-      snackbar: true,
+      text: "",
+      snackbar: false,
     };
   },
   methods: {
     toClipboard: function() {
-      var copyText = document.createRange();
-      copyText.selectNode(document.getElementById("clipboardText"));
-      window.getSelection().addRange(copyText);
+      var copyText = document.getElementById("clipboardText");
+      
+      copyText.select();
+      copyText.setSelectionRange(0, 99999); /* For mobile devices */
       document.execCommand("copy");
     },
     toTsv: function() {
@@ -144,15 +150,19 @@ export default {
         });
     },
     toLink: function() {
-      fetch(this.$store.state.baseUrl + "/down", {
+      var store = this.$store;
+      var data = this.$data;
+
+      fetch(store.state.baseUrl + "/down", {
         method: "post",
-        body: JSON.stringify({ Format: "LINK", Owid: this.$store.state.owid }),
+        body: JSON.stringify({ Format: "LINK", Owid: store.state.owid }),
       })
         .then(function(r) {
-          return r.arrayBuffer();
+          return r.text();
         })
-        .then(function(buffer) {
-          saveBlob(buffer, "image/png", "image.png");
+        .then(function(text) {
+          data.text = "https://" + window.location.hostname + "/" + text;
+          data.snackbar = true;
         })
         .catch(function(error) {
           console.log("Request failed", error);
