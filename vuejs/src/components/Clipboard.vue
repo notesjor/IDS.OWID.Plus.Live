@@ -135,7 +135,7 @@ export default {
         });
 
         data.selected = Array.from(selected);
-        console.log(data.selected);
+        
         data.entries = res;
       },
       {

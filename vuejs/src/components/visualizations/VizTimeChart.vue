@@ -109,7 +109,7 @@ export default {
             axisPointer: {
               type: "cross",
             },
-            formatter: function(params) {console.log(params);
+            formatter: function(params) {
               return (
                 "<strong>"+params.seriesName + "</strong><br/>"+
                 params.name +

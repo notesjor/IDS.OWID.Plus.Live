@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import { OwidLiveStorage } from "./OwidLiveStorage";
+import { Normalize } from "./DataHelper";
 
 Vue.use(Vuex);
 
@@ -178,16 +179,12 @@ export default new Vuex.Store({
         }
 
         Object.keys(res).forEach((key) => {
-          var item = res[key];
-          Object.keys(normData).forEach((date) => {
-            if (date in item.data)
-              item.data[date].value = parseFloat(
-                ((item.data[date].value / normData[date]) * 1000000.0).toFixed(
-                  2
-                )
-              );
-            else item.data[date] = { dates: new Set(), value: 0.0 };
-          });
+          res[key] = Normalize(res[key], normData);
+          if (res[key].items != null) {
+            Object.keys(res[key].items).forEach((subKey) => {
+              res[key].items[subKey] = Normalize(res[key].items[subKey], normData);
+            });
+          }
         });
       }
 
@@ -222,7 +219,10 @@ export default new Vuex.Store({
             sum /= odd
               ? state.vizOptionSmoothing
               : state.vizOptionSmoothing - 1;
-            nval[keys[i + labelSelector]] = { dates: dates, value: sum.toFixed(3) };
+            nval[keys[i + labelSelector]] = {
+              dates: dates,
+              value: sum.toFixed(3),
+            };
           }
 
           res[key].data = nval;
