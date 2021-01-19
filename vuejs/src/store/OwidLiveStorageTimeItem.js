@@ -2,6 +2,7 @@ export class OwidLiveStorageTimeItem {
   #Key;
   #Token;
   #Name;
+  #Label;
   #Dates;
   #IsSelected;
 
@@ -23,6 +24,7 @@ export class OwidLiveStorageTimeItem {
     this.#Key = key;
     this.#Token = key.split("µ");
     this.#Name = key.split("µ")[0];
+    this.#Label = key.split("µ").join(" | ");
     this.#Dates = dates;
     this.#IsSelected = true;
   }
@@ -46,6 +48,13 @@ export class OwidLiveStorageTimeItem {
    */
   get Name() {
     return this.#Name;
+  }
+
+  /**
+   * The label of the search-result
+   */
+  get Label() {
+    return this.#Label;
   }
 
   /**

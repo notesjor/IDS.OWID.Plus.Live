@@ -62,6 +62,14 @@ export default new Vuex.Store({
       state.vizOptionSmoothing = payload.s;
     },
 
+    selectSearchChange(state, payload){
+      state.owid.selectSearchItems(payload);
+    },
+
+    selectSearchHistoryItemsChange(state, payload){
+      state.owid.selectSearchHistoryItem(payload);
+    },
+
     calculate(state) {
       if (state.owid === null || state.owid.OwidLiveSearches === null) {
         state.vizData = null;
@@ -101,7 +109,7 @@ export default new Vuex.Store({
               break;
           }
 
-          subItems[item.Name] = { name: item.Name, data: sitem, items: null };
+          subItems[item.Label] = { name: item.Name, label: item.Label, data: sitem, items: null };
         }
         if (Object.keys(subItems).length === 0) continue;
 
@@ -127,12 +135,13 @@ export default new Vuex.Store({
           }
 
           // if you had selected a 'search' all subItems will be appended
-          res[search.Name] = { name: search.Name, data: sgrp, items: subItems };
+          res[search.Name] = { name: search.Name, label: search.Label, data: sgrp, items: subItems };
         } else {
           // if you had not selected a 'search' all subItems will be root items
-          subItems.forEach((x) => {
+          Object.keys(subItems).forEach((x) => {
             res[x] = {
               name: subItems[x].name,
+              label: subItems[x].Label,
               data: subItems[x].data,
               items: [subItems[x]],
             };
@@ -155,7 +164,7 @@ export default new Vuex.Store({
           } else sumAll[subKey] = item.data[subKey];
         });
       });
-      res["ALLE"] = { name: "ALLE", data: sumAll, items: null };
+      res["ALLE"] = { name: "ALLE", label: "ALLE", data: sumAll, items: null };
 
       // relativ Frquency
       if (state.vizOptionRelative) {
@@ -228,7 +237,7 @@ export default new Vuex.Store({
           res[key].data = nval;
         });
       }
-
+console.log(state.owid);console.log(res);
       state.vizData = res;
       state.version++;
     },

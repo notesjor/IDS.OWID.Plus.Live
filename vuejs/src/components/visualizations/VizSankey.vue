@@ -54,7 +54,7 @@ export default {
               sum += data.items[key2].data[key3].value;
             });
 
-            var tokens = key2.split(" ");
+            var tokens = data.items[key2].name.split(" ");
             var last = "0>>>";
             var n = 1;
             tokens.forEach((t) => {

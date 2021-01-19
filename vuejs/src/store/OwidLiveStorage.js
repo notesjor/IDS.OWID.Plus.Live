@@ -9,13 +9,13 @@ export class OwidLiveStorage {
   #NormTotal;
   #N;
 
-  toJSON(){
+  toJSON() {
     return {
       N: this.#N,
       OwidLiveSearches: this.#OwidLiveSearches,
       Norm: this.#Norm,
       Total: this.#Total,
-      NormTotal: this.#NormTotal
+      NormTotal: this.#NormTotal,
       //Dates: this.#Dates - hide in serized data (only used in view)
     };
   }
@@ -46,7 +46,7 @@ export class OwidLiveStorage {
     }
 
     this.#Dates = dates.sort();
-    this.#Total = total;    
+    this.#Total = total;
     this.#NormTotal = notal;
   }
 
@@ -55,6 +55,27 @@ export class OwidLiveStorage {
    */
   get OwidLiveSearches() {
     return this.#OwidLiveSearches;
+  }
+
+  /**
+   * (Un-)Selects all OwidLiveSearches
+   * @param  {arry} selection all listed items will be selected - other: unselected
+   */
+  selectSearchItems(selection) {
+    var set = new Set(selection);
+    Object.keys(this.#OwidLiveSearches).forEach((key) => {
+      this.#OwidLiveSearches[key].IsSelected = set.has(key);
+    });
+  }
+
+  /**
+   * (Un-)Selects all OwidLiveStorageTimeItems
+   * @param  {arry} selection all listed items will be selected - other: unselected
+   */
+  selectSearchHistoryItem(selection) {
+    Object.keys(this.#OwidLiveSearches).forEach((key) => {
+      this.#OwidLiveSearches[key].SelectOwidLiveStorageTimeItems(selection);
+    });
   }
 
   /**

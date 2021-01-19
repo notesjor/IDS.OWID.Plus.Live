@@ -61,9 +61,9 @@ export default {
           availableDates.forEach((c) => {
             values.push(c in data.data ? data.data[c] : 0);
           });
-
+console.log(data);
           series.push({
-            name: data.name,
+            name: data.label,
             type: "line",
             data: values,
             symbolSize: 10,

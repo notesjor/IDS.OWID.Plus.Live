@@ -10,15 +10,20 @@
     </v-card-title>
     <v-expansion-panels multiple>
       <v-expansion-panel v-for="i in entries" :key="i.label">
-        <v-expansion-panel-header
-          ><v-checkbox
-            :input-value="i.checked"
-            :label="i.label"
-            :value="i.label"
-            style="max-height:10px; margin-top:-10px; margin-bottom:10px"
-            @change="changeSumSelection"
-          ></v-checkbox
-        ></v-expansion-panel-header>
+        <v-expansion-panel-header>
+          <div>
+            <div style="display:inline;">{{ i.label }}</div>
+            <div style="float:right;display:block; margin-top:-25px">
+              <v-checkbox
+                :value="i.label"
+                label="Summieren"
+                style="max-height:10px; margin: 15px 10px 0 0"
+                @change="changeSumSelection"
+                v-model="syncSumSelection"
+              ></v-checkbox>
+            </div>
+          </div>
+        </v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-data-table
             :headers="headers"
@@ -90,21 +95,40 @@ export default {
         { text: "Frequenzkurve (rel.)", value: "sparkNorm" },
       ],
       entries: [],
+
+      syncLock: false,
+      syncSumSelection: [],
     };
   },
 
   watch: {
     selected: function(val) {
-      console.log(val);
+      if (this.$data.syncLock) return;
+
+var sel = [];
+for(var i in val)
+sel.push(val[i].key);
+console.log(sel);
+      this.$data.syncLock = true;
+      this.$store.commit("updateStatus", "pending");
+      this.$store.commit("selectSearchHistoryItemsChange", sel);
+      this.$store.commit("calculate");
+      this.$store.commit("updateStatus", "success");
+      this.$data.syncLock = false;
     },
   },
 
   methods: {
-    changeSumSelection: function(val, item, x){
-      console.log(item);
-      console.log(val);
-      console.log(x);
-    }
+    changeSumSelection: function() {
+      if (this.$data.syncLock) return;
+
+      this.$data.syncLock = true;
+      this.$store.commit("updateStatus", "pending");
+      this.$store.commit("selectSearchChange", this.$data.syncSumSelection);
+      this.$store.commit("calculate");
+      this.$store.commit("updateStatus", "success");
+      this.$data.syncLock = false;
+    },
   },
 
   created() {
@@ -118,7 +142,9 @@ export default {
         if (this.$store.state.owid === null) return;
 
         var selected = new Set();
+        var selectedSums = [];
         var res = [];
+
         this.$store.state.owid.GetSearchHistory().forEach((key) => {
           var grid = this.$store.state.owid.GetSearchHistoryItem(
             key,
@@ -132,11 +158,16 @@ export default {
             checked: this.$store.state.owid.OwidLiveSearches[key].IsSelected,
             grid: grid,
           });
+
+          if (this.$store.state.owid.OwidLiveSearches[key].IsSelected)
+            selectedSums.push(key);
         });
 
+        data.syncLock = true;
         data.selected = Array.from(selected);
-        
+        data.syncSumSelection = selectedSums;
         data.entries = res;
+        data.syncLock = false;
       },
       {
         deep: true,

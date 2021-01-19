@@ -7,14 +7,14 @@ export class OwidLiveSearch {
   #OwidLiveStorageTimeItems;
   #IsSelected;
 
-  toJSON(){
+  toJSON() {
     return {
       N: this.#N,
       Key: this.#Key,
       Request: this.#Request,
       OwidLiveStorageTimeItems: this.#OwidLiveStorageTimeItems,
-      IsSelected: this.#IsSelected
-    }
+      IsSelected: this.#IsSelected,
+    };
   }
 
   /**
@@ -35,7 +35,7 @@ export class OwidLiveSearch {
     this.#Request = request;
 
     var olsti = [];
-    Object.keys(items).forEach(item => {
+    Object.keys(items).forEach((item) => {
       olsti.push(new OwidLiveStorageTimeItem(item, items[item]));
     });
     this.#OwidLiveStorageTimeItems = olsti;
@@ -67,7 +67,12 @@ export class OwidLiveSearch {
     });
 
     return (
-      this.#Key + " [" + cnt + " / " + this.#OwidLiveStorageTimeItems.length + "]"
+      this.#Key +
+      " [" +
+      cnt +
+      " / " +
+      this.#OwidLiveStorageTimeItems.length +
+      "]"
     );
   }
 
@@ -92,7 +97,7 @@ export class OwidLiveSearch {
     if (typeof bool === "boolean") {
       this.#IsSelected = bool;
       this.#OwidLiveStorageTimeItems.forEach((x) => {
-        this.#OwidLiveStorageTimeItems[x].IsSelected(true);
+        x.IsSelected = true;
       });
     }
   }
@@ -167,14 +172,25 @@ export class OwidLiveSearch {
     var res = {};
     this.#OwidLiveStorageTimeItems.forEach((x) => {
       var items = func(x);
-      Object.keys(items).forEach(key => {
-        if (key in res){
-           res[key].value += items[key].value;
-           res[key].dates = new Set([...res[key].dates, ...items[key].dates]);
-        }
-        else res[key] = items[key];
-      });
+      if (items != null)
+        Object.keys(items).forEach((key) => {
+          if (key in res) {
+            res[key].value += items[key].value;
+            res[key].dates = new Set([...res[key].dates, ...items[key].dates]);
+          } else res[key] = items[key];
+        });
     });
     return res;
+  }
+
+  /**
+   * (Un-)Selects all OwidLiveStorageTimeItems
+   * @param  {arry} selection all listed items will be selected - other: unselected
+   */
+  SelectOwidLiveStorageTimeItems(selection) {
+    var set = new Set(selection);
+    this.#OwidLiveStorageTimeItems.forEach((i) => {
+      i.IsSelected = set.has(i.Key);
+    });
   }
 }

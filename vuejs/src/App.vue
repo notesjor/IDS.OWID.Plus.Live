@@ -92,7 +92,6 @@
 </template>
 
 <script>
-//import DataGrid from "./components/DataGrid";
 import VizPanel from "./components/VizPanel";
 import VizOptions from "./components/VizOptions";
 import Search from "./components/Search";
@@ -104,7 +103,6 @@ export default {
   name: "App",
 
   components: {
-    //DataGrid,
     VizPanel,
     VizOptions,
     Search,
