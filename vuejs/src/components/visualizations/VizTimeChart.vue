@@ -63,7 +63,7 @@ export default {
           });
 console.log(data);
           series.push({
-            name: data.label,
+            name: data.name,
             type: "line",
             data: values,
             symbolSize: 10,
