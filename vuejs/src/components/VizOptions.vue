@@ -49,9 +49,11 @@
           <v-slider
             id="smooth"
             v-model="smoothValue"
-            thumb-label
             min="1"
+            thumb-label="always"
             :max="smoothMax"
+            :tick-labels="smoothLabels"
+            ticks="always"
             style="margin-left:10px; margin-top:-27px"
           ></v-slider>
         </v-col>
@@ -69,18 +71,23 @@ function commit() {
   switch (g) {
     case 1:
       this.$data.smoothMax = 52;
+      this.$data.smoothLabels = ["1","","","4","","","","8","","","","12","","","","16","","","","20","","","","24","","26","","28","","","","32","","","","36","","","","40","","","","44","","","","48","","","","52"];
       break;
     case 2:
       this.$data.smoothMax = 24;
+      this.$data.smoothLabels = ["1","2","","4","","6","","8","","","","12","","","","16","","18","","20","","","","24"];
       break;
     case 3:
       this.$data.smoothMax = 8;
+      this.$data.smoothLabels = ["1","2","","4","","6","","8"];
       break;
     case 4:
       this.$data.smoothMax = 10;
+      this.$data.smoothLabels = ["1","","","","5","","","","","10"];
       break;
     default:
       this.$data.smoothMax = 31;
+      this.$data.smoothLabels = ["1","","","","","","7","","","","","","","14","","","","","","","21","","","","","","","28","","","31"];
       break;
   }
 
@@ -102,6 +109,7 @@ export default {
       smoothMax: 31,
       granulationValue: 0,
       granulationLabels: ["Tag", "Woche", "Monat", "Quartal", "Jahr"],
+      smoothLabels: ["1","","","","","","7","","","","","","","14","","","","","","","21","","","","","","","28","","","31"]
     };
   },
   watch: {

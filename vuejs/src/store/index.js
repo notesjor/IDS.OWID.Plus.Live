@@ -62,11 +62,11 @@ export default new Vuex.Store({
       state.vizOptionSmoothing = payload.s;
     },
 
-    selectSearchChange(state, payload){
+    selectSearchChange(state, payload) {
       state.owid.selectSearchItems(payload);
     },
 
-    selectSearchHistoryItemsChange(state, payload){
+    selectSearchHistoryItemsChange(state, payload) {
       state.owid.selectSearchHistoryItem(payload);
     },
 
@@ -109,7 +109,12 @@ export default new Vuex.Store({
               break;
           }
 
-          subItems[item.Label] = { name: item.Name, label: item.Label, data: sitem, items: null };
+          subItems[item.Label] = {
+            name: item.Name,
+            label: item.Label,
+            data: sitem,
+            items: null,
+          };
         }
         if (Object.keys(subItems).length === 0) continue;
 
@@ -135,7 +140,12 @@ export default new Vuex.Store({
           }
 
           // if you had selected a 'search' all subItems will be appended
-          res[search.Name] = { name: search.Name, label: search.Label, data: sgrp, items: subItems };
+          res[search.Name] = {
+            name: search.Name,
+            label: search.Label,
+            data: sgrp,
+            items: subItems,
+          };
         } else {
           // if you had not selected a 'search' all subItems will be root items
           Object.keys(subItems).forEach((x) => {
@@ -191,7 +201,10 @@ export default new Vuex.Store({
           res[key] = Normalize(res[key], normData);
           if (res[key].items != null) {
             Object.keys(res[key].items).forEach((subKey) => {
-              res[key].items[subKey] = Normalize(res[key].items[subKey], normData);
+              res[key].items[subKey] = Normalize(
+                res[key].items[subKey],
+                normData
+              );
             });
           }
         });
@@ -237,7 +250,7 @@ export default new Vuex.Store({
           res[key].data = nval;
         });
       }
-console.log(state.owid);console.log(res);
+
       state.vizData = res;
       state.version++;
     },

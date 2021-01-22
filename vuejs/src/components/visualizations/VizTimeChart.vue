@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import * as echarts from 'echarts';
+import * as echarts from "echarts";
 
 export default {
   name: "VizTimeChart",
@@ -61,35 +61,19 @@ export default {
           availableDates.forEach((c) => {
             values.push(c in data.data ? data.data[c] : 0);
           });
-console.log(data);
+
           series.push({
             name: data.name,
             type: "line",
             data: values,
-            symbolSize: 10,
+            symbolSize: 1,
             line: { marker: { enable: false } },
-            /*
-            lineStyle: {
-              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                {
-                  offset: 0,
-                  color: "rgba(247, 32, 71)",
-                },
-                {
-                  offset: 0.5,
-                  color: "rgba(255, 210, 0)",
-                },
-                {
-                  offset: 1,
-                  color: "rgba(31, 234, 234)",
-                },
-              ]),
-            },
-            */
           });
         }
-
-        var unit = this.$store.state.vizOptionRelative ? " (pro Mio. Token)" : " (Token)";
+        
+        var unit = this.$store.state.vizOptionRelative
+          ? " (pro Mio. Token)"
+          : " (Token)";
 
         let myChartOption = {
           animation: false,
@@ -99,6 +83,7 @@ console.log(data);
           },
           yAxis: {
             type: "value",
+            scale: true
           },
           series: series,
           dataZoom: [
@@ -107,14 +92,20 @@ console.log(data);
           ],
           tooltip: {
             axisPointer: {
+              snap: true,
               type: "cross",
             },
             formatter: function(params) {
               return (
-                "<strong>"+params.seriesName + "</strong><br/>"+
+                "<strong>" +
+                params.seriesName +
+                "</strong><br/>" +
                 params.name +
                 ": " +
-                params.value.toString().replace(",", "'").replace(".", ",") +
+                params.value
+                  .toString()
+                  .replace(",", "'")
+                  .replace(".", ",") +
                 unit
               );
             },

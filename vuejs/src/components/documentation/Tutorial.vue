@@ -5,7 +5,7 @@
     </template>
     <v-card>
       <v-card-title class="headline">
-        Herzlich willkommen bei OWID+LIVE
+        Herzlich willkommen bei OWIDplusLIVE
       </v-card-title>
       <video
         controls
@@ -22,7 +22,7 @@
         />
       </video>
       <v-card-text>
-        Dieses Video gibt Ihnen eine kurze 3-minütige Einführung in 'OWID+LIVE'
+        Dieses Video gibt Ihnen eine kurze 3-minütige Einführung in 'OWIDplusLIVE'
         mit hilfreichen Tipps.<br />
         Eine textbasiete Anleitung können Sie hier herunterladen.
       </v-card-text>
