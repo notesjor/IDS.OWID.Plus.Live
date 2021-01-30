@@ -24,6 +24,10 @@ export default new Vuex.Store({
     vizVizportId: "",
 
     vizData: null,
+
+    progressAbort: false,
+    progressIndex: 0,
+    progressMax: 0,
   },
   mutations: {
     id(state, id) {
@@ -257,4 +261,9 @@ export default new Vuex.Store({
   },
   actions: {},
   modules: {},
+  getters: {
+    progressMsg: state => {
+      return "Lade Zeitreihe(n): " + state.progressIndex + " von " + state.progressMax;
+    }
+  }
 });

@@ -3,14 +3,20 @@
     <v-app>
       <v-app-bar app dark class="d-print-none">
         <div class="d-flex align-center">
-          <v-img
-            alt="OWIDplus Logo"
-            class="shrink mr-2"
-            contain
-            src="./assets/owid_plus.png"
-            transition="scale-transition"
-            height="40"
-          />
+          <a
+            href="https://www.owid.de/plus/index.html"
+            target="_blank"
+            rel="nofollow"
+          >
+            <v-img
+              alt="OWIDplus Logo"
+              class="shrink mr-2"
+              contain
+              src="./assets/owid_plus.png"
+              transition="scale-transition"
+              height="40"
+            />
+          </a>
         </div>
 
         <v-spacer></v-spacer>
@@ -34,14 +40,20 @@
         <v-spacer></v-spacer>
 
         <div class="d-flex align-center">
-          <v-img
-            alt="IDS Logo"
-            class="shrink mr-2"
-            contain
-            src="./assets/ids-wbmarke.svg"
-            transition="scale-transition"
-            height="80"
-          />
+          <a
+            href="https://www.ids-mannheim.de/"
+            target="_blank"
+            rel="nofollow"
+          >
+            <v-img
+              alt="IDS Logo"
+              class="shrink mr-2"
+              contain
+              src="./assets/ids-wbmarke.svg"
+              transition="scale-transition"
+              height="80"
+            />
+          </a>
         </div>
       </v-app-bar>
       <v-main>
@@ -84,7 +96,8 @@
         <div class="text-center">
           <v-progress-circular indeterminate size="64"></v-progress-circular>
           <h3>Bitte warten...</h3>
-          <!--<v-btn>Abbrechen</v-btn>-->
+          <h4>{{ this.$store.state.progressMsg }}</h4>
+          <v-btn @click="this.$store.state.progressAbort = true">Abbrechen</v-btn>
         </div>
       </v-overlay>
     </v-app>

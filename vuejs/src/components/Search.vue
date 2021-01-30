@@ -10,6 +10,37 @@
         <v-expansion-panel-content>
           <v-row>
             <v-col>
+              <h5>
+                Die "Einfache Suche" nach N-Grammen umfasst folgende
+                Funktionalitäten:
+                <ul>
+                  <li>
+                    Suche nach Grammen &rang; z. B. bayer (exakte Suche), bayer*
+                    (Prefix - z. B. bayern), *bayer (Suffix - z. B. nordbayer)
+                    oder *bayer* (beliebige Position - z. B. nordbayern)
+                  </li>
+                  <li>
+                    Unterschiedliche N-Gramm-Längen von 1-3 &rang; z. B. N=1:
+                    Virus, N=2: Angela Merkel,
+                  </li>
+                  <li>
+                    Verschiedene Annotationsebenen &rang; Wortform, Lemma oder
+                    POS (Part-of-Speech &rarr; Wortart
+                    <a
+                      href="https://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/data/STTS-Tagset.pdf"
+                      rel="nofollow"
+                      target="_blank"
+                      >[siehe Dokumentation]</a
+                    >). Bsp.: 2-Gram: ADJ* Merkel, 3-Gram: ART unglaublich NN
+                  </li>
+                </ul>
+                Mit der "Einfachen Suche" können Sie nach N-Grammen suchen - z.
+                B. nach 1-Gram: Virus, nach 2-Gram: Angela Merkel
+              </h5>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
               <v-tabs>
                 <v-tab @click="search_simple_n_change(1)">
                   <v-tooltip right>
@@ -448,8 +479,8 @@
 
     <v-snackbar v-model="snackbar">
       Ihr Suchausdruck konnte nicht gefunden werden oder der Server ist
-      vorübergehend nicht erreichbar.<br/>Bitte probieren Sie es mit einem anderen
-      (einfacheren) Suchausdruck erneut.
+      vorübergehend nicht erreichbar.<br />Bitte probieren Sie es mit einem
+      anderen (einfacheren) Suchausdruck erneut.
 
       <template v-slot:action="{ attrs }">
         <v-btn text v-bind="attrs" @click="snackbar = false">
@@ -505,32 +536,64 @@ class queryItem {
 }
 
 function sendSearchRequest(data, store, n, queryItems) {
+  store.state.progressAbort = false;
+
   store.commit("updateStatus", "pending");
   var xhr = new XMLHttpRequest();
+
+  store.state.progressMsg = "Suche N-Gramme";
+
   xhr.addEventListener("readystatechange", function() {
     if (this.readyState === 4) {
-      var xhr2 = new XMLHttpRequest();
-      xhr2.addEventListener("readystatechange", function() {
-        if (this.readyState === 4) {
-          if (this.status === 200 && this.responseText.length > 2) {
-            store.commit("search", {
-              n: n,
-              queryItems: queryItems,
-              items: JSON.parse(this.responseText),
-            });
-            store.commit("calculate");
-            store.commit("updateStatus", "success");
-          } else {
-            store.commit("updateStatus", "success");
-            data.snackbar = true;
-          }
+      var searchResult = JSON.parse(this.responseText);
+      store.state.progressIndex = 0;
+      store.state.progressMax = searchResult.Items.length;
+      var packageSize = 50;
+
+      var result = {};
+      var error = false;
+
+      for (var i = 0; i < searchResult.Items.length; i += packageSize) {
+        if (store.state.progressAbort) {
+          error = true;
+          break;
         }
-      });
+        
+        var request = searchResult.Items.slice(i, i + packageSize);
+        store.state.progressIndex += request.length;
 
-      xhr2.open("POST", store.state.baseUrl + "/pull");
-      xhr2.setRequestHeader("Content-Type", "application/json");
+        var xhr2 = new XMLHttpRequest();
+        xhr2.addEventListener("readystatechange", function() {
+          if (this.readyState === 4) {
+            if (this.status === 200 && this.responseText.length > 2) {
+              var t = JSON.parse(this.responseText);
+              console.log(t);
+              result = Object.assign({}, result, JSON.parse(this.responseText));
+              console.log(result);
+            } else {
+              error = true;
+            }
+          }
+        });
 
-      xhr2.send(this.responseText);
+        xhr2.open("POST", store.state.baseUrl + "/pull", false);
+        xhr2.setRequestHeader("Content-Type", "application/json");
+
+        xhr2.send(JSON.stringify({ N: n, Items: request }));
+      }
+
+      if (error) {
+        store.commit("updateStatus", "success");
+        if (!store.state.progressAbort) data.snackbar = true;
+      } else {
+        store.commit("search", {
+          n: n,
+          queryItems: queryItems,
+          items: result,
+        });
+        store.commit("calculate");
+        store.commit("updateStatus", "success");
+      }
     }
   });
 
@@ -611,7 +674,12 @@ export default {
           )
         );
 
-      sendSearchRequest(this.$data, this.$store, this.$data.search_simple_n, queryItems);
+      sendSearchRequest(
+        this.$data,
+        this.$store,
+        this.$data.search_simple_n,
+        queryItems
+      );
     },
     search_complex: function() {
       var queryItems = [];
@@ -674,7 +742,12 @@ export default {
         ];
       }
 
-      sendSearchRequest(this.$data, this.$store, this.$data.search_complex_n, queryItems);
+      sendSearchRequest(
+        this.$data,
+        this.$store,
+        this.$data.search_complex_n,
+        queryItems
+      );
     },
     validate_notEmpty: function(value) {
       return value === "" || value == "*"
