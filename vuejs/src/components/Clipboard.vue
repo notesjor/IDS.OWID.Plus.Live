@@ -30,6 +30,7 @@
             :items="i.grid"
             :search="search"
             :single-select="false"
+            :footer-props="{ itemsPerPageOptions: [10, 20, 50, 100, 250, -1] }"
             v-model="selected"
             item-key="key"
             mutli-sort
@@ -105,10 +106,8 @@ export default {
     selected: function(val) {
       if (this.$data.syncLock) return;
 
-var sel = [];
-for(var i in val)
-sel.push(val[i].key);
-console.log(sel);
+      var sel = [];
+      for (var i in val) sel.push(val[i].key);
       this.$data.syncLock = true;
       this.$store.commit("updateStatus", "pending");
       this.$store.commit("selectSearchHistoryItemsChange", sel);

@@ -536,19 +536,15 @@ class queryItem {
 }
 
 function sendSearchRequest(data, store, n, queryItems) {
-  store.state.progressAbort = false;
-
   store.commit("updateStatus", "pending");
+  store.commit("searchProgressInit");
   var xhr = new XMLHttpRequest();
-
-  store.state.progressMsg = "Suche N-Gramme";
 
   xhr.addEventListener("readystatechange", function() {
     if (this.readyState === 4) {
       var searchResult = JSON.parse(this.responseText);
-      store.state.progressIndex = 0;
-      store.state.progressMax = searchResult.Items.length;
-      var packageSize = 50;
+      store.commit("searchProgressSetup", searchResult.Items.length);
+      var packageSize = 250;
 
       var result = {};
       var error = false;
@@ -558,18 +554,17 @@ function sendSearchRequest(data, store, n, queryItems) {
           error = true;
           break;
         }
-        
+
         var request = searchResult.Items.slice(i, i + packageSize);
-        store.state.progressIndex += request.length;
+        console.log(request.length);
+        store.commit("searchProgressNextPage", request.length);
+        console.log(store.state.progressIndex);
 
         var xhr2 = new XMLHttpRequest();
         xhr2.addEventListener("readystatechange", function() {
           if (this.readyState === 4) {
             if (this.status === 200 && this.responseText.length > 2) {
-              var t = JSON.parse(this.responseText);
-              console.log(t);
               result = Object.assign({}, result, JSON.parse(this.responseText));
-              console.log(result);
             } else {
               error = true;
             }
@@ -754,6 +749,6 @@ export default {
         ? "Das Feld darf nicht leer sein."
         : true;
     },
-  },
+  },  
 };
 </script>

@@ -28,6 +28,7 @@ export default new Vuex.Store({
     progressAbort: false,
     progressIndex: 0,
     progressMax: 0,
+    progressMsg: "",
   },
   mutations: {
     id(state, id) {
@@ -49,6 +50,26 @@ export default new Vuex.Store({
 
     updateN(state, N) {
       state.owid.N = N;
+    },
+
+    searchProgressInit(state) {
+      state.progressAbort = false;
+      state.progressMsg = "Suche N-Gramme";
+      state.progressIndex = 0;
+      state.progressMax = 0;
+    },
+
+    searchProgressSetup(state, payload) {
+      state.progressMax = payload;
+    },
+
+    searchProgressNextPage(state, payload) {
+      state.progressIndex += payload;
+      state.progressMsg = `Lade Zeitreihe(n): ${state.progressIndex} von ${state.progressMax}`;
+    },
+
+    searchProgressAbort(state) {
+      state.progressAbort = true;
     },
 
     updateStatus(state, status) {
@@ -261,9 +282,4 @@ export default new Vuex.Store({
   },
   actions: {},
   modules: {},
-  getters: {
-    progressMsg: state => {
-      return "Lade Zeitreihe(n): " + state.progressIndex + " von " + state.progressMax;
-    }
-  }
 });

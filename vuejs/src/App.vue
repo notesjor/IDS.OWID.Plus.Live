@@ -96,8 +96,8 @@
         <div class="text-center">
           <v-progress-circular indeterminate size="64"></v-progress-circular>
           <h3>Bitte warten...</h3>
-          <h4>{{ this.$store.state.progressMsg }}</h4>
-          <v-btn @click="this.$store.state.progressAbort = true">Abbrechen</v-btn>
+          <h4>{{ progressMsg }}</h4>
+          <v-btn @click="abortProgress">Abbrechen</v-btn>
         </div>
       </v-overlay>
     </v-app>
@@ -128,6 +128,24 @@ export default {
     overlay: false,
     alert: false,
   }),
+
+  methods:{
+    abortProgress: function(){
+      this.$store.commit("searchProgressAbort");
+    }
+  },
+
+  computed: {
+    progressMsg(){
+      return this.$store.state.progressMsg;
+    }
+  },
+
+  watch:{
+    progressMsg(n){
+      return n;
+    }
+  },
 
   mounted() {
     var store = this.$store;
