@@ -3,44 +3,43 @@
     <v-expansion-panels :value="0">
       <v-expansion-panel>
         <v-expansion-panel-header class="justify-self-start">
-          <div>
-            <v-icon left>mdi-magnify</v-icon><span>SUCHEN: Einfache Suche</span>
-          </div>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <div v-bind="attrs" v-on="on"
+                ><v-icon left>mdi-magnify</v-icon
+                ><span>SUCHEN: Einfache Suche</span></div
+              >
+            </template>
+            <span>
+              Die "Einfache Suche" nach N-Grammen umfasst folgende
+              Funktionalitäten:
+              <ul>
+                <li>
+                  <strong>Unterschiedliche N-Gramm-Längen von 1-3</strong>
+                  <br />
+                  z. B. N=1: Virus, N=2: zweite Welle, N=3: Bundeskanzlerin Angela Merkel
+                </li>
+                <li>
+                  <strong>Suche nach Grammen</strong> <br />
+                  z. B. bayer (exakte Suche), bayer* (Prefix - z. B. bayern),
+                  *bayer (Suffix - z. B. nordbayer) <br /> oder *bayer* (beliebige
+                  Position - z. B. nordbayern)
+                </li>                
+                <li>
+                  <strong>Verschiedene Annotationsebenen</strong> <br />
+                  Wortform, Lemma oder POS (Part-of-Speech &rarr; Wortart).<br />
+                  Bsp.: 2-Gram: ADJ* Merkel, 3-Gram: ART unglaublich NN
+                </li>
+              </ul>
+              Mit der "Einfachen Suche" können Sie nach N-Grammen suchen - z. B.
+              nach 1-Gram: Virus, nach 2-Gram: Angela Merkel
+            </span>
+          </v-tooltip>
         </v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-row>
             <v-col>
-              <h5>
-                Die "Einfache Suche" nach N-Grammen umfasst folgende
-                Funktionalitäten:
-                <ul>
-                  <li>
-                    Suche nach Grammen &rang; z. B. bayer (exakte Suche), bayer*
-                    (Prefix - z. B. bayern), *bayer (Suffix - z. B. nordbayer)
-                    oder *bayer* (beliebige Position - z. B. nordbayern)
-                  </li>
-                  <li>
-                    Unterschiedliche N-Gramm-Längen von 1-3 &rang; z. B. N=1:
-                    Virus, N=2: Angela Merkel,
-                  </li>
-                  <li>
-                    Verschiedene Annotationsebenen &rang; Wortform, Lemma oder
-                    POS (Part-of-Speech &rarr; Wortart
-                    <a
-                      href="https://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/data/STTS-Tagset.pdf"
-                      rel="nofollow"
-                      target="_blank"
-                      >[siehe Dokumentation]</a
-                    >). Bsp.: 2-Gram: ADJ* Merkel, 3-Gram: ART unglaublich NN
-                  </li>
-                </ul>
-                Mit der "Einfachen Suche" können Sie nach N-Grammen suchen - z.
-                B. nach 1-Gram: Virus, nach 2-Gram: Angela Merkel
-              </h5>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col>
+              <h5>Suchfenstergröße:</h5>
               <v-tabs>
                 <v-tab @click="search_simple_n_change(1)">
                   <v-tooltip right>
@@ -91,6 +90,11 @@
                 <v-tab-item>
                   <v-card flat>
                     <v-row>
+                      <v-col style="padding:0px; margin: 40px 0 -20px 10px">
+                        <h5>Suchabfrage:</h5>
+                      </v-col>
+                    </v-row>
+                    <v-row>
                       <v-col cols="2">
                         <v-overflow-btn
                           persistent-hint
@@ -101,7 +105,7 @@
                       </v-col>
                       <v-col cols="10" style="margin-top:7px">
                         <v-text-field
-                          label="Suchausdruck..."
+                          label="Suchausdruck (einzelnes Token)..."
                           v-model="search_simple_1_value"
                           id="search_simple_1_1"
                           :rules="inputRules"
@@ -113,6 +117,11 @@
                 <v-tab-item>
                   <v-card flat>
                     <v-row>
+                      <v-col style="padding:0px; margin: 40px 0 -20px 10px">
+                        <h5>Suchabfrage:</h5>
+                      </v-col>
+                    </v-row>
+                    <v-row>
                       <v-col cols="2">
                         <v-overflow-btn
                           persistent-hint
@@ -123,7 +132,7 @@
                       </v-col>
                       <v-col cols="4">
                         <v-text-field
-                          label="Suchausdruck..."
+                          label="Suchausdruck (an 1. Postion)..."
                           v-model="search_simple_1_value"
                           id="search_simple_2_1"
                           :rules="inputRules"
@@ -139,7 +148,7 @@
                       </v-col>
                       <v-col cols="4">
                         <v-text-field
-                          label="Suchausdruck..."
+                          label="Suchausdruck (an 2. Postion)..."
                           v-model="search_simple_2_value"
                           id="search_simple_2_2"
                           :rules="inputRules"
@@ -150,6 +159,11 @@
                 </v-tab-item>
                 <v-tab-item>
                   <v-card flat>
+                    <v-row>
+                      <v-col style="padding:0px; margin: 40px 0 -20px 10px">
+                        <h5>Suchabfrage:</h5>
+                      </v-col>
+                    </v-row>
                     <v-row cols="27">
                       <v-col cols="2">
                         <v-overflow-btn
@@ -161,7 +175,7 @@
                       </v-col>
                       <v-col cols="2">
                         <v-text-field
-                          label="Suchausdruck..."
+                          label="Suchausdruck (an 1. Postion)..."
                           v-model="search_simple_1_value"
                           id="search_simple_3_1"
                           :rules="inputRules"
@@ -177,7 +191,7 @@
                       </v-col>
                       <v-col cols="2">
                         <v-text-field
-                          label="Suchausdruck..."
+                          label="Suchausdruck (an 2. Postion)..."
                           v-model="search_simple_2_value"
                           id="search_simple_3_2"
                           :rules="inputRules"
@@ -193,7 +207,7 @@
                       </v-col>
                       <v-col cols="2">
                         <v-text-field
-                          label="Suchausdruck..."
+                          label="Suchausdruck (an 3. Postion)..."
                           v-model="search_simple_3_value"
                           id="search_simple_3_3"
                           :rules="inputRules"
@@ -224,6 +238,7 @@
         <v-expansion-panel-content>
           <v-row>
             <v-col>
+              <h5>Suchfenstergröße:</h5>
               <v-tabs>
                 <v-tab @click="search_complex_n_change(1)">
                   <v-tooltip right>
@@ -232,7 +247,7 @@
                     </template>
                     <span>
                       <strong>Hinweis: </strong>N=1 erlaubt es, nach einzelnen
-                      Token (Layer: Wortform, Lemma oder POS) zu suchen.<br />
+                      Token zu suchen.<br />
                       <strong>Beispiele: </strong>Wortform = berlin | Lemma =
                       sein | POS = ADJA | Wortform = *bayer* | POS = N* | Lemma
                       = *stadt
@@ -246,8 +261,7 @@
                     </template>
                     <span>
                       <strong>Hinweis: </strong>N=2 erlaubt es, nach zwei direkt
-                      aufeinanderfolgende Token (Layer: Wortform, Lemma oder
-                      POS) zu suchen.<br />
+                      aufeinanderfolgende Token zu suchen.<br />
                       <strong>Beispiele: </strong>1. Wortform = angela &amp; 2.
                       Wortform = merkel | 1. POS = ADJA &amp; 2. Lemma =
                       lockdown | 1. Lemma = *präsident &amp; 2. POS = N*
@@ -261,9 +275,8 @@
                     </template>
                     <span>
                       <strong>Hinweis: </strong>N=3 erlaubt es, nach drei direkt
-                      aufeinanderfolgende Token (Layer: Wortform, Lemma oder
-                      POS) zu suchen. Dabei kann die mittlere Position auch leer
-                      gelassen werden.<br />
+                      aufeinanderfolgende Token zu suchen. Dabei kann die
+                      mittlere Position auch leer gelassen werden.<br />
                       <strong>Beispiele: </strong>1. Wortform = sowohl &amp; 2.
                       LEER &amp; 3. Wortform = auch | 1. POS = ADJA &amp; 2.
                       Lemma = angela &amp; Lemma = merkel*
@@ -273,6 +286,11 @@
 
                 <v-tab-item>
                   <v-card flat>
+                    <v-row>
+                      <v-col style="padding:0px; margin: 40px 0 -20px 15px">
+                        <h5>Suchabfrage:</h5>
+                      </v-col>
+                    </v-row>
                     <v-row>
                       <v-col>
                         <p style="text-align:center">
@@ -311,6 +329,11 @@
                 </v-tab-item>
                 <v-tab-item>
                   <v-card flat>
+                    <v-row>
+                      <v-col style="padding:0px; margin: 40px 0 -20px 15px">
+                        <h5>Suchabfrage:</h5>
+                      </v-col>
+                    </v-row>
                     <v-row>
                       <v-col>
                         <p style="text-align:center">
@@ -375,6 +398,11 @@
                 </v-tab-item>
                 <v-tab-item>
                   <v-card flat>
+                    <v-row>
+                      <v-col style="padding:0px; margin: 40px 0 -20px 15px">
+                        <h5>Suchabfrage:</h5>
+                      </v-col>
+                    </v-row>
                     <v-row cols="11">
                       <v-col>
                         <p style="text-align:center">
@@ -469,7 +497,8 @@
           <v-row>
             <v-col>
               <v-btn block @click="search_complex">
-                <v-icon>mdi-magnify</v-icon>Suche ausführen</v-btn>
+                <v-icon>mdi-magnify</v-icon>Suche ausführen</v-btn
+              >
             </v-col>
           </v-row>
         </v-expansion-panel-content>
@@ -748,6 +777,6 @@ export default {
         ? "Das Feld darf nicht leer sein."
         : true;
     },
-  },  
+  },
 };
 </script>
