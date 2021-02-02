@@ -1,5 +1,4 @@
 import Vue from "vue";
-import "material-design-icons-iconfont/dist/material-design-icons.css";
 import Vuetify from "vuetify/lib";
 import de from "vuetify/es5/locale/de";
 import { preset } from "vue-cli-plugin-vuetify-preset-rally/preset";
@@ -14,6 +13,6 @@ export default new Vuetify({
   },
   theme: { dark: false },
   icons: {
-    iconfont: "md",
+    iconfont: "mdi",
   },
 });

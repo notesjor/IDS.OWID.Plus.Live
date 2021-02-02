@@ -13,14 +13,40 @@
         <v-expansion-panel-header>
           <div>
             <div style="display:inline;">{{ i.label }}</div>
-            <div style="float:right;display:block; margin-top:-25px">
+            <div style="float:right;display:block; margin:-25px 45px 0 0">
               <v-checkbox
                 :value="i.label"
                 label="Summieren"
                 style="max-height:10px; margin: 15px 10px 0 0"
                 @change="changeSumSelection"
                 v-model="syncSumSelection"
-              ></v-checkbox>
+              ></v-checkbox>              
+            </div>
+            <div style="float:right;display:block; margin:-13px 5px 0 0">
+              <v-menu bottom left>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn icon v-bind="attrs" v-on="on">
+                    <v-icon>mdi-dots-vertical</v-icon>
+                  </v-btn>
+                </template>
+
+                <!--<v-list>
+                  <v-list-item v-for="(item, i) in items" :key="i">
+                    <v-list-item-title>{{ item.title }}</v-list-item-title>
+                  </v-list-item>
+                </v-list>-->
+                <v-list>
+                  <v-list-item>
+                    <v-list-item-title><v-icon style="margin-right:10px">mdi-link-variant</v-icon>Link erzeugen</v-list-item-title>
+                  </v-list-item>
+                  <v-list-item>
+                    <v-list-item-title><v-icon style="margin-right:10px">mdi-export</v-icon>TSV-Tabelle </v-list-item-title>
+                  </v-list-item>
+                  <v-list-item>
+                    <v-list-item-title><v-icon style="margin-right:10px">mdi-export</v-icon>JSON-Objekt</v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
             </div>
           </div>
         </v-expansion-panel-header>

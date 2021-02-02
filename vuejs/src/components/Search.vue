@@ -4,7 +4,7 @@
       <v-expansion-panel>
         <v-expansion-panel-header class="justify-self-start">
           <div>
-            <v-icon left>search</v-icon><span>SUCHEN: Einfache Suche</span>
+            <v-icon left>mdi-magnify</v-icon><span>SUCHEN: Einfache Suche</span>
           </div>
         </v-expansion-panel-header>
         <v-expansion-panel-content>
@@ -208,7 +208,7 @@
           <v-row>
             <v-col>
               <v-btn block @click="search_simple">
-                <v-icon>search</v-icon>Suche ausführen
+                <v-icon>mdi-magnify</v-icon>Suche ausführen
               </v-btn>
             </v-col>
           </v-row>
@@ -217,7 +217,7 @@
       <v-expansion-panel>
         <v-expansion-panel-header class="justify-self-start">
           <div>
-            <v-icon left>search</v-icon
+            <v-icon left>mdi-magnify</v-icon
             ><span>SUCHEN: Erweiterte Tiefen-Suche</span>
           </div>
         </v-expansion-panel-header>
@@ -469,8 +469,7 @@
           <v-row>
             <v-col>
               <v-btn block @click="search_complex">
-                <v-icon>search</v-icon>Suchen
-              </v-btn>
+                <v-icon>mdi-magnify</v-icon>Suche ausführen</v-btn>
             </v-col>
           </v-row>
         </v-expansion-panel-content>

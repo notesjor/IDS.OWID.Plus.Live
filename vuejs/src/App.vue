@@ -84,11 +84,6 @@
               <Clipboard />
             </v-col>
           </v-row>
-          <v-row class="text-center">
-            <v-col>
-              <Export />
-            </v-col>
-          </v-row>
         </v-container>
       </v-main>
 
@@ -108,7 +103,6 @@
 import VizPanel from "./components/VizPanel";
 import VizOptions from "./components/VizOptions";
 import Search from "./components/Search";
-import Export from "./components/Export";
 import Clipboard from "./components/Clipboard";
 import Help from "./components/documentation/Help";
 
@@ -119,7 +113,6 @@ export default {
     VizPanel,
     VizOptions,
     Search,
-    Export,
     Clipboard,
     Help,
   },

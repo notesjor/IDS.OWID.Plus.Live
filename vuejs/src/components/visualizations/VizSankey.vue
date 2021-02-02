@@ -34,7 +34,7 @@ export default {
         if (component != null && this.$data.component === null) {
           try {
             this.$data.component = echarts.init(component, "shine", {
-              renderer: "svg",
+              renderer: "canvas",
             });            
           } catch {
             // ignore
@@ -79,6 +79,15 @@ export default {
         var unit = this.$store.state.vizOptionRelative ? " (pro Mio. Token)" : " (Token)";
 
         var sankeyOptions = {
+          toolbox: {
+            show: true,
+            feature: {
+              saveAsImage: {
+                title: "Speichern \xa0 \xa0 \xa0 \xa0 \xa0",
+                name: "OWIDplusLIVE"
+              },
+            },
+          },
           animation: false,
           tooltip: {
             trigger: "item",

@@ -22,7 +22,7 @@ export default {
     if (component != null) {
       try {
         this.$data.component = echarts.init(component, null, {
-          renderer: "svg",
+          renderer: "canvas",
         });
       } catch {
         // ignore
@@ -76,6 +76,26 @@ export default {
           : " (Token)";
 
         let myChartOption = {
+          toolbox: {
+            show: true,
+            top: "3%",
+            right: "10%",
+            feature: {
+              dataZoom:{
+                title:{
+                  zoom: "Zoom",
+                  back: "Zoom zurücksetzen"
+                }
+              },
+              restore:{
+                title: "Wiederherstellen",
+              },
+              saveAsImage: {
+                title: "Speichern \xa0 \xa0 \xa0 \xa0 \xa0",
+                name: "OWIDplusLIVE"
+              },
+            },
+          },
           animation: false,
           xAxis: {
             type: "category",

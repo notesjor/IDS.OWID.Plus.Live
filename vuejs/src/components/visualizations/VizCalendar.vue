@@ -14,6 +14,28 @@
 <script>
 import * as echarts from "echarts";
 
+var monthMap = {
+  nameMap: [
+    "JAN",
+    "FEB",
+    "MÄR",
+    "APR",
+    "MAI",
+    "JUN",
+    "JUL",
+    "AUG",
+    "SEP",
+    "OKT",
+    "NOV",
+    "DEZ",
+  ],
+};
+
+var dayMap = {
+  firstDay: 1,
+  nameMap: ["So.", "Mo.", "Di.", "Mi.", "Do.", "Fr.", "Sa."],
+};
+
 export default {
   name: "VizCalendar",
   theme: { dark: false },
@@ -36,7 +58,7 @@ export default {
         if (component != null && this.$data.component === null) {
           try {
             this.$data.component = echarts.init(component, null, {
-              renderer: "svg",
+              renderer: "canvas",
             });
           } catch {
             // ignore
@@ -59,11 +81,26 @@ export default {
           : " (Token)";
 
         let myCalendarOption = {
+          toolbox: {
+            show: true,
+            feature: {
+              saveAsImage: {
+                title: "Speichern \xa0 \xa0 \xa0 \xa0 \xa0",
+                name: "OWIDplusLIVE"
+              },
+            },
+          },
           tooltip: {
             position: "top",
             formatter: function(params) {
               return (
-                params.value[0] + ": " + params.value[1].toString().replace(",", "'").replace(".", ",")  + unit
+                params.value[0] +
+                ": " +
+                params.value[1]
+                  .toString()
+                  .replace(",", "'")
+                  .replace(".", ",") +
+                unit
               );
             },
           },
@@ -82,26 +119,15 @@ export default {
             {
               range: "2020",
               cellSize: ["auto", 20],
-              dayLabel: {
-                firstDay: 1,
-                nameMap: ["So.", "Mo.", "Di.", "Mi.", "Do.", "Fr.", "Sa."],
-              },
-              monthLabel: {
-                nameMap: [
-                  "JAN",
-                  "FEB",
-                  "MÄR",
-                  "APR",
-                  "MAI",
-                  "JUN",
-                  "JUL",
-                  "AUG",
-                  "SEP",
-                  "OKT",
-                  "NOV",
-                  "DEZ",
-                ],
-              },
+              dayLabel: dayMap,
+              monthLabel: monthMap,
+            },
+            {
+              range: "2021",
+              cellSize: ["auto", 20],
+              dayLabel: dayMap,
+              monthLabel: monthMap,
+              top: 250,
             },
           ],
           series: [
