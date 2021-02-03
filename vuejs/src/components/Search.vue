@@ -5,10 +5,15 @@
         <v-expansion-panel-header class="justify-self-start">
           <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
-              <div v-bind="attrs" v-on="on"
-                ><v-icon left>mdi-magnify</v-icon
-                ><span>SUCHEN: Einfache Suche</span></div
-              >
+              <div v-bind="attrs" v-on="on">
+                <v-icon left>mdi-magnify</v-icon>
+                <span>SUCHEN: Einfache Suche</span>
+                <sup
+                  ><v-icon left small style="margin-left:5px"
+                    >mdi-information-outline</v-icon
+                  ></sup
+                >
+              </div>
             </template>
             <span>
               Die "Einfache Suche" nach N-Grammen umfasst folgende
@@ -17,22 +22,22 @@
                 <li>
                   <strong>Unterschiedliche N-Gramm-Längen von 1-3</strong>
                   <br />
-                  z. B. N=1: Virus, N=2: zweite Welle, N=3: Bundeskanzlerin Angela Merkel
+                  z. B. N=1: Virus, N=2: zweite Welle, N=3: Bundeskanzlerin
+                  Angela Merkel
                 </li>
                 <li>
                   <strong>Suche nach Grammen</strong> <br />
                   z. B. bayer (exakte Suche), bayer* (Prefix - z. B. bayern),
-                  *bayer (Suffix - z. B. nordbayer) <br /> oder *bayer* (beliebige
-                  Position - z. B. nordbayern)
-                </li>                
+                  *bayer (Suffix - z. B. nordbayer) <br />
+                  oder *bayer* (beliebige Position - z. B. nordbayern)
+                </li>
                 <li>
                   <strong>Verschiedene Annotationsebenen</strong> <br />
                   Wortform, Lemma oder POS (Part-of-Speech &rarr; Wortart).<br />
                   Bsp.: 2-Gram: ADJ* Merkel, 3-Gram: ART unglaublich NN
                 </li>
               </ul>
-              Mit der "Einfachen Suche" können Sie nach N-Grammen suchen - z. B.
-              nach 1-Gram: Virus, nach 2-Gram: Angela Merkel
+              Hinweis: Abfragen und Ergebnisse werden immer zur Kleinschreibung reduziert.
             </span>
           </v-tooltip>
         </v-expansion-panel-header>
@@ -48,7 +53,7 @@
                     </template>
                     <span>
                       <strong>Hinweis: </strong>N=1 erlaubt es, nach einzelnen
-                      Token (Layer: Wortform, Lemma oder POS) zu suchen.<br />
+                      Token zu suchen.<br />
                       <strong>Beispiele: </strong>Wortform = berlin | Lemma =
                       sein | POS = ADJA | Wortform = *bayer* | POS = N* | Lemma
                       = *stadt
@@ -62,8 +67,7 @@
                     </template>
                     <span>
                       <strong>Hinweis: </strong>N=2 erlaubt es, nach zwei direkt
-                      aufeinanderfolgende Token (Layer: Wortform, Lemma oder
-                      POS) zu suchen.<br />
+                      aufeinanderfolgende Token zu suchen.<br />
                       <strong>Beispiele: </strong>1. Wortform = angela &amp; 2.
                       Wortform = merkel | 1. POS = ADJA &amp; 2. Lemma =
                       lockdown | 1. Lemma = *präsident &amp; 2. POS = N*
@@ -77,12 +81,11 @@
                     </template>
                     <span>
                       <strong>Hinweis: </strong>N=3 erlaubt es, nach drei direkt
-                      aufeinanderfolgende Token (Layer: Wortform, Lemma oder
-                      POS) zu suchen. Dabei kann die mittlere Position auch leer
-                      gelassen werden.<br />
+                      aufeinanderfolgende Token zu suchen. Dabei kann die
+                      mittlere Position auch leer gelassen werden.<br />
                       <strong>Beispiele: </strong>1. Wortform = sowohl &amp; 2.
                       LEER &amp; 3. Wortform = auch | 1. POS = ADJA &amp; 2.
-                      Lemma = angela &amp; Lemma = merkel*
+                      Lemma = angela &amp; 3. Lemma = merkel*
                     </span>
                   </v-tooltip>
                 </v-tab>
@@ -90,7 +93,7 @@
                 <v-tab-item>
                   <v-card flat>
                     <v-row>
-                      <v-col style="padding:0px; margin: 40px 0 -20px 10px">
+                      <v-col style="padding:0px; margin: 40px 0 -20px 15px">
                         <h5>Suchabfrage:</h5>
                       </v-col>
                     </v-row>
@@ -117,7 +120,7 @@
                 <v-tab-item>
                   <v-card flat>
                     <v-row>
-                      <v-col style="padding:0px; margin: 40px 0 -20px 10px">
+                      <v-col style="padding:0px; margin: 40px 0 -20px 15px">
                         <h5>Suchabfrage:</h5>
                       </v-col>
                     </v-row>
@@ -160,7 +163,7 @@
                 <v-tab-item>
                   <v-card flat>
                     <v-row>
-                      <v-col style="padding:0px; margin: 40px 0 -20px 10px">
+                      <v-col style="padding:0px; margin: 40px 0 -20px 15px">
                         <h5>Suchabfrage:</h5>
                       </v-col>
                     </v-row>
@@ -279,7 +282,7 @@
                       mittlere Position auch leer gelassen werden.<br />
                       <strong>Beispiele: </strong>1. Wortform = sowohl &amp; 2.
                       LEER &amp; 3. Wortform = auch | 1. POS = ADJA &amp; 2.
-                      Lemma = angela &amp; Lemma = merkel*
+                      Lemma = angela &amp; 3. Lemma = merkel*
                     </span>
                   </v-tooltip>
                 </v-tab>
