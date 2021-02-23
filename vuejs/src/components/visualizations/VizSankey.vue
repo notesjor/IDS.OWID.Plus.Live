@@ -3,7 +3,7 @@
     id="sankey"
     v-bind:style="
       'min-width:' +
-        this.$store.state.vizViewportWidth +
+        (this.$store.state.vizViewportWidth * 0.95)+
         'px; min-height:' +
         this.$store.state.vizViewportHeight +
         'px; height: auto'

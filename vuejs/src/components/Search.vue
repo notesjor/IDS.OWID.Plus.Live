@@ -8,11 +8,11 @@
               <div v-bind="attrs" v-on="on">
                 <v-icon left>mdi-magnify</v-icon>
                 <span>SUCHEN: Einfache Suche</span>
-                <sup
-                  ><v-icon left small style="margin-left:5px"
-                    >mdi-information-outline</v-icon
-                  ></sup
-                >
+                <sup>
+                  <v-icon left small style="margin-left:5px">
+                    mdi-information-outline
+                  </v-icon>
+                </sup>
               </div>
             </template>
             <span>
@@ -37,7 +37,8 @@
                   Bsp.: 2-Gram: ADJ* Merkel, 3-Gram: ART unglaublich NN
                 </li>
               </ul>
-              Hinweis: Abfragen und Ergebnisse werden immer zur Kleinschreibung reduziert.
+              Hinweis: Abfragen und Ergebnisse werden immer zur Kleinschreibung
+              reduziert.
             </span>
           </v-tooltip>
         </v-expansion-panel-header>
@@ -47,47 +48,13 @@
               <h5>Suchfenstergröße:</h5>
               <v-tabs>
                 <v-tab @click="search_simple_n_change(1)">
-                  <v-tooltip right>
-                    <template v-slot:activator="{ on, attrs }">
-                      <span v-bind="attrs" v-on="on">N=1</span>
-                    </template>
-                    <span>
-                      <strong>Hinweis: </strong>N=1 erlaubt es, nach einzelnen
-                      Token zu suchen.<br />
-                      <strong>Beispiele: </strong>Wortform = berlin | Lemma =
-                      sein | POS = ADJA | Wortform = *bayer* | POS = N* | Lemma
-                      = *stadt
-                    </span>
-                  </v-tooltip>
+                  <span v-bind="attrs" v-on="on">N=1</span>
                 </v-tab>
                 <v-tab @click="search_simple_n_change(2)">
-                  <v-tooltip right>
-                    <template v-slot:activator="{ on, attrs }">
-                      <span v-bind="attrs" v-on="on">N=2</span>
-                    </template>
-                    <span>
-                      <strong>Hinweis: </strong>N=2 erlaubt es, nach zwei direkt
-                      aufeinanderfolgende Token zu suchen.<br />
-                      <strong>Beispiele: </strong>1. Wortform = angela &amp; 2.
-                      Wortform = merkel | 1. POS = ADJA &amp; 2. Lemma =
-                      lockdown | 1. Lemma = *präsident &amp; 2. POS = N*
-                    </span>
-                  </v-tooltip>
+                  <span v-bind="attrs" v-on="on">N=2</span>
                 </v-tab>
                 <v-tab @click="search_simple_n_change(3)">
-                  <v-tooltip right>
-                    <template v-slot:activator="{ on, attrs }">
-                      <span v-bind="attrs" v-on="on">N=3</span>
-                    </template>
-                    <span>
-                      <strong>Hinweis: </strong>N=3 erlaubt es, nach drei direkt
-                      aufeinanderfolgende Token zu suchen. Dabei kann die
-                      mittlere Position auch leer gelassen werden.<br />
-                      <strong>Beispiele: </strong>1. Wortform = sowohl &amp; 2.
-                      LEER &amp; 3. Wortform = auch | 1. POS = ADJA &amp; 2.
-                      Lemma = angela &amp; 3. Lemma = merkel*
-                    </span>
-                  </v-tooltip>
+                  <span v-bind="attrs" v-on="on">N=3</span>
                 </v-tab>
 
                 <v-tab-item>
@@ -233,10 +200,34 @@
       </v-expansion-panel>
       <v-expansion-panel>
         <v-expansion-panel-header class="justify-self-start">
-          <div>
-            <v-icon left>mdi-magnify</v-icon
-            ><span>SUCHEN: Erweiterte Tiefen-Suche</span>
-          </div>
+
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <div v-bind="attrs" v-on="on">
+                <v-icon left>mdi-magnify</v-icon>
+                <span>SUCHEN: Erweiterte Tiefen-Suche</span>
+                <sup>
+                  <v-icon left small style="margin-left:5px">
+                    mdi-information-outline
+                  </v-icon>
+                </sup>
+              </div>
+            </template>
+            <span>
+              Die "Erweiterte Tiefen-Suche" bietet folgende
+              Zusatzfunktionalität (Basis-Funktionen siehe: "Einfache Suche"):
+              <ul>
+                <li>
+                  <strong>Gleichzeitige Suche auf mehreren Annotationsebenen</strong> <br />
+                  Wortform und/oder Lemma und/oder POS (Part-of-Speech &rarr; Wortart).<br />
+                  Bsp. 1.: 1-Gram: 1. Lemma = gut* &amp; 1. POS = ADJ*<br/>
+                  Bsp. 2.: 2-Gram: 1. Lemma = gefährlich &amp; 2. Lemma = Virus &amp; 2. POS = NN
+                </li>
+              </ul>
+              Hinweis: Abfragen und Ergebnisse werden immer zur Kleinschreibung
+              reduziert.
+            </span>
+          </v-tooltip>
         </v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-row>
@@ -244,47 +235,13 @@
               <h5>Suchfenstergröße:</h5>
               <v-tabs>
                 <v-tab @click="search_complex_n_change(1)">
-                  <v-tooltip right>
-                    <template v-slot:activator="{ on, attrs }">
-                      <span v-bind="attrs" v-on="on">N=1</span>
-                    </template>
-                    <span>
-                      <strong>Hinweis: </strong>N=1 erlaubt es, nach einzelnen
-                      Token zu suchen.<br />
-                      <strong>Beispiele: </strong>Wortform = berlin | Lemma =
-                      sein | POS = ADJA | Wortform = *bayer* | POS = N* | Lemma
-                      = *stadt
-                    </span>
-                  </v-tooltip>
+                  <span v-bind="attrs" v-on="on">N=1</span>
                 </v-tab>
                 <v-tab @click="search_complex_n_change(2)">
-                  <v-tooltip right>
-                    <template v-slot:activator="{ on, attrs }">
-                      <span v-bind="attrs" v-on="on">N=2</span>
-                    </template>
-                    <span>
-                      <strong>Hinweis: </strong>N=2 erlaubt es, nach zwei direkt
-                      aufeinanderfolgende Token zu suchen.<br />
-                      <strong>Beispiele: </strong>1. Wortform = angela &amp; 2.
-                      Wortform = merkel | 1. POS = ADJA &amp; 2. Lemma =
-                      lockdown | 1. Lemma = *präsident &amp; 2. POS = N*
-                    </span>
-                  </v-tooltip>
+                  <span v-bind="attrs" v-on="on">N=2</span>
                 </v-tab>
                 <v-tab @click="search_complex_n_change(3)">
-                  <v-tooltip right>
-                    <template v-slot:activator="{ on, attrs }">
-                      <span v-bind="attrs" v-on="on">N=3</span>
-                    </template>
-                    <span>
-                      <strong>Hinweis: </strong>N=3 erlaubt es, nach drei direkt
-                      aufeinanderfolgende Token zu suchen. Dabei kann die
-                      mittlere Position auch leer gelassen werden.<br />
-                      <strong>Beispiele: </strong>1. Wortform = sowohl &amp; 2.
-                      LEER &amp; 3. Wortform = auch | 1. POS = ADJA &amp; 2.
-                      Lemma = angela &amp; 3. Lemma = merkel*
-                    </span>
-                  </v-tooltip>
+                  <span v-bind="attrs" v-on="on">N=3</span>
                 </v-tab>
 
                 <v-tab-item>

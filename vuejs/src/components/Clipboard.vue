@@ -191,7 +191,7 @@ export default {
         data.syncLock = true;
         data.selected = Array.from(selected);
         data.syncSumSelection = selectedSums;
-        data.entries = res;
+        data.entries = res;console.log(res);
         data.syncLock = false;
       },
       {
