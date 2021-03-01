@@ -48,13 +48,13 @@
               <h5>Suchfenstergröße:</h5>
               <v-tabs>
                 <v-tab @click="search_simple_n_change(1)">
-                  <span v-bind="attrs" v-on="on">N=1</span>
+                  <span>N=1</span>
                 </v-tab>
                 <v-tab @click="search_simple_n_change(2)">
-                  <span v-bind="attrs" v-on="on">N=2</span>
+                  <span>N=2</span>
                 </v-tab>
                 <v-tab @click="search_simple_n_change(3)">
-                  <span v-bind="attrs" v-on="on">N=3</span>
+                  <span>N=3</span>
                 </v-tab>
 
                 <v-tab-item>
@@ -200,7 +200,6 @@
       </v-expansion-panel>
       <v-expansion-panel>
         <v-expansion-panel-header class="justify-self-start">
-
           <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
               <div v-bind="attrs" v-on="on">
@@ -214,14 +213,19 @@
               </div>
             </template>
             <span>
-              Die "Erweiterte Tiefen-Suche" bietet folgende
-              Zusatzfunktionalität (Basis-Funktionen siehe: "Einfache Suche"):
+              Die "Erweiterte Tiefen-Suche" bietet folgende Zusatzfunktionalität
+              (Basis-Funktionen siehe: "Einfache Suche"):
               <ul>
                 <li>
-                  <strong>Gleichzeitige Suche auf mehreren Annotationsebenen</strong> <br />
-                  Wortform und/oder Lemma und/oder POS (Part-of-Speech &rarr; Wortart).<br />
-                  Bsp. 1.: 1-Gram: 1. Lemma = gut* &amp; 1. POS = ADJ*<br/>
-                  Bsp. 2.: 2-Gram: 1. Lemma = gefährlich &amp; 2. Lemma = Virus &amp; 2. POS = NN
+                  <strong
+                    >Gleichzeitige Suche auf mehreren Annotationsebenen</strong
+                  >
+                  <br />
+                  Wortform und/oder Lemma und/oder POS (Part-of-Speech &rarr;
+                  Wortart).<br />
+                  Bsp. 1.: 1-Gram: 1. Lemma = gut* &amp; 1. POS = ADJ*<br />
+                  Bsp. 2.: 2-Gram: 1. Lemma = gefährlich &amp; 2. Lemma = Virus
+                  &amp; 2. POS = NN
                 </li>
               </ul>
               Hinweis: Abfragen und Ergebnisse werden immer zur Kleinschreibung
@@ -235,13 +239,13 @@
               <h5>Suchfenstergröße:</h5>
               <v-tabs>
                 <v-tab @click="search_complex_n_change(1)">
-                  <span v-bind="attrs" v-on="on">N=1</span>
+                  <span>N=1</span>
                 </v-tab>
                 <v-tab @click="search_complex_n_change(2)">
-                  <span v-bind="attrs" v-on="on">N=2</span>
+                  <span>N=2</span>
                 </v-tab>
                 <v-tab @click="search_complex_n_change(3)">
-                  <span v-bind="attrs" v-on="on">N=3</span>
+                  <span>N=3</span>
                 </v-tab>
 
                 <v-tab-item>
@@ -465,10 +469,17 @@
       </v-expansion-panel>
     </v-expansion-panels>
 
+    <v-overlay :value="progressWait">
+      <div class="text-center">
+        <v-progress-circular indeterminate size="64"></v-progress-circular>
+        <h3>Bitte warten...</h3>
+        <h4>{{ progressMsg }}</h4>
+        <v-btn @click="abortProgress">Abbrechen</v-btn>
+      </div>
+    </v-overlay>
+
     <v-snackbar v-model="snackbar">
-      Ihr Suchausdruck konnte nicht gefunden werden oder der Server ist
-      vorübergehend nicht erreichbar.<br />Bitte probieren Sie es mit einem
-      anderen (einfacheren) Suchausdruck erneut.
+      {{ progressError }}
 
       <template v-slot:action="{ attrs }">
         <v-btn text v-bind="attrs" @click="snackbar = false">
@@ -523,73 +534,84 @@ class queryItem {
   }
 }
 
-function sendSearchRequest(data, store, n, queryItems) {
-  store.commit("updateStatus", "pending");
-  store.commit("searchProgressInit");
-  var xhr = new XMLHttpRequest();
+async function sendSearchRequest(data, store, n, queryItems) {
+  data.progressWait = true;
+  data.progressMsg = "Suche N-Gramme";
 
-  xhr.addEventListener("readystatechange", function() {
-    if (this.readyState === 4) {
-      var searchResult = JSON.parse(this.responseText);
-      store.commit("searchProgressSetup", searchResult.Items.length);
+  fetch(store.state.baseUrl + "/find", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      sessionKey: store.state.sessionKey,
+    },
+    body: JSON.stringify({ N: n, Items: queryItems }),
+  })
+    .then((resp) => {
+      if (!resp.ok) {
+        data.snackbar = true;
+        return null;
+      }
+      return resp.json();
+    })
+    .then((searchResult) => {
+      if (searchResult === null) return;
+
       var packageSize = 250;
-
       var result = {};
       var error = false;
+      var done = 0;
 
       for (var i = 0; i < searchResult.Items.length; i += packageSize) {
-        if (store.state.progressAbort) {
+        if (!data.progressWait) {
           error = true;
           break;
         }
 
         var request = searchResult.Items.slice(i, i + packageSize);
-        console.log(request.length);
-        store.commit("searchProgressNextPage", request.length);
-        console.log(store.state.progressIndex);
+        
+        fetch(store.state.baseUrl + "/pull", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ N: n, Items: request }),
+        })
+          .then((resp2) => {
+            if (!resp2.ok) {
+              error = true;
+              return;
+            }
+            return resp2.json();
+          })
+          .then((page) => {
+            if (page === null) return;
+            if (error === true) return;
+            if (!data.progressWait) {
+              error = true;
+              return;
+            }
 
-        var xhr2 = new XMLHttpRequest();
-        xhr2.addEventListener("readystatechange", function() {
-          if (this.readyState === 4) {
-            if (this.status === 200 && this.responseText.length > 2) {
-              result = Object.assign({}, result, JSON.parse(this.responseText));
+            if (page != null) {
+              result = Object.assign({}, result, page);
             } else {
               error = true;
             }
-          }
-        });
 
-        xhr2.open("POST", store.state.baseUrl + "/pull", false);
-        xhr2.setRequestHeader("Content-Type", "application/json");
+            done += Object.keys(page).length;
+            data.progressMsg = `Lade Zeitreihe(n): ${done} von ${searchResult.Items.length}`;
 
-        xhr2.send(JSON.stringify({ N: n, Items: request }));
+            if (done === searchResult.Items.length) {
+              store.commit("search", {
+                n: n,
+                queryItems: queryItems,
+                items: result,
+              });
+              store.commit("calculate");
+              data.progressWait = false;
+            }
+          });
       }
 
-      if (error) {
-        store.commit("updateStatus", "success");
-        if (!store.state.progressAbort) data.snackbar = true;
-      } else {
-        store.commit("search", {
-          n: n,
-          queryItems: queryItems,
-          items: result,
-        });
-        store.commit("calculate");
-        store.commit("updateStatus", "success");
-      }
-    }
-  });
-
-  xhr.open("POST", store.state.baseUrl + "/find");
-  xhr.setRequestHeader("Content-Type", "application/json");
-  xhr.setRequestHeader("sessionKey", store.state.sessionKey);
-
-  xhr.send(
-    JSON.stringify({
-      N: n,
-      Items: queryItems,
-    })
-  );
+      if (error) if (!store.state.progressAbort) data.snackbar = true;
+    });
 }
 
 export default {
@@ -609,6 +631,10 @@ export default {
       name: "world",
       snackbar: false,
 
+      progressWait: false,
+      progressMsg: "",
+      progressError: "",
+
       iconSeachExt: mdiMagnifyPlus,
       inputRules: [
         (v) =>
@@ -621,6 +647,9 @@ export default {
     };
   },
   methods: {
+    abortProgress: function() {
+      this.$data.progressWait = false;
+    },
     search_simple_n_change: function(n) {
       this.$data.search_simple_n = n;
       this.$store.commit("updateN", n);

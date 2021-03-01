@@ -19,7 +19,7 @@
       </div>
 
       <v-spacer></v-spacer>
-      <a>
+      <a @click="tutorial = true">
         <div style="min-width:350px">
           <v-icon style="font-size:48px; float:left; margin-right:5px"
             >mdi-help-circle-outline</v-icon
@@ -29,8 +29,8 @@
               style="font-size:14px; line-height:1; font-weight:200; margin-top:10px; color:white"
             >
               <p>
-                <strong>Schnelle Hilfe</strong><br />
-                Tutorial / Dokumentation / Tipps&amp;Tricks anzeigen
+                <strong>Hilfe anzeigen</strong><br />
+                Zeige das Video-Tutorial erneut an...
               </p>
             </span>
           </div>
@@ -53,12 +53,6 @@
     </v-app-bar>
     <v-main>
       <v-container>
-        <v-row class="text-center">
-          <v-alert type="error" :value="alert">
-            Achtung: Es konnte keine Verbindung zum Server aufgebaut werden.
-            Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.
-          </v-alert>
-        </v-row>
         <v-row>
           <v-col>
             <Search />
@@ -82,14 +76,6 @@
       </v-container>
     </v-main>
 
-    <v-overlay :value="overlay">
-      <div class="text-center">
-        <v-progress-circular indeterminate size="64"></v-progress-circular>
-        <h3>Bitte warten...</h3>
-        <h4>{{ progressMsg }}</h4>
-        <v-btn @click="abortProgress">Abbrechen</v-btn>
-      </div>
-    </v-overlay>
     <v-overlay :value="tutorial">
       <div class="text-center">
         <v-card>
@@ -124,6 +110,19 @@
         </v-card>
       </div>
     </v-overlay>
+
+   <v-overlay :value="alert">
+      <div class="text-center">
+        <v-card>
+          <v-card-title class="headline">
+            Server-Wartung von OWIDplusLIVE
+          </v-card-title>
+          <v-card-text>
+            Die OWIDplusLIVE-API ist aktuell nicht erreichbar. Der Server wird gerade gewartet. Bitte probieren Sie es zu einem späteren Zeitpunkt erneut.
+          </v-card-text>
+        </v-card>
+      </div>
+    </v-overlay>
   </v-app>
 </template>
 
@@ -144,28 +143,9 @@ export default {
   },
 
   data: () => ({
-    overlay: false,
-    tutorial: true,
+    tutorial: false,
     alert: false,
   }),
-
-  methods: {
-    abortProgress: function() {
-      this.$store.commit("searchProgressAbort");
-    },
-  },
-
-  computed: {
-    progressMsg() {
-      return this.$store.state.progressMsg;
-    },
-  },
-
-  watch: {
-    progressMsg(n) {
-      return n;
-    },
-  },
 
   mounted() {
     var store = this.$store;
@@ -189,20 +169,6 @@ export default {
         console.log(ex);
         this.$data.alert = true;
       });
-  },
-
-  created() {
-    this.$store.watch(
-      () => {
-        return this.$store.state.status;
-      },
-      (status) => {
-        this._data.overlay = status === "pending";
-      },
-      {
-        deep: true,
-      }
-    );
   },
 };
 </script>

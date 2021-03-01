@@ -135,10 +135,8 @@ export default {
       var sel = [];
       for (var i in val) sel.push(val[i].key);
       this.$data.syncLock = true;
-      this.$store.commit("updateStatus", "pending");
       this.$store.commit("selectSearchHistoryItemsChange", sel);
       this.$store.commit("calculate");
-      this.$store.commit("updateStatus", "success");
       this.$data.syncLock = false;
     },
   },
@@ -148,10 +146,8 @@ export default {
       if (this.$data.syncLock) return;
 
       this.$data.syncLock = true;
-      this.$store.commit("updateStatus", "pending");
       this.$store.commit("selectSearchChange", this.$data.syncSumSelection);
       this.$store.commit("calculate");
-      this.$store.commit("updateStatus", "success");
       this.$data.syncLock = false;
     },
   },

@@ -8,7 +8,6 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     baseUrl: "https://owidnext.jan-oliver-ruediger.de",
-    status: "init",
     sessionKey: null,
 
     owid: null,
@@ -23,12 +22,7 @@ export default new Vuex.Store({
     vizViewportHeight: 500,
     vizVizportId: "",
 
-    vizData: null,
-
-    progressAbort: false,
-    progressIndex: 0,
-    progressMax: 0,
-    progressMsg: "",
+    vizData: null
   },
   mutations: {
     id(state, id) {
@@ -50,30 +44,6 @@ export default new Vuex.Store({
 
     updateN(state, N) {
       state.owid.N = N;
-    },
-
-    searchProgressInit(state) {
-      state.progressAbort = false;
-      state.progressMsg = "Suche N-Gramme";
-      state.progressIndex = 0;
-      state.progressMax = 0;
-    },
-
-    searchProgressSetup(state, payload) {
-      state.progressMax = payload;
-    },
-
-    searchProgressNextPage(state, payload) {
-      state.progressIndex += payload;
-      state.progressMsg = `Lade Zeitreihe(n): ${state.progressIndex} von ${state.progressMax}`;
-    },
-
-    searchProgressAbort(state) {
-      state.progressAbort = true;
-    },
-
-    updateStatus(state, status) {
-      Vue.set(state, "status", status);
     },
 
     search(state, { n, queryItems, items }) {
