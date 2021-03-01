@@ -8,6 +8,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     baseUrl: "https://owidnext.jan-oliver-ruediger.de",
+    webUrl: "http://192.168.178.40:8080/",
     sessionKey: null,
 
     owid: null,

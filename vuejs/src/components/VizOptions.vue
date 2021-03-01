@@ -91,10 +91,8 @@ function commit() {
       break;
   }
 
-  this.$store.commit("updateStatus", "pending");
   this.$store.commit("vizOption", { r, s, g });
   this.$store.commit("calculate");
-  this.$store.commit("updateStatus", "success");
 }
 
 export default {

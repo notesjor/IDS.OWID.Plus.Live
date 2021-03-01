@@ -599,6 +599,7 @@ async function sendSearchRequest(data, store, n, queryItems) {
             data.progressMsg = `Lade Zeitreihe(n): ${done} von ${searchResult.Items.length}`;
 
             if (done === searchResult.Items.length) {
+              data.progressMsg = "Visualisiere die Daten";
               store.commit("search", {
                 n: n,
                 queryItems: queryItems,

@@ -1,12 +1,23 @@
 <template>
   <v-card>
     <v-card-title>
-      <div>
-        <v-icon>mdi-compare-horizontal</v-icon
-        ><span style="margin-left:10px; font-size:15px"
-          >SUCHVERLAUF: Vorangeganenen Suchen vergleichen &amp; verfeinern</span
-        >
-      </div>
+      <v-row>
+        <v-col style="text-align:left;">
+          <v-icon>mdi-compare-horizontal</v-icon>
+          <span style="margin-left:10px; font-size:15px"
+            >SUCHVERLAUF: Vorangeganenen Suchen vergleichen &amp;
+            verfeinern</span
+          >
+        </v-col>
+        <!-- ToDo
+        <v-col style="text-align:right;">
+          <a>
+          <v-icon style="block:inline;">mdi-folder-outline</v-icon>
+          <span style="margin-left:10px; font-size:15px; color:rgb(0,0,0,0.87)">Laden</span>
+          </a>
+        </v-col>
+        -->
+      </v-row>
     </v-card-title>
     <v-expansion-panels multiple>
       <v-expansion-panel v-for="i in entries" :key="i.label">
@@ -20,7 +31,7 @@
                 style="max-height:10px; margin: 15px 10px 0 0"
                 @change="changeSumSelection"
                 v-model="syncSumSelection"
-              ></v-checkbox>              
+              ></v-checkbox>
             </div>
             <div style="float:right;display:block; margin:-13px 5px 0 0">
               <v-menu bottom left>
@@ -30,20 +41,25 @@
                   </v-btn>
                 </template>
 
-                <!--<v-list>
-                  <v-list-item v-for="(item, i) in items" :key="i">
-                    <v-list-item-title>{{ item.title }}</v-list-item-title>
-                  </v-list-item>
-                </v-list>-->
                 <v-list>
-                  <v-list-item>
-                    <v-list-item-title><v-icon style="margin-right:10px">mdi-link-variant</v-icon>Link erzeugen</v-list-item-title>
+                  <v-list-item @click="exportLink(i)">
+                    <v-list-item-title
+                      ><v-icon style="margin-right:10px"
+                        >mdi-link-variant</v-icon
+                      >Link erzeugen</v-list-item-title
+                    >
                   </v-list-item>
-                  <v-list-item>
-                    <v-list-item-title><v-icon style="margin-right:10px">mdi-export</v-icon>TSV-Tabelle </v-list-item-title>
+                  <v-list-item @click="exportTsv(i)">
+                    <v-list-item-title
+                      ><v-icon style="margin-right:10px">mdi-export</v-icon
+                      >TSV-Tabelle</v-list-item-title
+                    >
                   </v-list-item>
-                  <v-list-item>
-                    <v-list-item-title><v-icon style="margin-right:10px">mdi-export</v-icon>JSON-Objekt</v-list-item-title>
+                  <v-list-item @click="exportJson(i)">
+                    <v-list-item-title
+                      ><v-icon style="margin-right:10px">mdi-export</v-icon
+                      >JSON-Objekt</v-list-item-title
+                    >
                   </v-list-item>
                 </v-list>
               </v-menu>
@@ -94,10 +110,44 @@
         </v-expansion-panel-content>
       </v-expansion-panel>
     </v-expansion-panels>
+
+    <v-snackbar v-model="snackbar">
+      <div style=" width: 95%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; margin-top:8px">
+        {{ snackbarLink }}</div>
+      <v-icon style="margin-top:-10px;" @click="copyToClipboard">mdi-content-copy</v-icon>
+
+      <template v-slot:action="{ attrs }">
+        <v-btn text v-bind="attrs" @click="snackbar = false">
+          Ok
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-card>
 </template>
 
 <script>
+function download(content, fileName, contentType) {
+  var a = document.createElement("a");
+  var file = new Blob([content], { type: contentType });
+  a.href = URL.createObjectURL(file);
+  a.download = fileName;
+  a.click();
+}
+
+export function saveJson(i) {
+  console.log(i);
+  download(i, "OWIDplusLIVE.json", "application/json");
+}
+
+export function saveClipboard(str){
+  const el = document.createElement('textarea');
+  el.value = str;
+  document.body.appendChild(el);
+  el.select();
+  document.execCommand('copy');
+  document.body.removeChild(el);
+}
+
 export default {
   name: "Clipboard",
 
@@ -125,6 +175,9 @@ export default {
 
       syncLock: false,
       syncSumSelection: [],
+
+      snackbar: false,
+      snackbarLink: "",
     };
   },
 
@@ -150,6 +203,20 @@ export default {
       this.$store.commit("calculate");
       this.$data.syncLock = false;
     },
+    exportLink(i) {
+      var data = this.$store.state.owid.GetSearchHistoryItemRequest(i.label);
+      this.$data.snackbarLink = this.$store.state.webUrl + encodeURI(JSON.stringify(data));
+      this.$data.snackbar = true;
+    },
+    exportTsv(i) {
+      console.log(i);
+    },
+    exportJson(i) {
+      console.log(i);
+    },
+    copyToClipboard(){
+      saveClipboard(this.$data.snackbarLink);
+    }
   },
 
   created() {
@@ -187,7 +254,8 @@ export default {
         data.syncLock = true;
         data.selected = Array.from(selected);
         data.syncSumSelection = selectedSums;
-        data.entries = res;console.log(res);
+        data.entries = res;
+        console.log(res);
         data.syncLock = false;
       },
       {
