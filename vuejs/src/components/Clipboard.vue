@@ -16,7 +16,11 @@
           <v-icon style="block:inline;" @click="modelSave"
             >mdi-content-save-outline</v-icon
           >
-          <input type="file" ref="fileinput" style="visibility: collapse; width:0px"/>
+          <input
+            type="file"
+            ref="fileinput"
+            style="visibility: collapse; width:0px"
+          />
         </v-col>
       </v-row>
     </v-card-title>
@@ -160,27 +164,27 @@ export function saveClipboard(str) {
   document.body.removeChild(el);
 }
 
-export function handleFileSelect (e) {
-    var files = e.target.files;
-    if (files.length < 1) {
-        alert('select a file...');
-        return;
-    }
-    var file = files[0];
-    var reader = new FileReader();
-    reader.onload = onFileLoaded;
-    reader.readAsDataURL(file);
+export function handleFileSelect(e) {
+  var files = e.target.files;
+  if (files.length < 1) {
+    alert("select a file...");
+    return;
+  }
+  var file = files[0];
+  var reader = new FileReader();
+  reader.onload = onFileLoaded;
+  reader.readAsDataURL(file);
 }
 
-export function onFileLoaded (e) {
-    var match = /^data:(.*);base64,(.*)$/.exec(e.target.result);
-    if (match == null) {
-        throw 'Could not parse result';
-    }
-    var mimeType = match[1];
-    var content = match[2];
-    alert(mimeType);
-    alert(content);
+export function onFileLoaded(e) {
+  var match = /^data:(.*);base64,(.*)$/.exec(e.target.result);
+  if (match == null) {
+    throw "Could not parse result";
+  }
+  var mimeType = match[1];
+  var content = match[2];
+  alert(mimeType);
+  alert(content);
 }
 
 export default {
@@ -255,15 +259,34 @@ export default {
       this.$data.snackbar = true;
     },
     exportTsv(i) {
-      console.log(i); // TODO: Export TSV - siehe Export.vue
+      var raw = this.$store.state.owid.GetSearchHistoryItem4export(i.label);
+      var keys = [];
+      raw.OwidLiveStorageTimeItems.forEach((x) => {
+        if (x.IsSelected) keys.push(x.Key);
+      });
+      
+      fetch(this.$store.state.baseUrl + "/down", {
+        method: "post",
+        body: JSON.stringify({ Format: "TSV", Owid: keys }),
+      })
+        .then(function(r) {
+          return r.arrayBuffer();
+        })
+        .then(function(buffer) {
+          saveBlob(buffer, "text/tab-separated-value", "data.tsv");
+        })
+        .catch(function(error) {
+          console.log("Request failed", error);
+        });
     },
     exportJson(i) {
-      console.log(i); // TODO: Einzelnen Eintrag exportieren
-
       var enc = new TextEncoder();
       saveBlob(
         enc.encode(
-          JSON.stringify({ Format: "JSON", Owid: this.$store.state.owid })
+          JSON.stringify({
+            Format: "JSON",
+            Owid: this.$store.state.owid.GetSearchHistoryItem4export(i.label),
+          })
         ).buffer,
         "application/json",
         "data.json"
@@ -324,7 +347,7 @@ export default {
         data.selected = Array.from(selected);
         data.syncSumSelection = selectedSums;
         data.entries = res;
-        console.log(res);
+
         data.syncLock = false;
       },
       {

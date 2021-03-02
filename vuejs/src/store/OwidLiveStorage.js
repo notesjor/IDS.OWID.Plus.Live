@@ -154,6 +154,13 @@ export class OwidLiveStorage {
   }
 
   /**
+   * @param  {string} key Get the raw the HistoryItem (for export only)
+   */
+  GetSearchHistoryItem4export(key) {
+    return this.#OwidLiveSearches[key];
+  }
+
+  /**
    * @param  {string} key Get the specific table of the search (history) entry. Used by components/Clipboard
    * @param  {number} granulation Set the granulation for calculation (0=day, 1=week, 2=month, 3=quarter, 4=year)
    */
