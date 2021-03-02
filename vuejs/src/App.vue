@@ -111,14 +111,16 @@
       </div>
     </v-overlay>
 
-   <v-overlay :value="alert">
+    <v-overlay :value="alert">
       <div class="text-center">
         <v-card>
           <v-card-title class="headline">
             Server-Wartung von OWIDplusLIVE
           </v-card-title>
           <v-card-text>
-            Die OWIDplusLIVE-API ist aktuell nicht erreichbar. Der Server wird gerade gewartet. Bitte probieren Sie es zu einem späteren Zeitpunkt erneut.
+            Die OWIDplusLIVE-API ist aktuell nicht erreichbar. Der Server wird
+            gerade gewartet. Bitte probieren Sie es zu einem späteren Zeitpunkt
+            erneut.
           </v-card-text>
         </v-card>
       </div>
@@ -155,15 +157,20 @@ export default {
       .then((response) => {
         store.commit("id", response);
 
-        var xhr = new XMLHttpRequest();
-        xhr.addEventListener("readystatechange", function() {
-          if (this.readyState === 4) {
-            store.commit("init", JSON.parse(this.responseText));
-          }
-        });
-
-        xhr.open("GET", store.state.baseUrl + "/norm");
-        xhr.send(store);
+        fetch(store.state.baseUrl + "/norm", {
+          method: "GET",
+        })
+          .then((resp) => {
+            return resp.ok ? resp.json() : null;
+          })
+          .then((obj) => {
+            if (obj === null) return;
+            store.commit("init", obj);
+          })
+          .then(() => {
+            // TODO: Abfrage Url
+            return;
+          });
       })
       .catch((ex) => {
         console.log(ex);

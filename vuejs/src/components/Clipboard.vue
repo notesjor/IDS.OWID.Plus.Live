@@ -9,14 +9,15 @@
             verfeinern</span
           >
         </v-col>
-        <!-- ToDo
         <v-col style="text-align:right;">
-          <a>
-          <v-icon style="block:inline;">mdi-folder-outline</v-icon>
-          <span style="margin-left:10px; font-size:15px; color:rgb(0,0,0,0.87)">Laden</span>
-          </a>
+          <v-icon style="block:inline; margin-right:10px;" @click="modelLoad"
+            >mdi-folder-outline</v-icon
+          >
+          <v-icon style="block:inline;" @click="modelSave"
+            >mdi-content-save-outline</v-icon
+          >
+          <input type="file" ref="fileinput" style="visibility: collapse; width:0px"/>
         </v-col>
-        -->
       </v-row>
     </v-card-title>
     <v-expansion-panels multiple>
@@ -73,6 +74,7 @@
             :search="search"
             :single-select="false"
             :footer-props="{ itemsPerPageOptions: [10, 20, 50, 100, 250, -1] }"
+            @input="selectionChanged"
             v-model="selected"
             item-key="key"
             mutli-sort
@@ -112,9 +114,14 @@
     </v-expansion-panels>
 
     <v-snackbar v-model="snackbar">
-      <div style=" width: 95%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; margin-top:8px">
-        {{ snackbarLink }}</div>
-      <v-icon style="margin-top:-10px;" @click="copyToClipboard">mdi-content-copy</v-icon>
+      <div
+        style=" width: 95%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; margin-top:8px"
+      >
+        {{ snackbarLink }}
+      </div>
+      <v-icon style="margin-top:-10px;" @click="copyToClipboard"
+        >mdi-content-copy</v-icon
+      >
 
       <template v-slot:action="{ attrs }">
         <v-btn text v-bind="attrs" @click="snackbar = false">
@@ -126,26 +133,54 @@
 </template>
 
 <script>
-function download(content, fileName, contentType) {
-  var a = document.createElement("a");
-  var file = new Blob([content], { type: contentType });
-  a.href = URL.createObjectURL(file);
-  a.download = fileName;
-  a.click();
+function saveBlob(blob, fileType, fileName) {
+  var newBlob = new Blob([blob], { type: fileType });
+
+  if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+    window.navigator.msSaveOrOpenBlob(newBlob);
+    return;
+  }
+
+  const data = window.URL.createObjectURL(newBlob);
+  var link = document.createElement("a");
+  link.href = data;
+  link.download = fileName;
+  link.click();
+  setTimeout(function() {
+    window.URL.revokeObjectURL(data);
+  }, 100);
 }
 
-export function saveJson(i) {
-  console.log(i);
-  download(i, "OWIDplusLIVE.json", "application/json");
-}
-
-export function saveClipboard(str){
-  const el = document.createElement('textarea');
+export function saveClipboard(str) {
+  const el = document.createElement("textarea");
   el.value = str;
   document.body.appendChild(el);
   el.select();
-  document.execCommand('copy');
+  document.execCommand("copy");
   document.body.removeChild(el);
+}
+
+export function handleFileSelect (e) {
+    var files = e.target.files;
+    if (files.length < 1) {
+        alert('select a file...');
+        return;
+    }
+    var file = files[0];
+    var reader = new FileReader();
+    reader.onload = onFileLoaded;
+    reader.readAsDataURL(file);
+}
+
+export function onFileLoaded (e) {
+    var match = /^data:(.*);base64,(.*)$/.exec(e.target.result);
+    if (match == null) {
+        throw 'Could not parse result';
+    }
+    var mimeType = match[1];
+    var content = match[2];
+    alert(mimeType);
+    alert(content);
 }
 
 export default {
@@ -203,20 +238,54 @@ export default {
       this.$store.commit("calculate");
       this.$data.syncLock = false;
     },
+    selectionChanged() {
+      if (this.$data.selected === null) return;
+
+      var list = [];
+      Object.keys(this.$data.selected).forEach((k) => {
+        list.push(this.$data.selected[k].key);
+      });
+
+      this.$store.commit("selectSearchHistoryItemsChange", list);
+    },
     exportLink(i) {
       var data = this.$store.state.owid.GetSearchHistoryItemRequest(i.label);
-      this.$data.snackbarLink = this.$store.state.webUrl + encodeURI(JSON.stringify(data));
+      this.$data.snackbarLink =
+        this.$store.state.webUrl + encodeURI(JSON.stringify(data));
       this.$data.snackbar = true;
     },
     exportTsv(i) {
-      console.log(i);
+      console.log(i); // TODO: Export TSV - siehe Export.vue
     },
     exportJson(i) {
-      console.log(i);
+      console.log(i); // TODO: Einzelnen Eintrag exportieren
+
+      var enc = new TextEncoder();
+      saveBlob(
+        enc.encode(
+          JSON.stringify({ Format: "JSON", Owid: this.$store.state.owid })
+        ).buffer,
+        "application/json",
+        "data.json"
+      );
     },
-    copyToClipboard(){
+    modelSave() {
+      var enc = new TextEncoder();
+      saveBlob(
+        enc.encode(
+          JSON.stringify({ Format: "JSON", Owid: this.$store.state.owid })
+        ).buffer,
+        "application/json",
+        "data.json"
+      );
+    },
+    modelLoad() {
+      this.$refs.fileinput.click();
+      this.$refs.fileinput.change(handleFileSelect);
+    },
+    copyToClipboard() {
       saveClipboard(this.$data.snackbarLink);
-    }
+    },
   },
 
   created() {
