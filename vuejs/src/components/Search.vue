@@ -547,14 +547,17 @@ async function sendSearchRequest(data, store, n, queryItems) {
     body: JSON.stringify({ N: n, Items: queryItems }),
   })
     .then((resp) => {
-      if (!resp.ok) {
-        data.snackbar = true;
-        return null;
-      }
-      return resp.json();
+      return resp.ok ? resp.json() : null;
     })
     .then((searchResult) => {
-      if (searchResult === null) return;
+      if (searchResult === null || searchResult.Items === null || searchResult.Items.length === 0){
+        data.snackbar = true;
+        data.progressError = "Keine Ergebnisse - Abfrage zu spezifisch."
+        data.progressWait = false;
+        return;
+      }
+
+      searchResult.Items = searchResult.Items.slice(i, 1000);
 
       var packageSize = 250;
       var result = {};

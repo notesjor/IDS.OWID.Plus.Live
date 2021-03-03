@@ -18,7 +18,7 @@
           >
           <input
             type="file"
-            ref="fileinput"
+            id="fileinput"
             style="visibility: collapse; width:0px"
           />
         </v-col>
@@ -177,12 +177,13 @@ export function onFileLoaded(e) {
   var match = /^data:(.*);base64,(.*)$/.exec(e.target.result);
   if (match == null) {
     throw "Could not parse result";
-  }
-  var mimeType = match[1];
-  var content = match[2];
-  alert(mimeType);
-  alert(content);
+  }  
+  var obj = JSON.parse(atob(match[2]));
+  storeGlobal.commit("modelLoad", obj.Owid);
+  storeGlobal.commit("calculate");
 }
+
+export var storeGlobal;
 
 export default {
   name: "Clipboard",
@@ -299,9 +300,11 @@ export default {
         "data.json"
       );
     },
-    modelLoad() {
-      this.$refs.fileinput.click();
-      this.$refs.fileinput.change(handleFileSelect);
+    modelLoad() {      
+      storeGlobal = this.$store;
+      var fileinput = document.getElementById("fileinput");
+      fileinput.addEventListener("change", handleFileSelect);
+      fileinput.click();      
     },
     copyToClipboard() {
       saveClipboard(this.$data.snackbarLink);

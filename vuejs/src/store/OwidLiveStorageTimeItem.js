@@ -16,6 +16,17 @@ export class OwidLiveStorageTimeItem {
     }
   }
 
+  static load(obj){
+    var res = new OwidLiveStorageTimeItem("?µ?µ?", null);
+    res.#Key = obj.Key;
+    res.#Token = obj.Token;
+    res.#Name = obj.Name;
+    res.#Label = obj.Key.split("µ").join(" | ");
+    res.#Dates = obj.Dates;
+    res.#IsSelected = obj.IsSelected; 
+    return res;
+  }
+
   /**
    * @param  {string} key the key of the search-result
    * @param  {array} dates all matched dates

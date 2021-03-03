@@ -23,7 +23,7 @@ export default new Vuex.Store({
     vizViewportHeight: 500,
     vizVizportId: "",
 
-    vizData: null
+    vizData: null,
   },
   mutations: {
     id(state, id) {
@@ -64,6 +64,17 @@ export default new Vuex.Store({
 
     selectSearchHistoryItemsChange(state, payload) {
       state.owid.selectSearchHistoryItem(payload);
+    },
+
+    modelLoad(state, o) {
+      state.owid = OwidLiveStorage.load(
+        o.Norm,
+        o.OwidLiveSearches,
+        o.N,
+        o.Dates,
+        o.Total,
+        o.NormTotal
+      );
     },
 
     calculate(state) {
@@ -160,18 +171,19 @@ export default new Vuex.Store({
       var sumAll = {};
       Object.keys(res).forEach((key) => {
         var item = res[key];
-        Object.keys(item.data).forEach((subKey) => {
-          if (subKey in sumAll) {
-            sumAll[subKey].value += item.data[subKey].value;
-            sumAll[subKey].dates = new Set([
-              ...sumAll[subKey].dates,
-              ...item.data[subKey].dates,
-            ]);
-          } else sumAll[subKey] = item.data[subKey];
-        });
+        if (item != null)
+          Object.keys(item.data).forEach((subKey) => {
+            if (subKey in sumAll) {
+              sumAll[subKey].value += item.data[subKey].value;
+              sumAll[subKey].dates = new Set([
+                ...sumAll[subKey].dates,
+                ...item.data[subKey].dates,
+              ]);
+            } else sumAll[subKey] = item.data[subKey];
+          });
       });
       res["ALLE"] = { name: "ALLE", label: "ALLE", data: sumAll, items: null };
-
+      
       // relativ Frquency
       if (state.vizOptionRelative) {
         var normData;
@@ -205,7 +217,7 @@ export default new Vuex.Store({
           }
         });
       }
-
+      
       // smoothing
       if (state.vizOptionSmoothing > 1) {
         var labelSelector, carret, odd;
@@ -246,7 +258,7 @@ export default new Vuex.Store({
           res[key].data = nval;
         });
       }
-
+      
       state.vizData = res;
       state.version++;
     },

@@ -11,13 +11,27 @@ export class OwidLiveStorage {
 
   toJSON() {
     return {
+      Dates: this.#Dates,      
       N: this.#N,
-      OwidLiveSearches: this.#OwidLiveSearches,
       Norm: this.#Norm,
+      OwidLiveSearches: this.#OwidLiveSearches,      
       Total: this.#Total,
       NormTotal: this.#NormTotal,
-      //Dates: this.#Dates - hide in serized data (only used in view)
     };
+  }
+
+  static load(norm, ols, n, dates, total, ntotal) {
+    var res = new OwidLiveStorage([]);
+    res.#Norm = norm;
+    res.#OwidLiveSearches = {};
+    Object.keys(ols).forEach(x=>{
+      res.#OwidLiveSearches[x] = OwidLiveSearch.load(ols[x]);
+    });
+    res.#N = n;
+    res.#Dates = dates;
+    res.#Total = total;
+    res.#NormTotal = ntotal;
+    return res;
   }
 
   /**

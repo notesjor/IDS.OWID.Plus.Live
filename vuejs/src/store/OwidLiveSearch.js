@@ -17,6 +17,19 @@ export class OwidLiveSearch {
     };
   }
 
+  static load(obj) {
+    var olsti = [];
+    obj.OwidLiveStorageTimeItems.forEach((x) => {
+      console.log(x);
+      olsti.push(OwidLiveStorageTimeItem.load(x));
+    });
+    console.log(olsti);
+    var res = new OwidLiveSearch(obj.N, obj.Request, null);
+    res.#IsSelected = obj.IsSelected;
+    res.#OwidLiveStorageTimeItems = olsti;
+    return res;
+  }
+
   /**
    * Create a new OwidLiveSearch
    * @param  {number} n of the N-Gram search
@@ -35,9 +48,10 @@ export class OwidLiveSearch {
     this.#Request = request;
 
     var olsti = [];
-    Object.keys(items).forEach((item) => {
-      olsti.push(new OwidLiveStorageTimeItem(item, items[item]));
-    });
+    if (items != null)
+      Object.keys(items).forEach((item) => {
+        olsti.push(new OwidLiveStorageTimeItem(item, items[item]));
+      });
     this.#OwidLiveStorageTimeItems = olsti;
 
     this.#IsSelected = true;
