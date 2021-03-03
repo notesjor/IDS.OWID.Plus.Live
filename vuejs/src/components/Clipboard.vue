@@ -265,7 +265,7 @@ export default {
 
       fetch(this.$store.state.baseUrl + "/down", {
         method: "post",
-        body: JSON.stringify({ Format: "TSV", Owid: keys }),
+        body: JSON.stringify({ Format: "TSV", N: raw.N, Requests: keys }),
       })
         .then(function(r) {
           return r.arrayBuffer();
