@@ -118,14 +118,11 @@
     </v-expansion-panels>
 
     <v-snackbar v-model="snackbar">
-      <div
-        style=" width: 95%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; margin-top:8px"
-      >
-        {{ snackbarLink }}
-      </div>
-      <v-icon style="margin-top:-10px;" @click="copyToClipboard"
-        >mdi-content-copy</v-icon
-      >
+      <v-text-field label="Link" :value="snackbarLink" readonly> </v-text-field>
+      <a @click="copyToClipboard">
+        <v-icon>mdi-content-copy</v-icon
+        ><span style="color:white;">Kopieren</span>
+      </a>
 
       <template v-slot:action="{ attrs }">
         <v-btn text v-bind="attrs" @click="snackbar = false">
@@ -264,7 +261,7 @@ export default {
       raw.OwidLiveStorageTimeItems.forEach((x) => {
         if (x.IsSelected) keys.push(x.Key);
       });
-      
+
       fetch(this.$store.state.baseUrl + "/down", {
         method: "post",
         body: JSON.stringify({ Format: "TSV", Owid: keys }),
