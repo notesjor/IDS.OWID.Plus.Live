@@ -662,6 +662,19 @@ export default {
       this.$data.search_complex_n = n;
       this.$store.commit("updateN", n);
     },
+    search_invoke: function(payload){
+      var set = new Set();
+      payload.forEach(x => {
+        set.add(x.position);
+      });
+
+      sendSearchRequest(
+        this.$data,
+        this.$store,
+        set.size,
+        payload
+      );
+    },
     search_simple: function() {
       var queryItems = [
         new queryItem(

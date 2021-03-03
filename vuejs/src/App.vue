@@ -55,7 +55,7 @@
       <v-container>
         <v-row>
           <v-col>
-            <Search />
+            <Search ref="searchComponent" />
           </v-col>
         </v-row>
         <v-row class="text-center">
@@ -151,6 +151,7 @@ export default {
 
   mounted() {
     var store = this.$store;
+    var search = this.$refs.searchComponent;
 
     fetch(store.state.baseUrl + "/init")
       .then((response) => response.text())
@@ -168,7 +169,12 @@ export default {
             store.commit("init", obj);
           })
           .then(() => {
-            // TODO: Abfrage Url
+            var data = window.location.href.replace(this.$store.state.webUrl, "");
+            if(data.length < 10)
+              return;
+            
+            var test = JSON.parse(decodeURI(data));
+            search.search_invoke(test);
             return;
           });
       })
