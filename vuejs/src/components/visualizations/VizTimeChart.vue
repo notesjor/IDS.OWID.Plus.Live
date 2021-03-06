@@ -81,15 +81,6 @@ export default {
             top: "3%",
             right: "10%",
             feature: {
-              dataZoom:{
-                title:{
-                  zoom: "Zoom",
-                  back: "Zoom zurücksetzen"
-                }
-              },
-              restore:{
-                title: "Wiederherstellen",
-              },
               saveAsImage: {
                 title: "Speichern \xa0 \xa0 \xa0 \xa0 \xa0",
                 name: "OWIDplusLIVE"
