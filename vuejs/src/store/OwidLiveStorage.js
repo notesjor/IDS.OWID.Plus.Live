@@ -296,7 +296,7 @@ export class OwidLiveStorage {
    * @param  {function} func the functions needs to describe how-to find the dateTime-Key
    */
   calculateGranulation(func) {
-    var dates = this.#Norm[this.#N];
+    var dates = this.#Norm[this.#N - 1];
     var res = {};
     Object.keys(dates).forEach((d) => {
       var key = func(new Date(d));

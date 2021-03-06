@@ -547,12 +547,23 @@ async function sendSearchRequest(data, store, n, queryItems) {
     body: JSON.stringify({ N: n, Items: queryItems }),
   })
     .then((resp) => {
-      return resp.ok ? resp.json() : null;
+      try {
+        return resp.ok ? resp.json() : null;
+      } catch {
+        data.snackbar = true;
+        data.progressError = "Keine Ergebnisse - Abfrage zu spezifisch.";
+        data.progressWait = false;
+        return null;
+      }
     })
     .then((searchResult) => {
-      if (searchResult === null || searchResult.Items === null || searchResult.Items.length === 0){
+      if (
+        searchResult === null ||
+        searchResult.Items === null ||
+        searchResult.Items.length === 0
+      ) {
         data.snackbar = true;
-        data.progressError = "Keine Ergebnisse - Abfrage zu spezifisch."
+        data.progressError = "Keine Ergebnisse - Abfrage zu spezifisch.";
         data.progressWait = false;
         return;
       }
@@ -571,7 +582,7 @@ async function sendSearchRequest(data, store, n, queryItems) {
         }
 
         var request = searchResult.Items.slice(i, i + packageSize);
-        
+
         fetch(store.state.baseUrl + "/pull", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -662,18 +673,13 @@ export default {
       this.$data.search_complex_n = n;
       this.$store.commit("updateN", n);
     },
-    search_invoke: function(payload){
+    search_invoke: function(payload) {
       var set = new Set();
-      payload.forEach(x => {
+      payload.forEach((x) => {
         set.add(x.position);
       });
 
-      sendSearchRequest(
-        this.$data,
-        this.$store,
-        set.size,
-        payload
-      );
+      sendSearchRequest(this.$data, this.$store, set.size, payload);
     },
     search_simple: function() {
       var queryItems = [

@@ -173,8 +173,12 @@ export default {
             if(data.length < 10)
               return;
             
+            try{
             var test = JSON.parse(decodeURI(data));
             search.search_invoke(test);
+            }catch{
+              // ignore
+            }
             return;
           });
       })
