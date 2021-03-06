@@ -137,6 +137,12 @@ export default {
               calendarIndex: 0,
               data: res,
             },
+            {
+              type: "heatmap",
+              coordinateSystem: "calendar",
+              calendarIndex: 1,
+              data: res,
+            },
           ],
         };
         this.$data.component.setOption(myCalendarOption);
