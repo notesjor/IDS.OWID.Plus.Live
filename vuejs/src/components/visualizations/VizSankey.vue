@@ -123,16 +123,13 @@ export default {
           ],
         };
         this.$data.component.setOption(sankeyOptions);
-        this.$store.commit("updateViewportId", "sankey");
       },
       {
         deep: true,
       }
     );
 
-    this.$store.commit("updateStatus", "pending");
     this.$store.commit("calculate");
-    this.$store.commit("updateStatus", "success");
   },
 };
 </script>

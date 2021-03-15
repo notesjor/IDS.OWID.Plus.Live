@@ -44,15 +44,10 @@ export default {
       () => {
         if (this.$store.state.vizData === null) return;
 
-        var availableDates = new Set();
-
-        Object.keys(this.$store.state.vizData["ALLE"].data).forEach((key) => {
-          availableDates.add(key);
-        });
-        availableDates = Array.from(availableDates);
-        availableDates.sort();
+        var availableDates = this.$store.state.owid.Dates;
 
         var series = [];
+        
         for (const key in this.$store.state.vizData) {
           if (key === "ALLE") continue;
           const data = this.$store.state.vizData[key];
@@ -123,7 +118,6 @@ export default {
           },
         };
         this.$data.component.setOption(myChartOption);
-        this.$store.commit("updateViewportId", "timechart");
       },
       {
         deep: true,

@@ -21,7 +21,6 @@ export default new Vuex.Store({
 
     vizViewportWidth: 1200,
     vizViewportHeight: 500,
-    vizVizportId: "",
 
     vizData: null,
   },
@@ -37,10 +36,6 @@ export default new Vuex.Store({
     updateViewport(state, { w, h }) {
       state.vizViewportWidth = (w / 110) * 100;
       state.vizViewportHeight = h;
-    },
-
-    updateViewportId(state, id) {
-      state.vizVizportId = id;
     },
 
     updateN(state, N) {
@@ -166,24 +161,6 @@ export default new Vuex.Store({
         }
       }
 
-      // Build a sum series called "ALLE"
-
-      var sumAll = {};
-      Object.keys(res).forEach((key) => {
-        var item = res[key];
-        if (item != null)
-          Object.keys(item.data).forEach((subKey) => {
-            if (subKey in sumAll) {
-              sumAll[subKey].value += item.data[subKey].value;
-              sumAll[subKey].dates = new Set([
-                ...sumAll[subKey].dates,
-                ...item.data[subKey].dates,
-              ]);
-            } else sumAll[subKey] = item.data[subKey];
-          });
-      });
-      res["ALLE"] = { name: "ALLE", label: "ALLE", data: sumAll, items: null };
-      
       // relativ Frquency
       if (state.vizOptionRelative) {
         var normData;
@@ -217,7 +194,7 @@ export default new Vuex.Store({
           }
         });
       }
-      
+
       // smoothing
       if (state.vizOptionSmoothing > 1) {
         var labelSelector, carret, odd;
@@ -258,7 +235,7 @@ export default new Vuex.Store({
           res[key].data = nval;
         });
       }
-      
+
       state.vizData = res;
       state.version++;
     },

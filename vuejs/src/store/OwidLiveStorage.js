@@ -48,7 +48,7 @@ export class OwidLiveStorage {
     for (var n = 0; n < norm.length; n++) {
       if (n === 0)
         Object.keys(norm[0]).forEach(function(key) {
-          dates.push({ key });
+          dates.push( key.substring(0, 10) );
         });
 
       var sum = 0.0;

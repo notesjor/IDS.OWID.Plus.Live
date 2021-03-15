@@ -52,8 +52,6 @@ export default {
       () => {
         if (this.$store.state.vizData === null) return;
 
-        this.$store.commit("updateStatus", "pending");
-
         var component = document.getElementById("ecalendar");
         if (component != null && this.$data.component === null) {
           try {
@@ -65,16 +63,21 @@ export default {
           }
         }
 
-        var all = this.$store.state.vizData["ALLE"];
-        var res = [];
-
-        Object.keys(all.data).forEach((k) => {
-          var entry = all.data[k];
-          var dates = Array.from(entry.dates).sort();
-          dates.forEach((d) => {
-            res.push([d.substring(0, 10), entry.value]);
+        var tmp = {};
+        var dates = this.$store.state.owid.Dates;
+        dates.forEach((d) => {
+          tmp[d] = 0;
+          Object.keys(this.$store.state.vizData).forEach((sK) => {
+            if (d in this.$store.state.vizData[sK].data)
+              tmp[d] += parseFloat(this.$store.state.vizData[sK].data[d].value);
           });
         });
+
+        var res = [];
+        Object.keys(tmp).forEach((k) => {
+          res.push([k, tmp[k]]);
+        });
+        console.log(res);
 
         var unit = this.$store.state.vizOptionRelative
           ? " (pro Mio. Token)"
@@ -86,7 +89,7 @@ export default {
             feature: {
               saveAsImage: {
                 title: "Speichern \xa0 \xa0 \xa0 \xa0 \xa0",
-                name: "OWIDplusLIVE"
+                name: "OWIDplusLIVE",
               },
             },
           },
@@ -146,15 +149,12 @@ export default {
           ],
         };
         this.$data.component.setOption(myCalendarOption);
-        this.$store.commit("updateStatus", "success");
-        this.$store.commit("updateViewportId", "ecalendar");
       },
       {
         deep: true,
       }
     );
 
-    this.$store.commit("updateStatus", "pending");
     this.$store.commit("calculate");
   },
 };
