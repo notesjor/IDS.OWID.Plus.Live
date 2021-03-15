@@ -77,7 +77,6 @@ export default {
         Object.keys(tmp).forEach((k) => {
           res.push([k, tmp[k]]);
         });
-        console.log(res);
 
         var unit = this.$store.state.vizOptionRelative
           ? " (pro Mio. Token)"

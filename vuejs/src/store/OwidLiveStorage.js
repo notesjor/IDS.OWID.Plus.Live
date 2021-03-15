@@ -8,13 +8,14 @@ export class OwidLiveStorage {
   #Total;
   #NormTotal;
   #N;
+  #Granulation;
 
   toJSON() {
     return {
-      Dates: this.#Dates,      
+      Dates: this.#Dates,
       N: this.#N,
       Norm: this.#Norm,
-      OwidLiveSearches: this.#OwidLiveSearches,      
+      OwidLiveSearches: this.#OwidLiveSearches,
       Total: this.#Total,
       NormTotal: this.#NormTotal,
     };
@@ -24,7 +25,7 @@ export class OwidLiveStorage {
     var res = new OwidLiveStorage([]);
     res.#Norm = norm;
     res.#OwidLiveSearches = {};
-    Object.keys(ols).forEach(x=>{
+    Object.keys(ols).forEach((x) => {
       res.#OwidLiveSearches[x] = OwidLiveSearch.load(ols[x]);
     });
     res.#N = n;
@@ -48,7 +49,7 @@ export class OwidLiveStorage {
     for (var n = 0; n < norm.length; n++) {
       if (n === 0)
         Object.keys(norm[0]).forEach(function(key) {
-          dates.push( key.substring(0, 10) );
+          dates.push(key.substring(0, 10));
         });
 
       var sum = 0.0;
@@ -111,6 +112,20 @@ export class OwidLiveStorage {
   }
 
   /**
+   * Return all available dates
+   */
+  get Dates() {
+    return this.#Granulation;
+  }
+
+  /**
+   * Set the current granulation
+   */
+  set Dates(granulation) {
+    this.#Granulation = granulation;
+  }
+
+  /**
    * Return the current N(-gram)
    */
   get N() {
@@ -122,13 +137,6 @@ export class OwidLiveStorage {
    */
   set N(n) {
     this.#N = n;
-  }
-
-  /**
-   * Return all available dates
-   */
-  get Dates() {
-    return this.#Dates;
   }
 
   /**
@@ -240,55 +248,100 @@ export class OwidLiveStorage {
     return res;
   }
 
+  #funcDate = function(x) {
+    return (
+      x.getFullYear() +
+      "-" +
+      (x.getMonth() + 1).pad(2) +
+      "-" +
+      x.getDate().pad(2)
+    );
+  };
+
+  #funcWeek = function(x) {
+    return x.getYearWeek();
+  };
+
+  #funcMonth = function(x) {
+    return x.getFullYear() + "-" + x.getMonth().pad(2);
+  };
+
+  #funcQuarter = function(x) {
+    return x.getYearQuarter();
+  };
+
+  #funcYear = function(x) {
+    return x.getFullYear();
+  };
+
+  /**
+   * get a date array (day based)
+   */
+  get DatesDate() {
+    return this.calculateDateGranulation(this.#funcDate);
+  }
+
   /**
    * get the norm date values for N(-Gram)
    */
   get NormDate() {
-    return this.calculateGranulation(function(x) {
-      return (
-        x.getFullYear() +
-        "-" +
-        (x.getMonth() + 1).pad(2) +
-        "-" +
-        x.getDate().pad(2)
-      );
-    });
+    return this.calculateGranulation(this.#funcDate);
+  }
+
+  /**
+   * get a date array (week based)
+   */
+  get DatesWeek() {
+    return this.calculateDateGranulation(this.#funcWeek);
   }
 
   /**
    * get the norm weeks values for N(-Gram)
    */
   get NormWeek() {
-    return this.calculateGranulation(function(x) {
-      return x.getYearWeek();
-    });
+    return this.calculateGranulation(this.#funcWeek);
+  }
+
+  /**
+   * get a date array (month based)
+   */
+  get DatesMonth() {
+    return this.calculateDateGranulation(this.#funcMonth);
   }
 
   /**
    * get the norm month values for N(-Gram)
    */
   get NormMonth() {
-    return this.calculateGranulation(function(x) {
-      return x.getFullYear() + "-" + x.getMonth().pad(2);
-    });
+    return this.calculateGranulation(this.#funcMonth);
+  }
+
+  /**
+   * get a date array (quarter based)
+   */
+  get DatesQuarter() {
+    return this.calculateDateGranulation(this.#funcQuarter);
   }
 
   /**
    * get the norm quarters values for N(-Gram)
    */
   get NormQuarter() {
-    return this.calculateGranulation(function(x) {
-      return x.getYearQuarter();
-    });
+    return this.calculateGranulation(this.#funcQuarter);
+  }
+
+  /**
+   * get a date array (year based)
+   */
+  get DatesYear() {
+    return this.calculateDateGranulation(this.#funcYear);
   }
 
   /**
    * get the norm years values for N(-Gram)
    */
   get NormYear() {
-    return this.calculateGranulation(function(x) {
-      return x.getFullYear();
-    });
+    return this.calculateGranulation(this.#funcYear);
   }
 
   /**
@@ -303,6 +356,20 @@ export class OwidLiveStorage {
       if (key in res) res[key] += dates[d];
       else res[key] = dates[d];
     });
+    return res;
+  }
+
+  /**
+   * HELPER-Function: Used by NormDate, NormWeek, NormMonth, NormQuarter and NormYear (see above)
+   * @param  {function} func the functions needs to describe how-to find the dateTime-Key
+   */
+  calculateDateGranulation(func) {
+    var res = [];
+    console.log(this.#Dates);
+    Object.keys(this.#Dates).forEach((d) => {      
+      res.push(func(new Date(this.#Dates[d])));
+    });
+    console.log(res);
     return res;
   }
 }

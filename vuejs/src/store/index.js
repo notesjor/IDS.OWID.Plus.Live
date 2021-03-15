@@ -81,6 +81,25 @@ export default new Vuex.Store({
       state.vizData = {};
       var res = {};
 
+      // Set Granulation
+      switch (state.vizOptionGranulation) {
+        case 1:
+          state.owid.Dates = state.owid.DatesWeek;
+          break;
+        case 2:
+          state.owid.Dates = state.owid.DatesMonth;
+          break;
+        case 3:
+          state.owid.Dates = state.owid.DatesQuarter;
+          break;
+        case 4:
+          state.owid.Dates = state.owid.DatesYear;
+          break;
+        default:
+          state.owid.Dates = state.owid.DatesDate;
+          break;
+      }
+
       for (var s in state.owid.OwidLiveSearches) {
         var search = state.owid.OwidLiveSearches[s];
         if (search.N != state.owid.N) continue;
