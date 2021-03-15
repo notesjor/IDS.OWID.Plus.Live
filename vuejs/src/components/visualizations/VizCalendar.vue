@@ -64,12 +64,12 @@ export default {
         }
 
         var tmp = {};
-        var dates = this.$store.state.owid.Dates;
-        dates.forEach((d) => {
-          tmp[d] = 0;
-          Object.keys(this.$store.state.vizData).forEach((sK) => {
-            if (d in this.$store.state.vizData[sK].data)
-              tmp[d] += parseFloat(this.$store.state.vizData[sK].data[d].value);
+        Object.keys(this.$store.state.vizData).forEach((sK) => {
+          Object.keys(this.$store.state.vizData[sK].data).forEach((d) => {
+            this.$store.state.vizData[sK].data[d].dates.forEach((i) => {
+              if (i in tmp) tmp[i] += parseFloat(this.$store.state.vizData[sK].data[d].value);
+              else tmp[i] = parseFloat(this.$store.state.vizData[sK].data[d].value)
+            });
           });
         });
 

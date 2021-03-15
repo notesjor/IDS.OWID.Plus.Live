@@ -93,7 +93,6 @@ export default {
             trigger: "item",
             triggerOn: "mousemove",
             formatter: function(params) {
-              console.log(params);
               return (
                 (params.data.source === "0>>>"
                   ? ""

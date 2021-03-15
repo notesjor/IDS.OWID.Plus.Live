@@ -20,10 +20,8 @@ export class OwidLiveSearch {
   static load(obj) {
     var olsti = [];
     obj.OwidLiveStorageTimeItems.forEach((x) => {
-      console.log(x);
       olsti.push(OwidLiveStorageTimeItem.load(x));
     });
-    console.log(olsti);
     var res = new OwidLiveSearch(obj.N, obj.Request, null);
     res.#IsSelected = obj.IsSelected;
     res.#OwidLiveStorageTimeItems = olsti;

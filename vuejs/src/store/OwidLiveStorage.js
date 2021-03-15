@@ -365,11 +365,9 @@ export class OwidLiveStorage {
    */
   calculateDateGranulation(func) {
     var res = [];
-    console.log(this.#Dates);
     Object.keys(this.#Dates).forEach((d) => {      
       res.push(func(new Date(this.#Dates[d])));
     });
-    console.log(res);
     return res;
   }
 }
