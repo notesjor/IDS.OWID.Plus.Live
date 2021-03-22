@@ -216,38 +216,40 @@ export default new Vuex.Store({
 
       // smoothing
       if (state.vizOptionSmoothing > 1) {
-        var labelSelector, carret, odd;
+        var carret, odd;
 
         if (state.vizOptionSmoothing % 2 === 0) {
-          carret = state.vizOptionSmoothing / 2;
-          labelSelector = carret;
+          carret = parseInt((state.vizOptionSmoothing / 2).toFixed(0));
           odd = false;
         } else {
-          carret = (state.vizOptionSmoothing - 1) / 2;
-          labelSelector = carret;
+          carret = parseInt(((state.vizOptionSmoothing - 1) / 2).toFixed(0));
           odd = true;
         }
 
         Object.keys(res).forEach((key) => {
           var item = res[key].data;
-          var keys = Object.keys(item);
+          var keys = state.owid.Dates;
           var nval = {};
-          for (var i = 0; i < keys.length - state.vizOptionSmoothing; i++) {
+          for (var i = carret; i < keys.length - carret; i++) {
             var dates = new Set();
             var sum = 0.0;
-            for (var j = 0; j < state.vizOptionSmoothing; j++) {
+            for (var j = 0 - carret; j <= carret; j++) {
               item[keys[i + j]].dates.forEach((d) => dates.add(d));
 
-              if (!odd && (j === 0 || j + 1 === state.vizOptionSmoothing))
-                sum += item[keys[i + j]].value * 0.5;
-              else sum += item[keys[i + j]].value;
+              if(!(keys[i + j] in item))
+              {
+                console.log("XXX");
+                continue;
+              }
+
+              if (!odd && (j === 0 - carret || j === carret))
+                sum += item[keys[i + j]].value * (1.0 / state.vizOptionSmoothing / 2.0);
+              else sum += item[keys[i + j]].value * (1.0 / state.vizOptionSmoothing);
             }
-            sum /= odd
-              ? state.vizOptionSmoothing
-              : state.vizOptionSmoothing - 1;
-            nval[keys[i + labelSelector]] = {
+
+            nval[keys[i]] = {
               dates: dates,
-              value: sum.toFixed(3),
+              value: parseFloat(sum.toFixed(3)),
             };
           }
 
