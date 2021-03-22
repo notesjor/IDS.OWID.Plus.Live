@@ -79,6 +79,7 @@
                           v-model="search_simple_1_value"
                           id="search_simple_1_1"
                           :rules="inputRules"
+                          @keydown.enter="search_simple"
                         ></v-text-field>
                       </v-col>
                     </v-row>
@@ -106,6 +107,7 @@
                           v-model="search_simple_1_value"
                           id="search_simple_2_1"
                           :rules="inputRules"
+                          @keydown.enter="search_simple"
                         ></v-text-field>
                       </v-col>
                       <v-col cols="2">
@@ -122,6 +124,7 @@
                           v-model="search_simple_2_value"
                           id="search_simple_2_2"
                           :rules="inputRules"
+                          @keydown.enter="search_simple"
                         ></v-text-field>
                       </v-col>
                     </v-row>
@@ -149,6 +152,7 @@
                           v-model="search_simple_1_value"
                           id="search_simple_3_1"
                           :rules="inputRules"
+                          @keydown.enter="search_simple"
                         ></v-text-field>
                       </v-col>
                       <v-col cols="2">
@@ -165,6 +169,7 @@
                           v-model="search_simple_2_value"
                           id="search_simple_3_2"
                           :rules="inputRules"
+                          @keydown.enter="search_simple"
                         ></v-text-field>
                       </v-col>
                       <v-col cols="2">
@@ -181,6 +186,7 @@
                           v-model="search_simple_3_value"
                           id="search_simple_3_3"
                           :rules="inputRules"
+                          @keydown.enter="search_simple"
                         ></v-text-field>
                       </v-col>
                     </v-row>
@@ -268,6 +274,7 @@
                           label="Wortform"
                           id="search_complex_1_1_w"
                           :rules="inputRules"
+                          @keydown.enter="search_complex"
                         ></v-text-field>
                       </v-col>
                     </v-row>
@@ -277,6 +284,7 @@
                           label="Lemma"
                           id="search_complex_1_1_l"
                           :rules="inputRules"
+                          @keydown.enter="search_complex"
                         ></v-text-field>
                       </v-col>
                     </v-row>
@@ -286,6 +294,7 @@
                           label="POS-Tag"
                           id="search_complex_1_1_p"
                           :rules="inputRules"
+                          @keydown.enter="search_complex"
                         ></v-text-field>
                       </v-col>
                     </v-row>
@@ -316,6 +325,7 @@
                           label="Wortform (1. Position)"
                           id="search_complex_2_1_w"
                           :rules="inputRules"
+                          @keydown.enter="search_complex"
                         ></v-text-field>
                       </v-col>
                       <v-col>
@@ -323,6 +333,7 @@
                           label="Wortform (2. Position)"
                           id="search_complex_2_2_w"
                           :rules="inputRules"
+                          @keydown.enter="search_complex"
                         ></v-text-field>
                       </v-col>
                     </v-row>
@@ -332,6 +343,7 @@
                           label="Lemma (1. Position)"
                           id="search_complex_2_1_l"
                           :rules="inputRules"
+                          @keydown.enter="search_complex"
                         ></v-text-field>
                       </v-col>
                       <v-col>
@@ -339,6 +351,7 @@
                           label="Lemma (2. Position)"
                           id="search_complex_2_2_l"
                           :rules="inputRules"
+                          @keydown.enter="search_complex"
                         ></v-text-field>
                       </v-col>
                     </v-row>
@@ -348,6 +361,7 @@
                           label="POS-Tag (1. Position)"
                           id="search_complex_2_1_p"
                           :rules="inputRules"
+                          @keydown.enter="search_complex"
                         ></v-text-field>
                       </v-col>
                       <v-col>
@@ -355,6 +369,7 @@
                           label="POS-Tag (2. Position)"
                           id="search_complex_2_2_p"
                           :rules="inputRules"
+                          @keydown.enter="search_complex"
                         ></v-text-field>
                       </v-col>
                     </v-row>
@@ -390,6 +405,7 @@
                           label="Wortform (1. Position)"
                           id="search_complex_3_1_w"
                           :rules="inputRules"
+                          @keydown.enter="search_complex"
                         ></v-text-field>
                       </v-col>
                       <v-col>
@@ -397,6 +413,7 @@
                           label="Wortform (2. Position)"
                           id="search_complex_3_2_w"
                           :rules="inputRules"
+                          @keydown.enter="search_complex"
                         ></v-text-field>
                       </v-col>
                       <v-col>
@@ -404,6 +421,7 @@
                           label="Wortform (3. Position)"
                           id="search_complex_3_3_w"
                           :rules="inputRules"
+                          @keydown.enter="search_complex"
                         ></v-text-field>
                       </v-col>
                     </v-row>
@@ -413,6 +431,7 @@
                           label="Lemma (1. Position)"
                           id="search_complex_3_1_l"
                           :rules="inputRules"
+                          @keydown.enter="search_complex"
                         ></v-text-field>
                       </v-col>
                       <v-col>
@@ -420,6 +439,7 @@
                           label="Lemma (2. Position)"
                           id="search_complex_3_2_l"
                           :rules="inputRules"
+                          @keydown.enter="search_complex"
                         ></v-text-field>
                       </v-col>
                       <v-col>
@@ -427,6 +447,7 @@
                           label="Lemma (3. Position)"
                           id="search_complex_3_3_l"
                           :rules="inputRules"
+                          @keydown.enter="search_complex"
                         ></v-text-field>
                       </v-col>
                     </v-row>
@@ -436,6 +457,7 @@
                           label="POS-Tag (1. Position)"
                           id="search_complex_3_1_p"
                           :rules="inputRules"
+                          @keydown.enter="search_complex"
                         ></v-text-field>
                       </v-col>
                       <v-col>
@@ -443,6 +465,7 @@
                           label="POS-Tag (2. Position)"
                           id="search_complex_3_2_p"
                           :rules="inputRules"
+                          @keydown.enter="search_complex"
                         ></v-text-field>
                       </v-col>
                       <v-col>
@@ -450,6 +473,7 @@
                           label="POS-Tag (3. Position)"
                           id="search_complex_3_3_p"
                           :rules="inputRules"
+                          @keydown.enter="search_complex"
                         ></v-text-field>
                       </v-col>
                     </v-row>

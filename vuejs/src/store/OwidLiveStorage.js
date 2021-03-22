@@ -157,14 +157,23 @@ export class OwidLiveStorage {
    * Get the search history for N(-Gram). Used by components/Clipboard
    */
   GetSearchHistory() {
-    var res = [];
+    var tmp = [];
     if (Object.keys(this.#OwidLiveSearches).length == 0) return res;
 
     Object.keys(this.#OwidLiveSearches).forEach((key) => {
       var current = this.#OwidLiveSearches[key];
-      if (current.N === this.#N) res.push(key);
+      if (current.N === this.#N) tmp.push({key: key, date: current.TimeStamp});
     });
 
+    tmp.sort(function(a,b){
+      return b.date - a.date;
+    });
+
+    var res = [];
+    tmp.forEach(x=>{
+      res.push(x.key);
+    });
+  
     return res;
   }
 

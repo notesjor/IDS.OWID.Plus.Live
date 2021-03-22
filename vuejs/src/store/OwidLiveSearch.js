@@ -6,6 +6,7 @@ export class OwidLiveSearch {
   #Request;
   #OwidLiveStorageTimeItems;
   #IsSelected;
+  #TimeStamp;
 
   toJSON() {
     return {
@@ -14,6 +15,7 @@ export class OwidLiveSearch {
       Request: this.#Request,
       OwidLiveStorageTimeItems: this.#OwidLiveStorageTimeItems,
       IsSelected: this.#IsSelected,
+      TimeStamp: this.#TimeStamp,      
     };
   }
 
@@ -25,6 +27,7 @@ export class OwidLiveSearch {
     var res = new OwidLiveSearch(obj.N, obj.Request, null);
     res.#IsSelected = obj.IsSelected;
     res.#OwidLiveStorageTimeItems = olsti;
+    res.#TimeStamp = obj.TimeStamp;
     return res;
   }
 
@@ -36,6 +39,7 @@ export class OwidLiveSearch {
    */
   constructor(n, request, items) {
     this.#N = n;
+    this.#TimeStamp = new Date();
 
     var key = "(N = " + n.toString() + "): ";
     request.forEach((x) => {
@@ -86,6 +90,13 @@ export class OwidLiveSearch {
       this.#OwidLiveStorageTimeItems.length +
       "]"
     );
+  }
+
+  /**
+   * Get the TimeStamp
+   */
+  get TimeStamp(){
+    return this.#TimeStamp;
   }
 
   /**
