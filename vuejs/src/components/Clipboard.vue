@@ -10,6 +10,9 @@
           >
         </v-col>
         <v-col style="text-align:right;">
+          <v-icon style="margin-right:10px" @click="exportLinkAll"
+            >mdi-link-variant</v-icon
+          >
           <v-icon style="block:inline; margin-right:10px;" @click="modelLoad"
             >mdi-folder-outline</v-icon
           >
@@ -253,7 +256,18 @@ export default {
     exportLink(i) {
       var data = this.$store.state.owid.GetSearchHistoryItemRequest(i.label);
       this.$data.snackbarLink =
-        this.$store.state.webUrl + encodeURI(JSON.stringify(data));
+        this.$config.webUrl + encodeURI("[" + JSON.stringify(data) + "]");
+      this.$data.snackbar = true;
+    },
+    exportLinkAll() {
+      var owid = this.$store.state.owid;
+      var hist = owid.GetSearchHistory();
+      var data = [];
+      hist.forEach(x=>{
+        data.push(owid.GetSearchHistoryItemRequest(x));
+      });
+      this.$data.snackbarLink =
+        this.$config.webUrl + encodeURI(JSON.stringify(data));
       this.$data.snackbar = true;
     },
     exportTsv(i) {
@@ -263,7 +277,9 @@ export default {
         if (x.IsSelected) keys.push(x.Key);
       });
 
-      fetch(this.$store.state.baseUrl + "/down", {
+      var config = this.$config;
+
+      fetch(config.baseUrl + "/down", {
         method: "post",
         body: JSON.stringify({ Format: "TSV", N: raw.N, Requests: keys }),
       })

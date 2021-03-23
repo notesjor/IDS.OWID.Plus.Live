@@ -105,6 +105,13 @@ export class OwidLiveStorage {
   }
 
   /**
+   * Delete all searches
+   */
+  clearAll(){
+    this.#OwidLiveSearches = {};
+  }
+
+  /**
    * Return all normalization data
    */
   get Norm() {

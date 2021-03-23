@@ -54,7 +54,8 @@ export default {
 
           var values = [];
           availableDates.forEach((c) => {
-            values.push(c in data.data ? data.data[c] : 0);
+            if(c in data.data)
+              values.push(data.data[c]);
           });
 
           series.push({

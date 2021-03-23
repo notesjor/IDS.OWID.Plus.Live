@@ -33,6 +33,10 @@ export default new Vuex.Store({
       state.owid = new OwidLiveStorage(payload);
     },
 
+    clearAll(state) {
+      state.owid.clearAll();
+    },
+
     updateViewport(state, { w, h }) {
       state.vizViewportWidth = (w / 110) * 100;
       state.vizViewportHeight = h;
@@ -237,10 +241,7 @@ export default new Vuex.Store({
               item[keys[i + j]].dates.forEach((d) => dates.add(d));
 
               if(!(keys[i + j] in item))
-              {
-                console.log("XXX");
                 continue;
-              }
 
               if (!odd && (j === 0 - carret || j === carret))
                 sum += item[keys[i + j]].value * (1.0 / state.vizOptionSmoothing / 2.0);

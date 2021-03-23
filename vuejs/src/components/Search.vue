@@ -518,6 +518,7 @@
 import { mdiMagnifyPlus } from "@mdi/js";
 
 var global_layers = ["Wortform", "Lemma", "POS"];
+var config;
 
 class queryItem {
   layer;
@@ -562,7 +563,7 @@ async function sendSearchRequest(data, store, n, queryItems) {
   data.progressWait = true;
   data.progressMsg = "Suche N-Gramme";
 
-  fetch(store.state.baseUrl + "/find", {
+  fetch(config.baseUrl + "/find", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -607,7 +608,7 @@ async function sendSearchRequest(data, store, n, queryItems) {
 
         var request = searchResult.Items.slice(i, i + packageSize);
 
-        fetch(store.state.baseUrl + "/pull", {
+        fetch(config.baseUrl + "/pull", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ N: n, Items: request }),
@@ -684,6 +685,9 @@ export default {
           "Es sind maximal zwei *-Auslassungszeichen erlaubt!",
       ],
     };
+  },
+  mounted:function(){
+    config = this.$config;
   },
   methods: {
     abortProgress: function() {

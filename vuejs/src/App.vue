@@ -19,6 +19,23 @@
       </div>
 
       <v-spacer></v-spacer>
+      <a @click="newProject">
+        <div style="min-width:350px">
+          <v-icon style="font-size:48px; float:left; margin-right:5px"
+            >mdi-file-outline</v-icon
+          >
+          <div class="d-none d-sm-flex">
+            <span
+              style="font-size:14px; line-height:1; font-weight:200; margin-top:10px; color:white"
+            >
+              <p>
+                <strong>Neu</strong><br />
+                Löscht alle Suchabfragen.
+              </p>
+            </span>
+          </div>
+        </div>
+      </a>
       <a @click="tutorial = true">
         <div style="min-width:350px">
           <v-icon style="font-size:48px; float:left; margin-right:5px"
@@ -149,16 +166,24 @@ export default {
     alert: false,
   }),
 
+  methods:{
+    newProject: function(){
+      this.$store.commit("clearAll");
+      alert("Daten wurden gelöscht. Starten Sie eine erneute Suche, um die Anzeige zu aktualisieren.");
+    }
+  },
+
   mounted() {
     var store = this.$store;
     var search = this.$refs.searchComponent;
+    var config = this.$config;
 
-    fetch(store.state.baseUrl + "/init")
+    fetch(config.baseUrl + "/init")
       .then((response) => response.text())
       .then((response) => {
         store.commit("id", response);
 
-        fetch(store.state.baseUrl + "/norm", {
+        fetch(config.baseUrl + "/norm", {
           method: "GET",
         })
           .then((resp) => {
@@ -169,7 +194,7 @@ export default {
             store.commit("init", obj);
           })
           .then(() => {
-            var data = window.location.href.replace(this.$store.state.webUrl, "");
+            var data = window.location.href.replace(config.webUrl, "");
             if(data.length < 10)
               return;
             
