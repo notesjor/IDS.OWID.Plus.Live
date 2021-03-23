@@ -1,4 +1,5 @@
 <template>
+<panzoom>
   <div
     id="sankey"
     v-bind:style="
@@ -8,11 +9,13 @@
         this.$store.state.vizViewportHeight +
         'px; height: auto'
     "
-  ></div>  
+  ></div>
+</panzoom>
 </template>
 
 <script>
 import * as echarts from 'echarts';
+import * as panzoom from 'panzoom';
 
 export default {
   name: "VizSankey",
@@ -34,12 +37,14 @@ export default {
         if (component != null && this.$data.component === null) {
           try {
             this.$data.component = echarts.init(component, "shine", {
-              renderer: "canvas",
+              renderer: "svg",
             });            
           } catch {
             // ignore
           }
         }
+
+        panzoom(component);
 
         var tnodes = new Set();
         var links = [];
@@ -85,7 +90,7 @@ export default {
               saveAsImage: {
                 title: "Speichern \xa0 \xa0 \xa0 \xa0 \xa0",
                 name: "OWIDplusLIVE"
-              },
+              }
             },
           },
           animation: false,

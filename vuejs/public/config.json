@@ -1,4 +1,4 @@
 {
     "baseUrl": "https://owidnext.jan-oliver-ruediger.de",
-    "webUrl": "http://lexik02.ids-mannheim.de/owid-plus-live/index.html?"
+    "webUrl": "http://192.168.178.40:8080/?"
 }

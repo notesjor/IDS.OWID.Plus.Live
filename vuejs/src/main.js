@@ -10,8 +10,7 @@ fetch(process.env.BASE_URL + "config.json")
   return resp.json();
 })
 .then((config)=>{
-  Vue.prototype.$config = config
-       
+  Vue.prototype.$config = config;
   new Vue({
    vuetify,
    store,

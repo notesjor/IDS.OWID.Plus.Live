@@ -533,6 +533,12 @@ class queryItem {
     };
   }
 
+  static load(obj) {
+    var res = new queryItem(obj.layer, obj.position, "", false);
+    res.token = obj.token;
+    return res;
+  }
+
   constructor(layer, position, element, upperCase) {
     this.layer = layer;
     this.position = position;
@@ -644,6 +650,7 @@ async function sendSearchRequest(data, store, n, queryItems) {
                 queryItems: queryItems,
                 items: result,
               });
+              store.state.vizNoCommit = 1;
               store.commit("calculate");
               data.progressWait = false;
             }
@@ -686,7 +693,7 @@ export default {
       ],
     };
   },
-  mounted:function(){
+  mounted: function() {
     config = this.$config;
   },
   methods: {
@@ -701,13 +708,15 @@ export default {
       this.$data.search_complex_n = n;
       this.$store.commit("updateN", n);
     },
-    search_invoke: function(payload) {
+    search_invoke: function(queries) {
       var set = new Set();
-      payload.forEach((x) => {
+      var qs = [];
+      queries.forEach((x) => {
+        qs.push(queryItem.load(x));
         set.add(x.position);
       });
-
-      sendSearchRequest(this.$data, this.$store, set.size, payload);
+console.log(set.size); console.log(qs);
+      sendSearchRequest(this.$data, this.$store, set.size, qs);
     },
     search_simple: function() {
       var queryItems = [

@@ -10,9 +10,6 @@
           >
         </v-col>
         <v-col style="text-align:right;">
-          <v-icon style="margin-right:10px" @click="exportLinkAll"
-            >mdi-link-variant</v-icon
-          >
           <v-icon style="block:inline; margin-right:10px;" @click="modelLoad"
             >mdi-folder-outline</v-icon
           >
@@ -180,10 +177,11 @@ export function onFileLoaded(e) {
   var match = /^data:(.*);base64,(.*)$/.exec(e.target.result);
   if (match == null) {
     throw "Could not parse result";
-  }  
+  }
   var obj = JSON.parse(atob(match[2]));
   storeGlobal.commit("modelLoad", obj.Owid);
   storeGlobal.commit("calculate");
+  console.log("clipboard onFileLoaded");
 }
 
 export var storeGlobal;
@@ -229,7 +227,8 @@ export default {
       for (var i in val) sel.push(val[i].key);
       this.$data.syncLock = true;
       this.$store.commit("selectSearchHistoryItemsChange", sel);
-      this.$store.commit("calculate");
+      if (this.$store.state.vizNoCommit === 0) this.$store.commit("calculate");
+      else this.$store.state.vizNoCommit--;
       this.$data.syncLock = false;
     },
   },
@@ -256,18 +255,7 @@ export default {
     exportLink(i) {
       var data = this.$store.state.owid.GetSearchHistoryItemRequest(i.label);
       this.$data.snackbarLink =
-        this.$config.webUrl + encodeURI("[" + JSON.stringify(data) + "]");
-      this.$data.snackbar = true;
-    },
-    exportLinkAll() {
-      var owid = this.$store.state.owid;
-      var hist = owid.GetSearchHistory();
-      var data = [];
-      hist.forEach(x=>{
-        data.push(owid.GetSearchHistoryItemRequest(x));
-      });
-      this.$data.snackbarLink =
-        this.$config.webUrl + encodeURI(JSON.stringify(data));
+        this.$config.webUrl + btoa(JSON.stringify(data));
       this.$data.snackbar = true;
     },
     exportTsv(i) {
@@ -316,11 +304,11 @@ export default {
         "data.json"
       );
     },
-    modelLoad() {      
+    modelLoad() {
       storeGlobal = this.$store;
       var fileinput = document.getElementById("fileinput");
       fileinput.addEventListener("change", handleFileSelect);
-      fileinput.click();      
+      fileinput.click();
     },
     copyToClipboard() {
       saveClipboard(this.$data.snackbarLink);

@@ -7,17 +7,16 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    baseUrl: "https://owidnext.jan-oliver-ruediger.de",
-    webUrl: "http://lexik02.ids-mannheim.de/owid-plus-live/index.html?",
     sessionKey: null,
-
+    
     owid: null,
     version: 0,
     searches: 0,
 
+    vizNoCommit: 0,
     vizOptionRelative: true,
     vizOptionGranulation: 0,
-    vizOptionSmoothing: 7,
+    vizOptionSmoothing: 7,    
 
     vizViewportWidth: 1200,
     vizViewportHeight: 500,

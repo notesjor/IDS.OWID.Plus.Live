@@ -166,11 +166,10 @@ export default {
     alert: false,
   }),
 
-  methods:{
-    newProject: function(){
-      this.$store.commit("clearAll");
-      alert("Daten wurden gelöscht. Starten Sie eine erneute Suche, um die Anzeige zu aktualisieren.");
-    }
+  methods: {
+    newProject: function() {
+      location.reload();
+    },
   },
 
   mounted() {
@@ -195,13 +194,11 @@ export default {
           })
           .then(() => {
             var data = window.location.href.replace(config.webUrl, "");
-            if(data.length < 10)
-              return;
-            
-            try{
-            var test = JSON.parse(decodeURI(data));
-            search.search_invoke(test);
-            }catch{
+            if (data.length < 10) return;
+
+            try {
+              search.search_invoke(JSON.parse(atob(data)));
+            } catch {
               // ignore
             }
             return;
