@@ -180,8 +180,7 @@ export function onFileLoaded(e) {
   }
   var obj = JSON.parse(atob(match[2]));
   storeGlobal.commit("modelLoad", obj.Owid);
-  storeGlobal.commit("calculate");
-  console.log("clipboard onFileLoaded");
+  storeGlobal.commit("calculate");  
 }
 
 export var storeGlobal;

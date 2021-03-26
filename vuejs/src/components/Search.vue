@@ -715,7 +715,7 @@ export default {
         qs.push(queryItem.load(x));
         set.add(x.position);
       });
-console.log(set.size); console.log(qs);
+
       sendSearchRequest(this.$data, this.$store, set.size, qs);
     },
     search_simple: function() {
