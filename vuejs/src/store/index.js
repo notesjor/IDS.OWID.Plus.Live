@@ -75,7 +75,7 @@ export default new Vuex.Store({
       );
     },
 
-    calculate(state) {
+    calculate(state) {      
       if (state.owid === null || state.owid.OwidLiveSearches === null) {
         state.vizData = null;
         return;
@@ -216,7 +216,7 @@ export default new Vuex.Store({
           }
         });
       }
-
+      
       // smoothing
       if (state.vizOptionSmoothing > 1) {
         var carret, odd;
@@ -256,7 +256,7 @@ export default new Vuex.Store({
           res[key].data = nval;
         });
       }
-
+      
       state.vizData = res;
       state.version++;
     },

@@ -716,6 +716,8 @@ export default {
         set.add(x.position);
       });
 
+      this.$store.state.owid.N = set.size;
+      
       sendSearchRequest(this.$data, this.$store, set.size, qs);
     },
     search_simple: function() {
