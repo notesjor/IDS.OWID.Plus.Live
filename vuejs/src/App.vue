@@ -154,6 +154,25 @@ import Clipboard from "./components/Clipboard";
 export default {
   name: "App",
 
+  metaInfo() {
+    return {
+      title: this.$config.appName === "OWIDplusLIVE" ? this.$config.appName : this.$config.appName + " (powered by: OWIDplusLIVE)",
+      meta: [
+        {
+          name: "description",
+          content: "",
+        },
+        {
+          property: "og:title",
+          content: this.$config.appName,
+        },
+        { property: "og:site_name", content: "Epiloge" },
+        { property: "og:type", content: "website" },
+        { name: "robots", content: "index,nofollow" },
+      ],
+    };
+  },
+
   components: {
     VizPanel,
     VizOptions,

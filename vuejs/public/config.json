@@ -1,4 +1,100 @@
 {
     "baseUrl": "https://owidnext.jan-oliver-ruediger.de",
-    "webUrl": "http://192.168.178.40:8080/?"
+    "webUrl": "http://192.168.178.40:8080/?",
+    "appName": "OWIDplusLIVE",
+    "appDescription": "OWIDplusLIVE erlaubt die LIVE-Frequenzanalyse von Token und N-Grammen in ausgewählten deutschsprachigen Tageszeitungen.",
+    "sample_simple_1": 
+    [
+        {
+            "label": "Wortform = deutschland",
+            "query": "[{\"Wortform\":\"deutschland\"}]"
+        },
+        {
+            "label": "Lemma = sagen",
+            "query": "[{\"Lemma\":\"sagen\"}]"
+        },
+        {
+            "label": "POS = ART",
+            "query": "[{\"POS\":\"ART\"}]"
+        },
+        {
+            "label": "Wortform = *sagte",
+            "query": "[{\"Wortform\":\"*sagte\"}]"
+        },
+        {
+            "label": "Lemma = *bayer*",
+            "query": "[{\"Lemma\":\"*bayer*\"}]"
+        },
+        {
+            "label": "POS = KO*",
+            "query": "[{\"POS\":\"KO*\"}]"
+        }
+    ],
+    "sample_simple_2": 
+    [
+        {
+            "label": "Wortform = angela / Wortform = merkel",
+            "query": "[{\"Wortform\":\"angela\"},{\"Wortform\":\"merkel\"}]"
+        },
+        {
+            "label": "Lemma = sprechen / POS = APPR",
+            "query": "[{\"Lemma\":\"sprechen\"},{\"POS\":\"APPR\"}]"
+        },
+        {
+            "label": "POS = ADJ* / Lemma = merkel",
+            "query": "[{\"POS\":\"ADJ*\"},{\"Lemma\":\"merkel\"}]"
+        }
+    ],
+    "sample_simple_3": 
+    [
+        {
+            "label": "POS = ART / Lemma = unglaublich / POS = NN",
+            "query": "[{\"POS\":\"ART\"},{\"Lemma\":\"unglaublich\"},{\"POS\":\"NN\"}]"
+        },
+        {
+            "label": "Wortform = merkel / POS = KON / POS = NE",
+            "query": "[{\"Wortform\":\"merkel\"},{\"POS\":\"KON\"},{\"POS\":\"NE\"}]"
+        },
+        {
+            "label": "POS = APPR / Lemma = menschlich / POS = NN",
+            "query": "[{\"POS\":\"APPR\"},{\"Lemma\":\"menschlich\"},{\"POS\":\"NN\"}]"
+        }
+    ],
+    "sample_complex_1": 
+    [
+        {
+            "label": "Wortform = berg* + POS = NN",
+            "query": "[{\"Wortform\":\"berg*\",\"Lemma\":\"\",\"POS\":\"NN\"}]"
+        },
+        {
+            "label": "Lemma = *kampf* + POS = ADJ*",
+            "query": "[{\"Wortform\":\"\",\"Lemma\":\"*kampf*\",\"POS\":\"ADJ*\"}]"
+        },
+        {
+            "label": "Lemma = die + POS = ART",
+            "query": "[{\"Wortform\":\"\",\"Lemma\":\"die\",\"POS\":\"ART\"}]"
+        }
+    ],
+    "sample_complex_2": 
+    [
+        {
+            "label": "POS = ADJ* / Lemma = *bayer* + POS = NN",
+            "query": "[{\"Wortform\":\"\",\"Lemma\":\"\",\"POS\":\"ADJ*\"},{\"Wortform\":\"\",\"Lemma\":\"*bayer*\",\"POS\":\"NN\"}]"
+        },
+        {
+            "label": "Lemma = *trag* + POS = VV* / Lemma = von",
+            "query": "[{\"Wortform\":\"\",\"Lemma\":\"*trag*\",\"POS\":\"VV*\"},{\"Wortform\":\"\",\"Lemma\":\"von\",\"POS\":\"\"}]"
+        }
+    ],
+    "sample_complex_3": 
+    [
+        {
+            "label": "Lemma = gehen / Lemma = nach / POS = NN",
+            "query": "[{\"Wortform\":\"\",\"Lemma\":\"gehen\",\"POS\":\"\"},{\"Wortform\":\"\",\"Lemma\":\"nach\",\"POS\":\"\"},{\"Wortform\":\"\",\"Lemma\":\"\",\"POS\":\"NN\"}]"
+        },
+        {
+            "label": "Lemma = pochen / Lemma = auf / POS = NN",
+            "query": "[{\"Wortform\":\"\",\"Lemma\":\"pochen\",\"POS\":\"\"},{\"Wortform\":\"\",\"Lemma\":\"auf\",\"POS\":\"\"},{\"Wortform\":\"\",\"Lemma\":\"\",\"POS\":\"N*\"}]"
+        }
+    ]
 }

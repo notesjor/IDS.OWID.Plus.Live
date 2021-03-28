@@ -77,10 +77,37 @@
                         <v-text-field
                           label="Suchausdruck (einzelnes Token)..."
                           v-model="search_simple_1_value"
-                          id="search_simple_1_1"
                           :rules="inputRules"
                           @keydown.enter="search_simple"
                         ></v-text-field>
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col style="padding:0px; margin: -20px 0 15px 15px;">
+                        <div>
+                          <h5>Beispiele:</h5>
+                          <div class="sampleSection">
+                            <ul>
+                              <li
+                                v-for="item in this.$config.sample_simple_1"
+                                :key="item.label"
+                              >
+                                <a
+                                  v-on:click="
+                                    sample_simple_click(item.query, [
+                                      [
+                                        'search_simple_1_layer',
+                                        'search_simple_1_value',
+                                      ],
+                                    ]);
+                                    search_simple();
+                                  "
+                                  >{{ item.label }}</a
+                                >
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
                       </v-col>
                     </v-row>
                   </v-card>
@@ -105,7 +132,6 @@
                         <v-text-field
                           label="Suchausdruck (an 1. Postion)..."
                           v-model="search_simple_1_value"
-                          id="search_simple_2_1"
                           :rules="inputRules"
                           @keydown.enter="search_simple"
                         ></v-text-field>
@@ -122,10 +148,42 @@
                         <v-text-field
                           label="Suchausdruck (an 2. Postion)..."
                           v-model="search_simple_2_value"
-                          id="search_simple_2_2"
                           :rules="inputRules"
                           @keydown.enter="search_simple"
                         ></v-text-field>
+                      </v-col>
+                    </v-row>
+
+                    <v-row>
+                      <v-col style="padding:0px; margin: -20px 0 15px 15px;">
+                        <div>
+                          <h5>Beispiele:</h5>
+                          <div class="sampleSection">
+                            <ul>
+                              <li
+                                v-for="item in this.$config.sample_simple_2"
+                                :key="item.label"
+                              >
+                                <a
+                                  v-on:click="
+                                    sample_simple_click(item.query, [
+                                      [
+                                        'search_simple_1_layer',
+                                        'search_simple_1_value',
+                                      ],
+                                      [
+                                        'search_simple_2_layer',
+                                        'search_simple_2_value',
+                                      ],
+                                    ]);
+                                    search_simple();
+                                  "
+                                  >{{ item.label }}</a
+                                >
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
                       </v-col>
                     </v-row>
                   </v-card>
@@ -150,7 +208,6 @@
                         <v-text-field
                           label="Suchausdruck (an 1. Postion)..."
                           v-model="search_simple_1_value"
-                          id="search_simple_3_1"
                           :rules="inputRules"
                           @keydown.enter="search_simple"
                         ></v-text-field>
@@ -167,7 +224,6 @@
                         <v-text-field
                           label="Suchausdruck (an 2. Postion)..."
                           v-model="search_simple_2_value"
-                          id="search_simple_3_2"
                           :rules="inputRules"
                           @keydown.enter="search_simple"
                         ></v-text-field>
@@ -184,10 +240,46 @@
                         <v-text-field
                           label="Suchausdruck (an 3. Postion)..."
                           v-model="search_simple_3_value"
-                          id="search_simple_3_3"
                           :rules="inputRules"
                           @keydown.enter="search_simple"
                         ></v-text-field>
+                      </v-col>
+                    </v-row>
+
+                    <v-row>
+                      <v-col style="padding:0px; margin: -20px 0 15px 15px;">
+                        <div>
+                          <h5>Beispiele:</h5>
+                          <div class="sampleSection">
+                            <ul>
+                              <li
+                                v-for="item in this.$config.sample_simple_3"
+                                :key="item.label"
+                              >
+                                <a
+                                  v-on:click="
+                                    sample_simple_click(item.query, [
+                                      [
+                                        'search_simple_1_layer',
+                                        'search_simple_1_value',
+                                      ],
+                                      [
+                                        'search_simple_2_layer',
+                                        'search_simple_2_value',
+                                      ],
+                                      [
+                                        'search_simple_3_layer',
+                                        'search_simple_3_value',
+                                      ],
+                                    ]);
+                                    search_simple();
+                                  "
+                                  >{{ item.label }}</a
+                                >
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
                       </v-col>
                     </v-row>
                   </v-card>
@@ -272,7 +364,7 @@
                       <v-col style="margin-top:7px">
                         <v-text-field
                           label="Wortform"
-                          id="search_complex_1_1_w"
+                          v-model="search_complex_1_1_w"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
                         ></v-text-field>
@@ -282,7 +374,7 @@
                       <v-col style="margin-top:7px">
                         <v-text-field
                           label="Lemma"
-                          id="search_complex_1_1_l"
+                          v-model="search_complex_1_1_l"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
                         ></v-text-field>
@@ -292,10 +384,37 @@
                       <v-col style="margin-top:7px">
                         <v-text-field
                           label="POS-Tag"
-                          id="search_complex_1_1_p"
+                          v-model="search_complex_1_1_p"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
                         ></v-text-field>
+                      </v-col>
+                    </v-row>
+
+                    <v-row>
+                      <v-col style="padding:0px; margin: -20px 0 15px 15px;">
+                        <div>
+                          <h5>Beispiele:</h5>
+                          <div class="sampleSection">
+                            <ul>
+                              <li
+                                v-for="item in this.$config.sample_complex_1"
+                                :key="item.label"
+                              >
+                                <a
+                                  v-on:click="
+                                    sample_complex_click(
+                                      item.query,
+                                      'search_complex_1_'
+                                    );
+                                    search_complex();
+                                  "
+                                  >{{ item.label }}</a
+                                >
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
                       </v-col>
                     </v-row>
                   </v-card>
@@ -323,7 +442,7 @@
                       <v-col>
                         <v-text-field
                           label="Wortform (1. Position)"
-                          id="search_complex_2_1_w"
+                          v-model="search_complex_2_1_w"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
                         ></v-text-field>
@@ -331,7 +450,7 @@
                       <v-col>
                         <v-text-field
                           label="Wortform (2. Position)"
-                          id="search_complex_2_2_w"
+                          v-model="search_complex_2_2_w"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
                         ></v-text-field>
@@ -341,7 +460,7 @@
                       <v-col>
                         <v-text-field
                           label="Lemma (1. Position)"
-                          id="search_complex_2_1_l"
+                          v-model="search_complex_2_1_l"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
                         ></v-text-field>
@@ -349,7 +468,7 @@
                       <v-col>
                         <v-text-field
                           label="Lemma (2. Position)"
-                          id="search_complex_2_2_l"
+                          v-model="search_complex_2_2_l"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
                         ></v-text-field>
@@ -359,7 +478,7 @@
                       <v-col>
                         <v-text-field
                           label="POS-Tag (1. Position)"
-                          id="search_complex_2_1_p"
+                          v-model="search_complex_2_1_p"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
                         ></v-text-field>
@@ -367,10 +486,36 @@
                       <v-col>
                         <v-text-field
                           label="POS-Tag (2. Position)"
-                          id="search_complex_2_2_p"
+                          v-model="search_complex_2_2_p"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
                         ></v-text-field>
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col style="padding:0px; margin: -20px 0 15px 15px;">
+                        <div>
+                          <h5>Beispiele:</h5>
+                          <div class="sampleSection">
+                            <ul>
+                              <li
+                                v-for="item in this.$config.sample_complex_2"
+                                :key="item.label"
+                              >
+                                <a
+                                  v-on:click="
+                                    sample_complex_click(
+                                      item.query,
+                                      'search_complex_2_'
+                                    );
+                                    search_complex();
+                                  "
+                                  >{{ item.label }}</a
+                                >
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
                       </v-col>
                     </v-row>
                   </v-card>
@@ -403,7 +548,7 @@
                       <v-col>
                         <v-text-field
                           label="Wortform (1. Position)"
-                          id="search_complex_3_1_w"
+                          v-model="search_complex_3_1_w"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
                         ></v-text-field>
@@ -411,7 +556,7 @@
                       <v-col>
                         <v-text-field
                           label="Wortform (2. Position)"
-                          id="search_complex_3_2_w"
+                          v-model="search_complex_3_2_w"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
                         ></v-text-field>
@@ -419,7 +564,7 @@
                       <v-col>
                         <v-text-field
                           label="Wortform (3. Position)"
-                          id="search_complex_3_3_w"
+                          v-model="search_complex_3_3_w"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
                         ></v-text-field>
@@ -429,7 +574,7 @@
                       <v-col>
                         <v-text-field
                           label="Lemma (1. Position)"
-                          id="search_complex_3_1_l"
+                          v-model="search_complex_3_1_l"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
                         ></v-text-field>
@@ -437,7 +582,7 @@
                       <v-col>
                         <v-text-field
                           label="Lemma (2. Position)"
-                          id="search_complex_3_2_l"
+                          v-model="search_complex_3_2_l"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
                         ></v-text-field>
@@ -445,7 +590,7 @@
                       <v-col>
                         <v-text-field
                           label="Lemma (3. Position)"
-                          id="search_complex_3_3_l"
+                          v-model="search_complex_3_3_l"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
                         ></v-text-field>
@@ -455,7 +600,7 @@
                       <v-col>
                         <v-text-field
                           label="POS-Tag (1. Position)"
-                          id="search_complex_3_1_p"
+                          v-model="search_complex_3_1_p"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
                         ></v-text-field>
@@ -463,7 +608,7 @@
                       <v-col>
                         <v-text-field
                           label="POS-Tag (2. Position)"
-                          id="search_complex_3_2_p"
+                          v-model="search_complex_3_2_p"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
                         ></v-text-field>
@@ -471,10 +616,37 @@
                       <v-col>
                         <v-text-field
                           label="POS-Tag (3. Position)"
-                          id="search_complex_3_3_p"
+                          v-model="search_complex_3_3_p"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
                         ></v-text-field>
+                      </v-col>
+                    </v-row>
+
+                    <v-row>
+                      <v-col style="padding:0px; margin: -20px 0 15px 15px;">
+                        <div>
+                          <h5>Beispiele:</h5>
+                          <div class="sampleSection">
+                            <ul>
+                              <li
+                                v-for="item in this.$config.sample_complex_3"
+                                :key="item.label"
+                              >
+                                <a
+                                  v-on:click="
+                                    sample_complex_click(
+                                      item.query,
+                                      'search_complex_3_'
+                                    );
+                                    search_complex();
+                                  "
+                                  >{{ item.label }}</a
+                                >
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
                       </v-col>
                     </v-row>
                   </v-card>
@@ -514,6 +686,25 @@
   </v-container>
 </template>
 
+<style>
+.sampleSection {
+  overflow: hidden;
+  margin: 1em;
+}
+.sampleSection ul {
+  list-style: none;
+  padding: 0;
+  margin-left: -4px;
+}
+.sampleSection ul li {
+  display: inline;
+  white-space: nowrap;
+}
+.sampleSection ul li:before {
+  content: " | ";
+}
+</style>
+
 <script>
 import { mdiMagnifyPlus } from "@mdi/js";
 
@@ -542,15 +733,7 @@ class queryItem {
   constructor(layer, position, element, upperCase) {
     this.layer = layer;
     this.position = position;
-
-    if (typeof element === "string")
-      this.token = upperCase ? element.toUpperCase() : element.toLowerCase();
-    else {
-      element.value = upperCase
-        ? element.value.toUpperCase()
-        : element.value.toLowerCase();
-      this.token = element.value;
-    }
+    this.token = upperCase ? element.toUpperCase() : element.toLowerCase();
   }
 
   toString() {
@@ -673,6 +856,26 @@ export default {
       search_simple_1_value: "",
       search_simple_2_value: "",
       search_simple_3_value: "",
+
+      search_complex_1_1_w: "",
+      search_complex_1_1_l: "",
+      search_complex_1_1_p: "",
+      search_complex_2_1_w: "",
+      search_complex_2_1_l: "",
+      search_complex_2_1_p: "",
+      search_complex_2_2_w: "",
+      search_complex_2_2_l: "",
+      search_complex_2_2_p: "",
+      search_complex_3_1_w: "",
+      search_complex_3_1_l: "",
+      search_complex_3_1_p: "",
+      search_complex_3_2_w: "",
+      search_complex_3_2_l: "",
+      search_complex_3_2_p: "",
+      search_complex_3_3_w: "",
+      search_complex_3_3_l: "",
+      search_complex_3_3_p: "",
+
       search_simple_n: 1,
       search_complex_n: 1,
       name: "world",
@@ -684,12 +887,20 @@ export default {
 
       iconSeachExt: mdiMagnifyPlus,
       inputRules: [
-        (v) =>
-          (v.toString().match("\\s") || []).length < 1 ||
-          "Nur einzelne Token erlaubt!",
-        (v) =>
-          (v.toString().match("[\\*]") || []).length < 3 ||
-          "Es sind maximal zwei *-Auslassungszeichen erlaubt!",
+        function(v) {
+          if (v === undefined) return true;
+          return (
+            (v.toString().match("\\s") || []).length < 1 ||
+            "Nur einzelne Token erlaubt!"
+          );
+        },
+        function(v) {
+          if (v === undefined) return true;
+          return (
+            (v.toString().match("[\\*]") || []).length < 3 ||
+            "Es sind maximal zwei *-Auslassungszeichen erlaubt!"
+          );
+        },
       ],
     };
   },
@@ -699,6 +910,25 @@ export default {
   methods: {
     abortProgress: function() {
       this.$data.progressWait = false;
+    },
+    sample_simple_click: function(queryStr, controlIds) {
+      var query = JSON.parse(queryStr);
+      for (let i = 0; i < query.length; i++) {
+        const position = query[i];
+        var key = Object.keys(position)[0];
+
+        this.$data[controlIds[i][0]] = key;
+        this.$data[controlIds[i][1]] = position[key];
+      }
+    },
+    sample_complex_click: function(queryStr, controlIdTemplate) {
+      var query = JSON.parse(queryStr);
+      for (let i = 0; i < query.length; i++) {
+        const position = query[i];
+        Object.keys(position).forEach((key) => {
+          this.$data[controlIdTemplate + (i + 1) + "_" + key[0].toLowerCase()] = position[key];          
+        });
+      }
     },
     search_simple_n_change: function(n) {
       this.$data.search_simple_n = n;
@@ -717,7 +947,7 @@ export default {
       });
 
       this.$store.state.owid.N = set.size;
-      
+
       sendSearchRequest(this.$data, this.$store, set.size, qs);
     },
     search_simple: function() {
@@ -759,60 +989,30 @@ export default {
       var queryItems = [];
       if (this.$data.search_complex_n === 1) {
         queryItems = [
-          new queryItem(0, 0, document.getElementById("search_complex_1_1_w")),
-          new queryItem(1, 0, document.getElementById("search_complex_1_1_l")),
-          new queryItem(
-            2,
-            0,
-            document.getElementById("search_complex_1_1_p"),
-            true
-          ),
+          new queryItem(0, 0, this.$data.search_complex_1_1_w),
+          new queryItem(1, 0, this.$data.search_complex_1_1_l),
+          new queryItem(2, 0, this.$data.search_complex_1_1_p, true),
         ];
       } else if (this.$data.search_complex_n === 2) {
         queryItems = [
-          new queryItem(0, 0, document.getElementById("search_complex_2_1_w")),
-          new queryItem(1, 0, document.getElementById("search_complex_2_1_l")),
-          new queryItem(
-            2,
-            0,
-            document.getElementById("search_complex_2_1_p"),
-            true
-          ),
-          new queryItem(0, 1, document.getElementById("search_complex_2_2_w")),
-          new queryItem(1, 1, document.getElementById("search_complex_2_2_l")),
-          new queryItem(
-            2,
-            1,
-            document.getElementById("search_complex_2_2_p"),
-            true
-          ),
+          new queryItem(0, 0, this.$data.search_complex_2_1_w),
+          new queryItem(1, 0, this.$data.search_complex_2_1_l),
+          new queryItem(2, 0, this.$data.search_complex_2_1_p, true),
+          new queryItem(0, 1, this.$data.search_complex_2_2_w),
+          new queryItem(1, 1, this.$data.search_complex_2_2_l),
+          new queryItem(2, 1, this.$data.search_complex_2_2_p, true),
         ];
       } else if (this.$data.search_complex_n === 3) {
         queryItems = [
-          new queryItem(0, 0, document.getElementById("search_complex_3_1_w")),
-          new queryItem(1, 0, document.getElementById("search_complex_3_1_l")),
-          new queryItem(
-            2,
-            0,
-            document.getElementById("search_complex_3_1_p"),
-            true
-          ),
-          new queryItem(0, 1, document.getElementById("search_complex_3_2_w")),
-          new queryItem(1, 1, document.getElementById("search_complex_3_2_l")),
-          new queryItem(
-            2,
-            1,
-            document.getElementById("search_complex_3_2_p"),
-            true
-          ),
-          new queryItem(0, 2, document.getElementById("search_complex_3_3_w")),
-          new queryItem(1, 2, document.getElementById("search_complex_3_3_l")),
-          new queryItem(
-            2,
-            2,
-            document.getElementById("search_complex_3_3_p"),
-            true
-          ),
+          new queryItem(0, 0, this.$data.search_complex_3_1_w),
+          new queryItem(1, 0, this.$data.search_complex_3_1_l),
+          new queryItem(2, 0, this.$data.search_complex_3_1_p, true),
+          new queryItem(0, 1, this.$data.search_complex_3_2_w),
+          new queryItem(1, 1, this.$data.search_complex_3_2_l),
+          new queryItem(2, 1, this.$data.search_complex_3_2_p, true),
+          new queryItem(0, 2, this.$data.search_complex_3_3_w),
+          new queryItem(1, 2, this.$data.search_complex_3_3_l),
+          new queryItem(2, 2, this.$data.search_complex_3_3_p, true),
         ];
       }
 
