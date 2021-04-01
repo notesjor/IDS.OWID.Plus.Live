@@ -19,41 +19,6 @@
       </div>
 
       <v-spacer></v-spacer>
-      <a @click="newProject">
-        <div style="min-width:350px">
-          <v-icon style="font-size:48px; float:left; margin-right:5px"
-            >mdi-file-outline</v-icon
-          >
-          <div class="d-none d-sm-flex">
-            <span
-              style="font-size:14px; line-height:1; font-weight:200; margin-top:10px; color:white"
-            >
-              <p>
-                <strong>Neu</strong><br />
-                Löscht alle Suchabfragen.
-              </p>
-            </span>
-          </div>
-        </div>
-      </a>
-      <a @click="tutorial = true">
-        <div style="min-width:350px">
-          <v-icon style="font-size:48px; float:left; margin-right:5px"
-            >mdi-help-circle-outline</v-icon
-          >
-          <div class="d-none d-sm-flex">
-            <span
-              style="font-size:14px; line-height:1; font-weight:200; margin-top:10px; color:white"
-            >
-              <p>
-                <strong>Hilfe anzeigen</strong><br />
-                Zeige das Video-Tutorial erneut an...
-              </p>
-            </span>
-          </div>
-        </div>
-      </a>
-      <v-spacer></v-spacer>
 
       <div class="d-flex align-center">
         <a href="https://www.ids-mannheim.de/" target="_blank" rel="nofollow">
@@ -92,6 +57,55 @@
         </v-row>
       </v-container>
     </v-main>
+
+    <v-menu top :close-on-content-click="closeOnContentClick">
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn
+          color="#EF7D00"
+          fab
+          style="position:fixed; right:1em; bottom:1em"
+          v-bind="attrs"
+          v-on="on"
+        >
+          <v-icon>
+            mdi-menu
+          </v-icon>
+        </v-btn>
+      </template>
+
+      <v-list>
+        <v-list-item @click="newProject">
+          <div>
+            <v-icon style="font-size:32px; float:left; margin-right:5px"
+              >mdi-file-outline</v-icon
+            >
+            <div class="d-none d-sm-flex">
+              <span style="font-size:14px; line-height:1; font-weight:200;">
+                <p>
+                  <strong>Neu</strong><br />
+                  Löscht alle Suchabfragen.
+                </p>
+              </span>
+            </div>
+          </div>
+        </v-list-item>
+        <v-list-item @click="tutorial = true">
+          <v-icon style="font-size:32px; float:left; margin-right:5px"
+            >mdi-help-circle-outline</v-icon
+          >
+          <div class="d-none d-sm-flex">
+            <span
+              style="font-size:14px; line-height:1; font-weight:200; margin-top:10px;"
+            >
+              <p>
+                <strong>Hilfe anzeigen</strong><br />
+                Zeige das Video-Tutorial erneut an...
+              </p>
+            </span>
+          </div>
+        </v-list-item>
+      </v-list>
+    </v-menu>
 
     <v-overlay :value="tutorial">
       <div class="text-center">
@@ -156,7 +170,10 @@ export default {
 
   metaInfo() {
     return {
-      title: this.$config.appName === "OWIDplusLIVE" ? this.$config.appName : this.$config.appName + " (powered by: OWIDplusLIVE)",
+      title:
+        this.$config.appName === "OWIDplusLIVE"
+          ? this.$config.appName
+          : this.$config.appName + " (powered by: OWIDplusLIVE)",
       meta: [
         {
           name: "description",

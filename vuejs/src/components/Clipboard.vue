@@ -29,15 +29,6 @@
         <v-expansion-panel-header>
           <div>
             <div style="display:inline;">{{ i.label }}</div>
-            <div style="float:right;display:block; margin:-25px 45px 0 0">
-              <v-checkbox
-                :value="i.label"
-                label="Summieren"
-                style="max-height:10px; margin: 15px 10px 0 0"
-                @change="changeSumSelection"
-                v-model="syncSumSelection"
-              ></v-checkbox>
-            </div>
             <div style="float:right;display:block; margin:-13px 5px 0 0">
               <v-menu bottom left>
                 <template v-slot:activator="{ on, attrs }">
