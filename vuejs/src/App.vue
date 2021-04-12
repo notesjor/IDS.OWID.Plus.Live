@@ -58,7 +58,7 @@
       </v-container>
     </v-main>
 
-    <v-menu top :close-on-content-click="closeOnContentClick">
+    <v-menu top>
       <template v-slot:activator="{ on, attrs }">
         <v-btn
           color="#EF7D00"
@@ -111,30 +111,42 @@
       <div class="text-center">
         <v-card>
           <v-card-title class="headline">
-            Herzlich willkommen bei OWIDplusLIVE
+            Herzlich willkommen bei {{this.$config.appName}}
           </v-card-title>
           <video
+            v-if="tutorial_mp4"
             controls
             crossorigin
             playsinline
             autoplay
-            data-poster="./assets/owid_tutorial.png"
+            ref="tutorial_video"
             style="max-width:600px"
           >
             <source
               size="1080"
-              src="./assets/owid_tutorial.mp4"
+              ref="tutorial_video_source"
+              src=""
               type="video/mp4"
             />
           </video>
+          <iframe
+            v-if="tutorial_iframe"
+            ref="tutorial_iframe"
+            src=""
+            title="Video-Tutorial"
+            style="width:600px; max-width:600px; height:414px; max-height:414px;"
+          ></iframe>
           <v-card-text>
-            Dieses Video gibt Ihnen eine kurze 3-minütige Einführung in
-            'OWIDplusLIVE' mit hilfreichen Tipps.<br />
-            Eine textbasiete Anleitung können Sie hier herunterladen.
+            Dieses Video gibt Ihnen eine kurze Einführung in die Analyse von Token und N-Grammen.
           </v-card-text>
           <v-card-actions>
-            <v-btn text @click="tutorial = false">
+            <v-btn text @click="tutorial = false"  class="blink">
+              <v-icon style="margin-right:10px">
+                mdi-arrow-right-circle-outline
+              </v-icon>
+              <span>
               Tutorial beenden
+              </span>
             </v-btn>
             <v-spacer></v-spacer>
           </v-card-actions>
@@ -146,10 +158,10 @@
       <div class="text-center">
         <v-card>
           <v-card-title class="headline">
-            Server-Wartung von OWIDplusLIVE
+            Server-Wartung von {{this.$config.appName}}
           </v-card-title>
           <v-card-text>
-            Die OWIDplusLIVE-API ist aktuell nicht erreichbar. Der Server wird
+            Die {{this.$config.appName}}-API ist aktuell nicht erreichbar. Der Server wird
             gerade gewartet. Bitte probieren Sie es zu einem späteren Zeitpunkt
             erneut.
           </v-card-text>
@@ -158,6 +170,37 @@
     </v-overlay>
   </v-app>
 </template>
+
+<style scoped>
+.blink {
+  width: 200px;
+  height: 50px;
+  padding: 15px;
+  text-align: center;
+  line-height: 50px;
+}
+.blink span { 
+  color: white;
+  animation: blink 3s linear infinite;
+}
+@keyframes blink {
+  0% {
+    opacity: 0.3;
+  }
+  25% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0.3;
+  }
+}
+</style>
 
 <script>
 import VizPanel from "./components/VizPanel";
@@ -198,7 +241,9 @@ export default {
   },
 
   data: () => ({
-    tutorial: false,
+    tutorial: true,
+    tutorial_iframe: true,
+    tutorial_mp4: true,
     alert: false,
   }),
 
@@ -206,12 +251,31 @@ export default {
     newProject: function() {
       location.reload();
     },
+    blink(event) {
+      event.target.style.background = "red";
+      setTimeout(() => {
+        event.target.style.background = "purple";
+      }, 500);
+    },
   },
 
   mounted() {
     var store = this.$store;
     var search = this.$refs.searchComponent;
     var config = this.$config;
+
+    if (config.tutorialUrl.length < 1) this.tutorial = false;
+    else {
+      if (config.tutorialUrl.endsWith(".mp4")) {
+        this.$refs.tutorial_video.poster = config.tutorialUrl + ".png";
+        this.$refs.tutorial_video_source.src = config.tutorialUrl;
+        this.tutorial_iframe = false;
+      } else {
+        this.$refs.tutorial_iframe.src = config.tutorialUrl;
+        this.tutorial_mp4 = false;
+      }
+      this.tutorial = true;
+    }
 
     fetch(config.baseUrl + "/init")
       .then((response) => response.text())

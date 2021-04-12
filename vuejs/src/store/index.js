@@ -1,14 +1,14 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import { OwidLiveStorage } from "./OwidLiveStorage";
-import { Normalize } from "./DataHelper";
+import { Normalize, Prefill } from "./DataHelper";
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
     sessionKey: null,
-    
+
     owid: null,
     version: 0,
     searches: 0,
@@ -16,7 +16,7 @@ export default new Vuex.Store({
     vizNoCommit: 0,
     vizOptionRelative: true,
     vizOptionGranulation: 0,
-    vizOptionSmoothing: 7,    
+    vizOptionSmoothing: 7,
 
     vizViewportWidth: 1200,
     vizViewportHeight: 500,
@@ -75,7 +75,7 @@ export default new Vuex.Store({
       );
     },
 
-    calculate(state) {      
+    calculate(state) {
       if (state.owid === null || state.owid.OwidLiveSearches === null) {
         state.vizData = null;
         return;
@@ -183,27 +183,26 @@ export default new Vuex.Store({
         }
       }
 
+      var normData;
+      switch (state.vizOptionGranulation) {
+        case 1:
+          normData = state.owid.NormWeek;
+          break;
+        case 2:
+          normData = state.owid.NormMonth;
+          break;
+        case 3:
+          normData = state.owid.NormQuarter;
+          break;
+        case 4:
+          normData = state.owid.NormYear;
+          break;
+        default:
+          normData = state.owid.NormDate;
+          break;
+      }
       // relativ Frquency
       if (state.vizOptionRelative) {
-        var normData;
-        switch (state.vizOptionGranulation) {
-          case 1:
-            normData = state.owid.NormWeek;
-            break;
-          case 2:
-            normData = state.owid.NormMonth;
-            break;
-          case 3:
-            normData = state.owid.NormQuarter;
-            break;
-          case 4:
-            normData = state.owid.NormYear;
-            break;
-          default:
-            normData = state.owid.NormDate;
-            break;
-        }
-
         Object.keys(res).forEach((key) => {
           res[key] = Normalize(res[key], normData);
           if (res[key].items != null) {
@@ -216,7 +215,21 @@ export default new Vuex.Store({
           }
         });
       }
-      
+      // absolute Frequenz (auffüllen von Leerdaten)
+      else {
+        Object.keys(res).forEach((key) => {
+          res[key] = Prefill(res[key], normData);
+          if (res[key].items != null) {
+            Object.keys(res[key].items).forEach((subKey) => {
+              res[key].items[subKey] = Prefill(
+                res[key].items[subKey],
+                normData
+              );
+            });
+          }
+        });
+      }
+
       // smoothing
       if (state.vizOptionSmoothing > 1) {
         var carret, odd;
@@ -239,12 +252,15 @@ export default new Vuex.Store({
             for (var j = 0 - carret; j <= carret; j++) {
               item[keys[i + j]].dates.forEach((d) => dates.add(d));
 
-              if(!(keys[i + j] in item))
-                continue;
+              if (!(keys[i + j] in item)) continue;
 
               if (!odd && (j === 0 - carret || j === carret))
-                sum += item[keys[i + j]].value * (1.0 / state.vizOptionSmoothing / 2.0);
-              else sum += item[keys[i + j]].value * (1.0 / state.vizOptionSmoothing);
+                sum +=
+                  item[keys[i + j]].value *
+                  (1.0 / state.vizOptionSmoothing / 2.0);
+              else
+                sum +=
+                  item[keys[i + j]].value * (1.0 / state.vizOptionSmoothing);
             }
 
             nval[keys[i]] = {
@@ -256,7 +272,7 @@ export default new Vuex.Store({
           res[key].data = nval;
         });
       }
-      
+
       state.vizData = res;
       state.version++;
     },

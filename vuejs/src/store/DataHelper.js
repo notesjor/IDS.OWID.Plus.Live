@@ -7,4 +7,13 @@ function Normalize(item, normData) {
   return item;
 }
 
+function Prefill(item, normData) {
+  Object.keys(normData).forEach((date) => {
+    if (!(date in item.data))
+      item.data[date] = { dates: new Set(), value: 0.0 };
+  });
+  return item;
+}
+
 export { Normalize };
+export { Prefill };

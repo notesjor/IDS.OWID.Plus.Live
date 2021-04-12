@@ -1,6 +1,7 @@
 {
     "baseUrl": "https://owidnext.jan-oliver-ruediger.de",
     "webUrl": "http://192.168.178.40:8080/?",
+    "tutorialUrl": "http://lexik02.ids-mannheim.de/owid-plus-live_video/OWIDplusLIVE_01_player.html",
     "appName": "OWIDplusLIVE",
     "appDescription": "OWIDplusLIVE erlaubt die LIVE-Frequenzanalyse von Token und N-Grammen in ausgewählten deutschsprachigen Tageszeitungen.",
     "sample_simple_1": 

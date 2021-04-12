@@ -99,7 +99,7 @@ export default {
                 params.value[0] +
                 ": " +
                 params.value[1]
-                  .toString()
+                  .toFixed(3)
                   .replace(",", "'")
                   .replace(".", ",") +
                 unit

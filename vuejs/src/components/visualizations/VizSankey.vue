@@ -99,10 +99,10 @@ export default {
             triggerOn: "mousemove",
             formatter: function(params) {
               return (
-                (params.data.source === "0>>>"
+                (params.data.source === "START >>>"
                   ? ""
                   : params.data.source.substring(1)) +
-                " --" + params.data.value.toString().replace(",", "'").replace(".", ",")  + unit+ "-> " +
+                " --" + params.data.value.toFixed(3).replace(",", "'").replace(".", ",")  + unit+ "-> " +
                 params.data.target.substring(1)
               );
             },
