@@ -251,9 +251,9 @@ export class OwidLiveStorage {
         p: tokens[2],
 
         d: d,
-        dRel: ((d / dates.length) * 100.0).toFixed(2),
+        dRel: ((d / dates.length) * 100.0).toFixed(5),
         s: s,
-        sRel: ((s / total) * 1000000.0).toFixed(2),
+        sRel: ((s / total) * 1000000.0).toFixed(5),
         spark: spark,
         sparkNorm: sparkNorm,
 

@@ -242,6 +242,8 @@ export default new Vuex.Store({
           odd = true;
         }
 
+        var halfVOS = state.vizOptionSmoothing * 2.0;
+
         Object.keys(res).forEach((key) => {
           var item = res[key].data;
           var keys = state.owid.Dates;
@@ -256,8 +258,7 @@ export default new Vuex.Store({
 
               if (!odd && (j === 0 - carret || j === carret))
                 sum +=
-                  item[keys[i + j]].value *
-                  (1.0 / state.vizOptionSmoothing / 2.0);
+                  item[keys[i + j]].value * (1.0 / halfVOS);
               else
                 sum +=
                   item[keys[i + j]].value * (1.0 / state.vizOptionSmoothing);
@@ -265,7 +266,7 @@ export default new Vuex.Store({
 
             nval[keys[i]] = {
               dates: dates,
-              value: parseFloat(sum.toFixed(3)),
+              value: parseFloat(sum.toFixed(5)),
             };
           }
 
