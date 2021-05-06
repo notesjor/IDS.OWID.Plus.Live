@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-app-bar app dark class="d-print-none">
-      <div class="d-flex align-center">
+      <div class="d-flex">
         <a
           href="https://www.owid.de/plus/index.html"
           target="_blank"
@@ -20,7 +20,7 @@
 
       <v-spacer></v-spacer>
 
-      <div class="d-flex align-center">
+      <div class="d-flex">
         <a href="https://www.ids-mannheim.de/" target="_blank" rel="nofollow">
           <v-img
             alt="IDS Logo"

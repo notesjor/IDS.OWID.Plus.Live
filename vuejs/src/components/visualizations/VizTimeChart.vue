@@ -1,7 +1,7 @@
 <template>
   <div
     id="timechart"
-    style="width: 110%; height: 68vh; margin:-20px 0px 0px -20px"
+    style="width: 110%; height: 68vh; margin:0px 0px 0px 0px"
   ></div>
 </template>
 
@@ -84,6 +84,9 @@ export default {
             },
           },
           animation: false,
+          legend: {
+            show: true,
+          },
           xAxis: {
             type: "category",
             data: availableDates,

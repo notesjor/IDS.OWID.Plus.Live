@@ -733,7 +733,7 @@ class queryItem {
   constructor(layer, position, element, upperCase) {
     this.layer = layer;
     this.position = position;
-    this.token = upperCase ? element.toUpperCase() : element.toLowerCase();
+    this.token = (upperCase ? element.toUpperCase() : element.toLowerCase()).trim();
   }
 
   toString() {
@@ -891,14 +891,21 @@ export default {
           if (v === undefined) return true;
           return (
             (v.toString().match("\\s") || []).length < 1 ||
-            "Nur einzelne Token erlaubt!"
+            "Pro Suchfeld ist nur ein Token erlaubt. Wenn Sie nach N-Grammen suchen möchten, erhöhen Sie die Suchfenstergröße - z. B. auf N=2 oder N=3 (siehe oben)"
           );
         },
         function(v) {
           if (v === undefined) return true;
           return (
             (v.toString().match("[\\*]") || []).length < 3 ||
-            "Es sind maximal zwei *-Auslassungszeichen erlaubt!"
+            "Pro Suchfeld können Sie maximal zwei * verwenden."
+          );
+        },
+        function(v) {
+          if (v === undefined) return true;
+          return (
+            (v.toString().match("\\.\\*") || []).length < 1 ||
+            "Bitte verwenden Sie anstelle von '.*' nur '*' - OWIDplusLIVE unterstützt nur einfache Abfragen."
           );
         },
       ],
