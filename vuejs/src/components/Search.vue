@@ -72,6 +72,7 @@
                           v-model="search_simple_1_layer"
                           label="Layer"
                         ></v-overflow-btn>
+                        <TagsetInfo/>
                       </v-col>
                       <v-col cols="10" style="margin-top:7px">
                         <v-text-field
@@ -707,6 +708,7 @@
 
 <script>
 import { mdiMagnifyPlus } from "@mdi/js";
+import TagsetInfo from "./TagsetInfo";
 
 var global_layers = ["Wortform", "Lemma", "POS"];
 var config;
@@ -846,7 +848,9 @@ async function sendSearchRequest(data, store, n, queryItems) {
 
 export default {
   name: "Search",
-
+  components:{
+    TagsetInfo
+  },
   data: () => {
     return {
       layer: global_layers,

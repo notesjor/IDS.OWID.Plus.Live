@@ -24,8 +24,8 @@
         </v-col>
       </v-row>
     </v-card-title>
-    <v-expansion-panels multiple>
-      <v-expansion-panel v-for="i in entries" :key="i.label">
+    <v-expansion-panels multiple v-model="expanded">
+      <v-expansion-panel v-for="(i, idx) in entries" :key="idx" expand>
         <v-expansion-panel-header>
           <div>
             <div style="display:inline;">{{ i.label }}</div>
@@ -86,6 +86,7 @@
                 :fill="false"
                 :type="type"
                 :auto-line-width="true"
+                auto-draw-easing="none"
                 auto-draw
               ></v-sparkline>
             </template>
@@ -99,6 +100,7 @@
                 :fill="false"
                 :type="type"
                 :auto-line-width="true"
+                auto-draw-easing="none"
                 auto-draw
               ></v-sparkline>
             </template>
@@ -341,6 +343,12 @@ export default {
         data.selected = Array.from(selected);
         data.syncSumSelection = selectedSums;
         data.entries = res;
+
+        var exp = [];
+        var max = res.length > 3 ? 3 : res.length;
+        for(var ei = 0; ei < max; ei++)        
+          exp.push(ei);
+        data.expanded = exp;
 
         data.syncLock = false;
       },
