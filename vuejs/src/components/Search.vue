@@ -66,13 +66,13 @@
                     </v-row>
                     <v-row>
                       <v-col cols="2">
-                        <v-overflow-btn
+                        <TagsetInfo/><v-overflow-btn
                           persistent-hint
                           :items="layer"
                           v-model="search_simple_1_layer"
                           label="Layer"
-                        ></v-overflow-btn>
-                        <TagsetInfo/>
+                          style="display:block"
+                        ></v-overflow-btn>                        
                       </v-col>
                       <v-col cols="10" style="margin-top:7px">
                         <v-text-field
