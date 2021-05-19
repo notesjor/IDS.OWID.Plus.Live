@@ -1,9 +1,9 @@
-<template style="display:inline-block">
-  <v-dialog v-model="dialog" width="600" style="display:inline-block">
+<template>
+  <v-dialog v-model="dialog" width="600" scrollable>
     <template v-slot:activator="{ on, attrs }">
-      <div v-bind="attrs" v-on="on" style="display:inline-block">
+      <div v-bind="attrs" v-on="on" style="float:right; display:block; margin-top:-70px;" @click="dialog = true">
         <sup>
-          <v-icon left small @click="dialog = true">
+          <v-icon left small>
             mdi-information-outline
           </v-icon>
         </sup>
@@ -13,6 +13,7 @@
       <v-card-title class="headline grey lighten-2">
         Deutsches Wortart-Tagset STTS
       </v-card-title>
+      <v-divider></v-divider>
       <v-card-text>
         <span>
           <table>
@@ -298,6 +299,7 @@
           </table>
         </span>
       </v-card-text>
+      <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="primary" text @click="dialog = false">

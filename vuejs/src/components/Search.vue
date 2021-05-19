@@ -66,13 +66,14 @@
                     </v-row>
                     <v-row>
                       <v-col cols="2">
-                        <TagsetInfo/><v-overflow-btn
+                        <v-overflow-btn
                           persistent-hint
                           :items="layer"
                           v-model="search_simple_1_layer"
                           label="Layer"
-                          style="display:block"
-                        ></v-overflow-btn>                        
+                          style="display:block-inline;"
+                        ></v-overflow-btn>
+                        <TagsetInfo v-if="search_simple_1_layer === 'POS'" />
                       </v-col>
                       <v-col cols="10" style="margin-top:7px">
                         <v-text-field
@@ -128,6 +129,7 @@
                           v-model="search_simple_1_layer"
                           label="Layer"
                         ></v-overflow-btn>
+                        <TagsetInfo v-if="search_simple_1_layer === 'POS'" />
                       </v-col>
                       <v-col cols="4">
                         <v-text-field
@@ -144,6 +146,7 @@
                           v-model="search_simple_2_layer"
                           label="Layer"
                         ></v-overflow-btn>
+                        <TagsetInfo v-if="search_simple_2_layer === 'POS'" />
                       </v-col>
                       <v-col cols="4">
                         <v-text-field
@@ -204,6 +207,7 @@
                           v-model="search_simple_1_layer"
                           label="Layer"
                         ></v-overflow-btn>
+                        <TagsetInfo v-if="search_simple_1_layer === 'POS'" />
                       </v-col>
                       <v-col cols="2">
                         <v-text-field
@@ -220,6 +224,7 @@
                           v-model="search_simple_2_layer"
                           label="Layer"
                         ></v-overflow-btn>
+                        <TagsetInfo v-if="search_simple_2_layer === 'POS'" />
                       </v-col>
                       <v-col cols="2">
                         <v-text-field
@@ -236,6 +241,7 @@
                           v-model="search_simple_3_layer"
                           label="Layer"
                         ></v-overflow-btn>
+                        <TagsetInfo v-if="search_simple_3_layer === 'POS'" />
                       </v-col>
                       <v-col cols="2">
                         <v-text-field
@@ -389,6 +395,7 @@
                           :rules="inputRules"
                           @keydown.enter="search_complex"
                         ></v-text-field>
+                        <TagsetInfo />
                       </v-col>
                     </v-row>
 
@@ -483,6 +490,7 @@
                           :rules="inputRules"
                           @keydown.enter="search_complex"
                         ></v-text-field>
+                        <TagsetInfo />
                       </v-col>
                       <v-col>
                         <v-text-field
@@ -491,6 +499,7 @@
                           :rules="inputRules"
                           @keydown.enter="search_complex"
                         ></v-text-field>
+                        <TagsetInfo />
                       </v-col>
                     </v-row>
                     <v-row>
@@ -605,6 +614,7 @@
                           :rules="inputRules"
                           @keydown.enter="search_complex"
                         ></v-text-field>
+                        <TagsetInfo />
                       </v-col>
                       <v-col>
                         <v-text-field
@@ -613,6 +623,7 @@
                           :rules="inputRules"
                           @keydown.enter="search_complex"
                         ></v-text-field>
+                        <TagsetInfo />
                       </v-col>
                       <v-col>
                         <v-text-field
@@ -621,6 +632,7 @@
                           :rules="inputRules"
                           @keydown.enter="search_complex"
                         ></v-text-field>
+                        <TagsetInfo />
                       </v-col>
                     </v-row>
 
@@ -735,7 +747,10 @@ class queryItem {
   constructor(layer, position, element, upperCase) {
     this.layer = layer;
     this.position = position;
-    this.token = (upperCase ? element.toUpperCase() : element.toLowerCase()).trim();
+    this.token = (upperCase
+      ? element.toUpperCase()
+      : element.toLowerCase()
+    ).trim();
   }
 
   toString() {
@@ -829,6 +844,11 @@ async function sendSearchRequest(data, store, n, queryItems) {
             data.progressMsg = `Lade Zeitreihe(n): ${done} von ${searchResult.Items.length}`;
 
             if (done === searchResult.Items.length) {
+              if (!data.progressWait) {
+                error = true;
+                return;
+              }
+
               data.progressMsg = "Visualisiere die Daten";
               store.commit("search", {
                 n: n,
@@ -848,8 +868,8 @@ async function sendSearchRequest(data, store, n, queryItems) {
 
 export default {
   name: "Search",
-  components:{
-    TagsetInfo
+  components: {
+    TagsetInfo,
   },
   data: () => {
     return {
@@ -937,7 +957,8 @@ export default {
       for (let i = 0; i < query.length; i++) {
         const position = query[i];
         Object.keys(position).forEach((key) => {
-          this.$data[controlIdTemplate + (i + 1) + "_" + key[0].toLowerCase()] = position[key];          
+          this.$data[controlIdTemplate + (i + 1) + "_" + key[0].toLowerCase()] =
+            position[key];
         });
       }
     },
