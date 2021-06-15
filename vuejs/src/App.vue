@@ -37,12 +37,12 @@
       <v-container>
         <v-row>
           <v-col>
-            <Search ref="searchComponent" />
+            <Search ref="searchComponent" @searchRequestSubmitted="scrollToVizPanel" />
           </v-col>
         </v-row>
         <v-row class="text-center">
           <v-col>
-            <VizPanel />
+            <VizPanel id="vizPanel" />
           </v-col>
         </v-row>
         <v-row class="text-center">
@@ -256,6 +256,10 @@ export default {
       setTimeout(() => {
         event.target.style.background = "purple";
       }, 500);
+    },
+    scrollToVizPanel(){
+      document.getElementById("vizPanel").scrollIntoView(true);
+      window.scrollBy(0, -100);
     },
   },
 

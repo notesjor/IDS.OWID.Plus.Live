@@ -765,7 +765,7 @@ class queryItem {
   }
 }
 
-async function sendSearchRequest(data, store, n, queryItems) {
+async function sendSearchRequest(data, store, n, queryItems) {  
   data.progressWait = true;
   data.progressMsg = "Suche N-Gramme";
 
@@ -980,6 +980,7 @@ export default {
 
       this.$store.state.owid.N = set.size;
 
+      this.$emit("searchRequestSubmitted");
       sendSearchRequest(this.$data, this.$store, set.size, qs);
     },
     search_simple: function() {
@@ -1010,6 +1011,7 @@ export default {
           )
         );
 
+      this.$emit("searchRequestSubmitted");
       sendSearchRequest(
         this.$data,
         this.$store,
@@ -1048,6 +1050,7 @@ export default {
         ];
       }
 
+      this.$emit("searchRequestSubmitted");
       sendSearchRequest(
         this.$data,
         this.$store,

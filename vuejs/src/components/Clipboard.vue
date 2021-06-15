@@ -73,6 +73,8 @@
             v-model="selected"
             item-key="key"
             mutli-sort
+            :sort-by="['dRel']"
+            :sort-desc="[true]"
             show-select
           >
             <!-- eslint-disable -->
@@ -194,11 +196,11 @@ export default {
         { text: "Wortform", value: "w" },
         { text: "Lemma", value: "l" },
         { text: "POS-Tag", value: "p" },
-        { text: "Erfasst (Tage)", value: "d" },
-        { text: "Erfasst (%-Tage)", value: "dRel" },
-        { text: "Summe", value: "s" },
-        { text: "Summe (rel.)", value: "sRel" },
-        { text: "Frequenzkurve", value: "spark" },
+        { text: "Erfasst (Tage)", value: "d", align: "end" },
+        { text: "Erfasst (%-Tage)", value: "dRel", align: "end" },
+        { text: "Summe", value: "s", align: "end" },
+        { text: "Summe (rel.)", value: "sRel", align: "end" },
+        { text: "Frequenzkurve", value: "spark", align: "end" },
         { text: "Frequenzkurve (rel.)", value: "sparkNorm" },
       ],
       entries: [],
@@ -359,3 +361,27 @@ export default {
   },
 };
 </script>
+
+<style >
+.v-data-table-header{
+  font-weight: 400;  
+}
+th{
+  border-left-style: solid;
+  border-left-color:#1976d2;
+  border-left-width: 4px;
+}
+th:hover{
+  background: #1976d2;
+  color:white!important;
+}
+th:hover i{
+  color:white!important;
+}
+td{
+  background-color: white!important;
+}
+td.text-start .v-simple-checkbox{
+  text-align: center;
+}
+</style>
