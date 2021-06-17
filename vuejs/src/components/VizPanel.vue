@@ -31,21 +31,21 @@
     <v-tab-item>
       <v-row>
         <v-col>
-          <VizTimeChart></VizTimeChart>
+          <VizTimeChart style="z-index:100"></VizTimeChart>
         </v-col>
       </v-row>
     </v-tab-item>
     <v-tab-item>
       <v-row>
         <v-col>
-          <VizCalendar></VizCalendar>
+          <VizCalendar style="z-index:100"></VizCalendar>
         </v-col>
       </v-row>
     </v-tab-item>
     <v-tab-item>
       <v-row>
         <v-col>
-          <VizSankey></VizSankey>
+          <VizSankey style="z-index:100"></VizSankey>
         </v-col>
       </v-row>
     </v-tab-item>

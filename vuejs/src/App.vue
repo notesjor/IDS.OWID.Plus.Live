@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar app dark class="d-print-none">
+    <v-app-bar app dark class="d-print-none" style="z-index:999">
       <div class="d-flex">
         <a
           href="https://www.owid.de/plus/index.html"
@@ -89,7 +89,7 @@
             </div>
           </div>
         </v-list-item>
-        <v-list-item @click="tutorial = true">
+        <v-list-item @click="newProject">
           <v-icon style="font-size:32px; float:left; margin-right:5px"
             >mdi-help-circle-outline</v-icon
           >
