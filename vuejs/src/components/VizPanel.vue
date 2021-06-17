@@ -15,6 +15,7 @@
         mdi-view-dashboard-variant
       </v-icon>
     </v-tab>
+    
     <!--
     <v-tab>
       <v-icon left>
@@ -31,21 +32,21 @@
     <v-tab-item>
       <v-row>
         <v-col>
-          <VizTimeChart style="z-index:100"></VizTimeChart>
+          <VizTimeChart></VizTimeChart>
         </v-col>
       </v-row>
     </v-tab-item>
     <v-tab-item>
       <v-row>
         <v-col>
-          <VizCalendar style="z-index:100"></VizCalendar>
+          <VizCalendar></VizCalendar>
         </v-col>
       </v-row>
     </v-tab-item>
     <v-tab-item>
       <v-row>
         <v-col>
-          <VizSankey style="z-index:100"></VizSankey>
+          <VizSankey></VizSankey>
         </v-col>
       </v-row>
     </v-tab-item>

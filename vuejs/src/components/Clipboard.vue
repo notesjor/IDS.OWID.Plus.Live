@@ -5,22 +5,36 @@
         <v-col style="text-align:left;">
           <v-icon>mdi-compare-horizontal</v-icon>
           <span style="margin-left:10px; font-size:15px"
-            >SUCHVERLAUF: Vorangeganenen Suchen vergleichen &amp;
-            verfeinern</span
+            >SUCHVERLAUF: Vorangeganenen Suchen vergleichen &amp; verfeinern</span
           >
         </v-col>
         <v-col style="text-align:right;">
-          <v-icon style="block:inline; margin-right:10px;" @click="modelLoad"
-            >mdi-folder-outline</v-icon
-          >
-          <v-icon style="block:inline;" @click="modelSave"
-            >mdi-content-save-outline</v-icon
-          >
-          <input
-            type="file"
-            id="fileinput"
-            style="visibility: collapse; width:0px"
-          />
+          <div style="margin-right:10px; margin-left:20px; float:right">
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <div v-bind="attrs" v-on="on">
+                  <v-icon @click="modelSave">mdi-content-save-outline</v-icon>
+                </div>
+              </template>
+              <span>
+                Vollständigen Suchverlauf speichern
+              </span>
+            </v-tooltip>
+          </div>
+          <div>
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <div v-bind="attrs" v-on="on">
+                  <v-icon @click="modelLoad">mdi-folder-outline</v-icon>
+                </div>
+              </template>
+              <span>
+                Bestehenden Suchverlauf laden
+              </span>
+            </v-tooltip>
+          </div>          
+
+          <input type="file" id="fileinput" style="visibility: collapse; width:0px" />
         </v-col>
       </v-row>
     </v-card-title>
@@ -40,21 +54,17 @@
                 <v-list>
                   <v-list-item @click="exportLink(i)">
                     <v-list-item-title
-                      ><v-icon style="margin-right:10px"
-                        >mdi-link-variant</v-icon
-                      >Link erzeugen</v-list-item-title
+                      ><v-icon style="margin-right:10px">mdi-link-variant</v-icon>Link erzeugen</v-list-item-title
                     >
                   </v-list-item>
                   <v-list-item @click="exportTsv(i)">
                     <v-list-item-title
-                      ><v-icon style="margin-right:10px">mdi-export</v-icon
-                      >TSV-Tabelle</v-list-item-title
+                      ><v-icon style="margin-right:10px">mdi-export</v-icon>TSV-Tabelle</v-list-item-title
                     >
                   </v-list-item>
                   <v-list-item @click="exportJson(i)">
                     <v-list-item-title
-                      ><v-icon style="margin-right:10px">mdi-export</v-icon
-                      >JSON-Objekt</v-list-item-title
+                      ><v-icon style="margin-right:10px">mdi-export</v-icon>JSON-Objekt</v-list-item-title
                     >
                   </v-list-item>
                 </v-list>
@@ -114,10 +124,7 @@
 
     <v-snackbar v-model="snackbar">
       <v-text-field label="Link" :value="snackbarLink" readonly> </v-text-field>
-      <a @click="copyToClipboard">
-        <v-icon>mdi-content-copy</v-icon
-        ><span style="color:white;">Kopieren</span>
-      </a>
+      <a @click="copyToClipboard"> <v-icon>mdi-content-copy</v-icon><span style="color:white;">Kopieren</span> </a>
 
       <template v-slot:action="{ attrs }">
         <v-btn text v-bind="attrs" @click="snackbar = false">
@@ -175,7 +182,7 @@ export function onFileLoaded(e) {
   }
   var obj = JSON.parse(atob(match[2]));
   storeGlobal.commit("modelLoad", obj.Owid);
-  storeGlobal.commit("calculate");  
+  storeGlobal.commit("calculate");
 }
 
 export var storeGlobal;
@@ -248,8 +255,7 @@ export default {
     },
     exportLink(i) {
       var data = this.$store.state.owid.GetSearchHistoryItemRequest(i.label);
-      this.$data.snackbarLink =
-        this.$config.webUrl + btoa(JSON.stringify(data));
+      this.$data.snackbarLink = this.$config.webUrl + btoa(JSON.stringify(data));
       this.$data.snackbar = true;
     },
     exportTsv(i) {
@@ -291,9 +297,7 @@ export default {
     modelSave() {
       var enc = new TextEncoder();
       saveBlob(
-        enc.encode(
-          JSON.stringify({ Format: "JSON", Owid: this.$store.state.owid })
-        ).buffer,
+        enc.encode(JSON.stringify({ Format: "JSON", Owid: this.$store.state.owid })).buffer,
         "application/json",
         "data.json"
       );
@@ -324,10 +328,7 @@ export default {
         var res = [];
 
         this.$store.state.owid.GetSearchHistory().forEach((key) => {
-          var grid = this.$store.state.owid.GetSearchHistoryItem(
-            key,
-            this.$store.state.vizOptionGranulation
-          );
+          var grid = this.$store.state.owid.GetSearchHistoryItem(key, this.$store.state.vizOptionGranulation);
 
           for (var row in grid) if (grid[row].checked) selected.add(grid[row]);
 
@@ -337,8 +338,7 @@ export default {
             grid: grid,
           });
 
-          if (this.$store.state.owid.OwidLiveSearches[key].IsSelected)
-            selectedSums.push(key);
+          if (this.$store.state.owid.OwidLiveSearches[key].IsSelected) selectedSums.push(key);
         });
 
         data.syncLock = true;
@@ -348,8 +348,7 @@ export default {
 
         var exp = [];
         var max = res.length > 3 ? 3 : res.length;
-        for(var ei = 0; ei < max; ei++)        
-          exp.push(ei);
+        for (var ei = 0; ei < max; ei++) exp.push(ei);
         data.expanded = exp;
 
         data.syncLock = false;
@@ -362,26 +361,29 @@ export default {
 };
 </script>
 
-<style >
-.v-data-table-header{
-  font-weight: 400;  
+<style>
+.v-data-table-header {
+  font-weight: 400;
 }
-th{
+th {
   border-left-style: solid;
-  border-left-color:#1976d2;
+  border-left-color: #1976d2;
   border-left-width: 4px;
 }
-th:hover{
+th.active {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+th:hover {
   background: #1976d2;
-  color:white!important;
+  color: white !important;
 }
-th:hover i{
-  color:white!important;
+th:hover i {
+  color: white !important;
 }
-td{
-  background-color: white!important;
+td {
+  background-color: white !important;
 }
-td.text-start .v-simple-checkbox{
+td.text-start .v-simple-checkbox {
   text-align: center;
 }
 </style>
