@@ -17,15 +17,35 @@
           </v-card-title>
           <v-divider></v-divider>
           <v-card-text>
-            <span v-html="$t('vizPanel_help_info')">
-              
+            <span>
+              {{ $t("vizPanel_help_info") }}<br />
+              <br />
+              <ul>
+                <li>
+                  <strong><v-icon left> mdi-chart-line </v-icon>{{ $t("viz_name_timechart") }}</strong>
+                  <br />
+                  {{ $t("viz_name_timechart_info") }}
+                </li>
+                <li>
+                  <strong><v-icon left> mdi-calendar-multiselect </v-icon>{{ $t("viz_name_calendar") }}</strong>
+                  <br />
+                  {{ $t("viz_name_calendar_info") }}
+                </li>
+                <li>
+                  <strong><v-icon left> mdi-view-dashboard-variant </v-icon>{{ $t("viz_name_sankey") }}</strong>
+                  <br />
+                  {{ $t("viz_name_sankey_info") }}
+                </li>
+              </ul>
+              <br />
+              <i>{{ $t("lbl_hint") }}:</i>{{ $t("vizPanel_help_additionalInfo") }}
             </span>
           </v-card-text>
           <v-divider></v-divider>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="primary" text @click="dialog_help = false">
-              Fenster schließen
+              {{ $t("lbl_closeWindow") }}
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -44,7 +64,7 @@
                 </div>
               </template>
               <span>
-                Zeitverlauf
+                {{ $t("viz_name_timechart") }}
               </span>
             </v-tooltip>
           </v-tab>
@@ -58,7 +78,7 @@
                 </div>
               </template>
               <span>
-                Kalenderansicht
+                {{ $t("viz_name_calendar") }}
               </span>
             </v-tooltip>
           </v-tab>
@@ -72,7 +92,7 @@
                 </div>
               </template>
               <span>
-                Sankey-Varianten
+                {{ $t("viz_name_sankey") }}
               </span>
             </v-tooltip>
           </v-tab>

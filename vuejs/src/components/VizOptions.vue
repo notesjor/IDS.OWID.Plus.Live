@@ -5,7 +5,7 @@
         <template v-slot:activator="{ on, attrs }">
           <div v-bind="attrs" v-on="on" style="float:right; display:block;">
             <v-icon>mdi-eye-outline</v-icon>
-            <span style="margin-left:10px; font-size:15px">ANPASSEN: Einstellungen für Visualisierung ändern</span>
+            <span style="margin-left:10px; font-size:15px">{{ $t("vizOptions_header") }}</span>
             <sup>
               <v-icon left small style="margin-left:5px">
                 mdi-information-outline
@@ -15,34 +15,27 @@
         </template>
         <v-card>
           <v-card-title class="headline grey lighten-2">
-            HILFE: Einstellungen für Visualisierung ändern
+            {{ $t("vizOptions_help") }}
           </v-card-title>
           <v-divider></v-divider>
           <v-card-text>
             <span>
-              In diesem Abschnitt können Sie folgenden Optionen ändern:<br/> <br/>
+              {{ $t("vizOptions_help_info") }}<br/> <br/>
               <ul>
                 <li>
-                  <strong>Relative Frequenz</strong>
+                  <strong>{{ $t("vizOption_name_frequency") }}</strong>
                   <br />
-                  Die 'Relative Frequenz' ist in der Standardeinstellung immer aktiviert (blau - Punkt rechts). Bei
-                  aktiver 'Relative Frequenz' wird die Frequenz in 'pro Millionen' angezeigt. Dabei bezieht sich die
-                  'Relative Frequenz' immer auf die Summe aller 'N', die im gewählten Zeitabschnitt liegen (siehe
-                  'Granulierung'). Bei deaktivierter 'Relative Frequenz' wird die absolute Frequenz angezeigt - gezählt
-                  wird daher jedes Vorkommen von 'N' im Zeitabschnitt ohne Bezugsgröße.
+                  {{ $t("vizOption_name_frequency_info") }}
                 </li>
                 <li>
-                  <strong>Granulierung</strong> <br />
-                  Die Granulierung gibt den Zeitabschnitt an, der zur Berechnung betrachtet und summiert wird.
-                  <i>Hinweis:</i> Je nach Granulierung stehen unterschiedliche Glättungs-Einstellungen zur Verfügung
-                  (siehe 'Glättung').
+                  <strong>{{ $t("vizOption_name_granulation") }}</strong> <br />
+                  {{ $t("vizOption_name_granulation_info") }}
+                  <i>{{ $t("lbl_hint") }}:</i> {{ $t("vizOption_name_granulation_info_ext") }}
                 </li>
                 <li>
-                  <strong>Glättung</strong> <br />
-                  Wird ein Glättungswert größer 1 eingestellt, so werden die Daten mittels gleitendem Mittelwert
-                  geglättet. Bei einem Wert von 1 wird keine Glättung vorgenommen.
-                  <i>Hinweis:</i> Je nach Granulierung stehen unterschiedliche Glättungs-Einstellungen zur Verfügung
-                  (siehe 'Granulierung'). Auf der Skala werden besonders markante Glättungswerte hervorgehoben.
+                  <strong>{{ $t("vizOption_name_smoothing") }}</strong> <br />
+                  {{ $t("vizOption_name_smoothing_info") }}
+                  <i>{{ $t("lbl_hint") }}:</i> {{ $t("vizOption_name_smoothing_info_ext") }}
                 </li>
               </ul>
             </span>
@@ -51,7 +44,7 @@
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="primary" text @click="dialog_help = false">
-              Fenster schließen
+              {{ $t("lbl_closeWindow") }}
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -62,13 +55,13 @@
         <v-col class="d-flex justify-left" style="margin-top:-30px; margin-bottom:10px">
           <v-switch
             v-model="relativeFrequency"
-            :label="relativeFrequency ? 'Relative Frequenz' : 'Absolute Frequenz'"
+            :label="relativeFrequency ? $t('vizOption_name_frequency') : $t('vizOption_name_frequency_abs')"
           ></v-switch>
         </v-col>
       </v-row>
       <v-row>
         <v-col class="d-flex justify-left">
-          <label for="granulation" class="v-label theme--light" style="margin-top:-20px">Granulierung:</label>
+          <label for="granulation" class="v-label theme--light" style="margin-top:-20px">{{ $t("vizOption_name_granulation") }}:</label>
           <v-slider
             id="granulation"
             v-model="granulationValue"
@@ -81,7 +74,7 @@
           ></v-slider>
         </v-col>
         <v-col class="d-flex justify-left">
-          <label for="smooth" class="v-label theme--light" style="margin-top:-20px">Glättung:</label>
+          <label for="smooth" class="v-label theme--light" style="margin-top:-20px">{{ $t("vizOption_name_smoothing") }}:</label>
           <v-slider
             id="smooth"
             v-model="smoothValue"
@@ -243,7 +236,9 @@ function commit() {
 
 export default {
   name: "VizOptions",
-
+  created: function(){
+    this.granulationLabels = [this.$t('granulation_lbl_day'), this.$t('granulation_lbl_week'), this.$t('granulation_lbl_month'),this.$t('granulation_lbl_quarter'),this.$t('granulation_lbl_year')];
+  },
   data: () => {
     return {
       dialog_help: false,
@@ -253,7 +248,7 @@ export default {
       smoothMin: 1,
       smoothMax: 31,
       granulationValue: 0,
-      granulationLabels: ["Tag", "Woche", "Monat", "Quartal", "Jahr"],
+      granulationLabels: null,
       smoothLabels: [
         "1",
         "",
