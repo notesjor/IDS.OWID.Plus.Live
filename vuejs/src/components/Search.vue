@@ -1,44 +1,64 @@
 <template>
   <v-container>
-    <v-expansion-panels :value="0">
+    <v-expansion-panels :value="expensionPanelOpen">
       <v-expansion-panel>
         <v-expansion-panel-header class="justify-self-start">
-          <v-tooltip bottom>
+          <v-dialog v-model="dialog_helpSearchSimple" width="600" scrollable>
             <template v-slot:activator="{ on, attrs }">
-              <div v-bind="attrs" v-on="on">
-                <v-icon left>mdi-magnify</v-icon>
-                <span>SUCHEN: Einfache Suche</span>
-                <sup>
-                  <v-icon left small style="margin-left:5px">
-                    mdi-information-outline
-                  </v-icon>
-                </sup>
+              <div v-bind="attrs" v-on="on" style="float:right; display:block;">
+                <div style="display:block; float:left">
+                  <v-icon @click="stopClickSimple" left>mdi-magnify</v-icon>
+                  <span @click="stopClickSimple">SUCHEN: Einfache Suche</span>
+                  <sup>
+                    <v-icon left small style="margin-left:5px">
+                      mdi-information-outline
+                    </v-icon>
+                  </sup>
+                </div>
+                <div style="display:block; width:100%; height:20px;" @click="stopClickSimple"></div>
               </div>
             </template>
-            <span>
-              Die "Einfache Suche" nach N-Grammen umfasst folgende Funktionalitäten:
-              <ul>
-                <li>
-                  <strong>Unterschiedliche N-Gramm-Längen von 1-3</strong>
-                  <br />
-                  z. B. N=1: Virus, N=2: zweite Welle, N=3: Bundeskanzlerin Angela Merkel
-                </li>
-                <li>
-                  <strong>Suche nach Grammen</strong> <br />
-                  z. B. bayer (exakte Suche), bayer* (Prefix - z. B. bayern), *bayer (Suffix - z. B. nordbayer) <br />
-                  oder *bayer* (beliebige Position - z. B. nordbayern)
-                </li>
-                <li>
-                  <strong>Verschiedene Annotationsebenen</strong> <br />
-                  Wortform, Lemma oder POS (Part-of-Speech &rarr; Wortart).<br />
-                  Bsp.: 2-Gram: ADJ* Merkel, 3-Gram: ART unglaublich NN
-                </li>
-              </ul>
-              Hinweis: Abfragen und Ergebnisse werden immer zur Kleinschreibung reduziert.
-            </span>
-          </v-tooltip>
+            <v-card>
+              <v-card-title class="headline grey lighten-2">
+                HILFE: Einfache Suche
+              </v-card-title>
+              <v-divider></v-divider>
+              <v-card-text>
+                <span>
+                  Die "Einfache Suche" nach N-Grammen umfasst folgende Funktionalitäten:<br/> <br/>
+                  <ul>
+                    <li>
+                      <strong>Unterschiedliche N-Gramm-Längen von 1-3</strong>
+                      <br />
+                      z. B. N=1: Virus, N=2: zweite Welle, N=3: Bundeskanzlerin Angela Merkel
+                    </li>
+                    <li>
+                      <strong>Suche nach Grammen</strong> <br />
+                      z. B. bayer (exakte Suche), bayer* (Prefix - z. B. bayern), *bayer (Suffix - z. B. nordbayer)
+                      <br />
+                      oder *bayer* (beliebige Position - z. B. nordbayern)
+                    </li>
+                    <li>
+                      <strong>Verschiedene Annotationsebenen</strong> <br />
+                      Wortform, Lemma oder POS (Part-of-Speech &rarr; Wortart).<br />
+                      Bsp.: 2-Gram: ADJ* Merkel, 3-Gram: ART unglaublich NN
+                    </li>
+                  </ul>
+                  <br/>
+                  <i>Hinweis:</i> Abfragen und Ergebnisse werden immer zur Kleinschreibung reduziert.
+                </span>
+              </v-card-text>
+              <v-divider></v-divider>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="primary" text @click="dialog_helpSearchSimple = false">
+                  Fenster schließen
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </v-expansion-panel-header>
-        <v-expansion-panel-content>          
+        <v-expansion-panel-content>
           <v-row>
             <v-col>
               <h5>Suchfenstergröße:</h5>
@@ -263,47 +283,71 @@
               </v-tabs>
             </v-col>
           </v-row>
-          <v-row>                       
+          <v-row>
             <v-col cols="5">
-              <v-btn block @click="delete_simple"> <v-icon>mdi-delete-circle-outline</v-icon>Alle Eingaben löschen</v-btn>
+              <v-btn block @click="delete_simple">
+                <v-icon style="color:#c00">mdi-delete-circle-outline</v-icon>Alle Eingaben löschen</v-btn
+              >
             </v-col>
-            <v-col cols="2">
-            </v-col>
+            <v-col cols="2"> </v-col>
             <v-col cols="5">
-              <v-btn block @click="search_simple"> <v-icon>mdi-magnify</v-icon>Suche ausführen </v-btn>
+              <v-btn block @click="search_simple">
+                <v-icon style="color:#1976d2">mdi-magnify</v-icon>Suche ausführen
+              </v-btn>
             </v-col>
           </v-row>
         </v-expansion-panel-content>
       </v-expansion-panel>
       <v-expansion-panel>
         <v-expansion-panel-header class="justify-self-start">
-          <v-tooltip bottom>
+          <v-dialog v-model="dialog_helpSearchComplex" width="600" scrollable>
             <template v-slot:activator="{ on, attrs }">
-              <div v-bind="attrs" v-on="on">
-                <v-icon left>mdi-magnify</v-icon>
-                <span>SUCHEN: Erweiterte Tiefen-Suche</span>
-                <sup>
-                  <v-icon left small style="margin-left:5px">
-                    mdi-information-outline
-                  </v-icon>
-                </sup>
+              <div v-bind="attrs" v-on="on" style="float:right; display:block;">
+                <div style="float:left; display:block;">
+                  <v-icon @click="stopClickComplex" left>mdi-magnify</v-icon>
+                  <span @click="stopClickComplex">SUCHEN: Erweiterte Tiefen-Suche</span>
+                  <a @click="dialog = true">
+                    <sup>
+                      <v-icon left small style="margin-left:5px">
+                        mdi-information-outline
+                      </v-icon>
+                    </sup>
+                  </a>
+                </div>
+                <div style="display:block; width:100%; height:20px;" @click="stopClickComplex"></div>
               </div>
             </template>
-            <span>
-              Die "Erweiterte Tiefen-Suche" bietet folgende Zusatzfunktionalität (Basis-Funktionen siehe: "Einfache
-              Suche"):
-              <ul>
-                <li>
-                  <strong>Gleichzeitige Suche auf mehreren Annotationsebenen</strong>
-                  <br />
-                  Wortform und/oder Lemma und/oder POS (Part-of-Speech &rarr; Wortart).<br />
-                  Bsp. 1.: 1-Gram: 1. Lemma = gut* &amp; 1. POS = ADJ*<br />
-                  Bsp. 2.: 2-Gram: 1. Lemma = gefährlich &amp; 2. Lemma = Virus &amp; 2. POS = NN
-                </li>
-              </ul>
-              Hinweis: Abfragen und Ergebnisse werden immer zur Kleinschreibung reduziert.
-            </span>
-          </v-tooltip>
+            <v-card>
+              <v-card-title class="headline grey lighten-2">
+                HILFE: Erweiterte Tiefen-Suche
+              </v-card-title>
+              <v-divider></v-divider>
+              <v-card-text>
+                <span>
+                  Die "Erweiterte Tiefen-Suche" bietet folgende Zusatzfunktionalität<br />(Basis-Funktionen siehe:
+                  "Einfache Suche"):<br/> <br/>
+                  <ul>
+                    <li>
+                      <strong>Gleichzeitige Suche auf mehreren Annotationsebenen</strong>
+                      <br />
+                      Wortform und/oder Lemma und/oder POS (Part-of-Speech &rarr; Wortart).<br />
+                      Bsp. 1.: 1-Gram: 1. Lemma = gut* &amp; 1. POS = ADJ*<br />
+                      Bsp. 2.: 2-Gram: 1. Lemma = gefährlich &amp; 2. Lemma = Virus &amp; 2. POS = NN
+                    </li>
+                  </ul>
+                  <br/>
+                  <i>Hinweis:</i> Abfragen und Ergebnisse werden immer zur Kleinschreibung reduziert.
+                </span>
+              </v-card-text>
+              <v-divider></v-divider>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="primary" text @click="dialog_helpSearchComplex = false">
+                  Fenster schließen
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </v-expansion-panel-header>
         <v-expansion-panel-content>
           <v-row>
@@ -618,14 +662,17 @@
               </v-tabs>
             </v-col>
           </v-row>
-          <v-row>                       
+          <v-row>
             <v-col cols="5">
-              <v-btn block @click="delete_complex"> <v-icon>mdi-delete-circle-outline</v-icon>Alle Eingaben löschen</v-btn>
+              <v-btn block @click="delete_complex">
+                <v-icon style="color:#c00">mdi-delete-circle-outline</v-icon>Alle Eingaben löschen</v-btn
+              >
             </v-col>
-            <v-col cols="2">
-            </v-col>
+            <v-col cols="2"> </v-col>
             <v-col cols="5">
-              <v-btn block @click="search_complex"> <v-icon>mdi-magnify</v-icon>Suche ausführen</v-btn>
+              <v-btn block @click="search_complex">
+                <v-icon style="color:#1976d2">mdi-magnify</v-icon>Suche ausführen</v-btn
+              >
             </v-col>
           </v-row>
         </v-expansion-panel-content>
@@ -813,6 +860,10 @@ export default {
   },
   data: () => {
     return {
+      dialog_helpSearchSimple: false,
+      dialog_helpSearchComplex: false,
+      expensionPanelOpen: 0,
+
       layer: global_layers,
       search_simple_1_layer: "Wortform",
       search_simple_2_layer: "Wortform",
@@ -900,6 +951,14 @@ export default {
       this.search_complex_3_3_w = "";
       this.search_complex_3_3_l = "";
       this.search_complex_3_3_p = "";
+    },
+    stopClickSimple: function(e) {
+      e.stopPropagation();
+      this.expensionPanelOpen = 0;
+    },
+    stopClickComplex: function(e) {
+      e.stopPropagation();
+      this.expensionPanelOpen = 1;
     },
     abortProgress: function() {
       this.$data.progressWait = false;
