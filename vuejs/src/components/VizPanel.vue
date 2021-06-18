@@ -13,42 +13,12 @@
         </template>
         <v-card>
           <v-card-title class="headline grey lighten-2">
-            HILFE: Verfügbare Visualisierungen
+            {{ $t("vizPanel_help") }}
           </v-card-title>
           <v-divider></v-divider>
           <v-card-text>
-            <span>
-              Folgende Visualisierungen können Sie nutzen - Je nach gewählter Visualisierung erhalten Sie andere
-              Einblicke in die Daten:<br/> <br/>
-              <ul>
-                <li>
-                  <strong><v-icon left>
-                    mdi-chart-line
-                  </v-icon>Zeitverlauf</strong>
-                  <br />
-                  Der Zeitverlauf erlaubt eine sehr übersichtliche Darstellung aller Daten.
-                  Mehrere hintereinader gestellte Abfragen werden parallel visualisiert.
-                  Dadurch lassen sich mehrere Abfragen im Zeitverlauf vergleichen.
-                  Nutzen Sie die interaktiven Möglichkeiten (z. B. Zeitabschnitt wählen - unterhalb der Grafik).
-                </li>
-                <li>
-                  <strong><v-icon left>
-                    mdi-calendar-multiselect
-                  </v-icon>Kalenderansicht</strong> <br />
-                  Die Kalenderansicht bildet eine Summe alle Abfragen für den ausgewählten Zeitabschnitt (Granulierung).
-                  Dadurch lassen sich 'Peeks' zu bestimmten Tagen besser optisch erfassen.
-                  Nutzen Sie den Schieberegler, um die Daten einzugrenzen - z. B. um HOT/COLD-Spots zu identifizieren.
-                </li>
-                <li>
-                  <strong><v-icon left>
-                    mdi-view-dashboard-variant
-                  </v-icon>Sankey-Varianten</strong> <br />
-                  Die Sankey-Variante eignet sich insbesondere dann, wenn Sie an der Identifikation von Sprachgebrauchsmustern interessiert sind.
-                  Je größer Knoten/Kanten dargestellt werden, desto häufiger ist das entsprechende Token (=Knoten - an der Position) bzw. der entsprechende Übergang (=Kanten - Relation zwischen zwei Token/Knoten).
-                </li>
-              </ul>
-              <br/>
-              <i>Hinweis:</i> Alle Visualisierungen sind interaktiv. Bewegen Sie die Maus über interessante Stellen in der Grafik, um Detailinformationen anzuzeigen.
+            <span v-html="$t('vizPanel_help_info')">
+              
             </span>
           </v-card-text>
           <v-divider></v-divider>

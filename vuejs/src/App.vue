@@ -2,16 +2,12 @@
   <v-app>
     <v-app-bar app dark class="d-print-none" style="z-index:999">
       <div class="d-flex">
-        <a
-          href="https://www.owid.de/plus/index.html"
-          target="_blank"
-          rel="nofollow"
-        >
-          <v-img
-            alt="OWIDplus Logo"
+        <a :href="leftIconHref" target="_blank" rel="nofollow">
+          <img
+            alt="Logo links"
             class="shrink mr-2"
             contain
-            src="./assets/owid_plus.png"
+            src="./assets/logo_left.png"
             transition="scale-transition"
             height="40"
           />
@@ -21,14 +17,13 @@
       <v-spacer></v-spacer>
 
       <div class="d-flex">
-        <a href="https://www.ids-mannheim.de/" target="_blank" rel="nofollow">
+        <a :href="rightIconHref" target="_blank" rel="nofollow">
           <v-img
-            alt="IDS Logo"
+            alt="Logo rechts"
             class="shrink mr-2"
             contain
-            src="./assets/ids-wbmarke.svg"
+            src="./assets/logo_right.png"
             transition="scale-transition"
-            height="80"
           />
         </a>
       </div>
@@ -60,13 +55,7 @@
 
     <v-menu top>
       <template v-slot:activator="{ on, attrs }">
-        <v-btn
-          color="#EF7D00"
-          fab
-          style="position:fixed; right:1em; bottom:1em"
-          v-bind="attrs"
-          v-on="on"
-        >
+        <v-btn color="#EF7D00" fab style="position:fixed; right:1em; bottom:1em" v-bind="attrs" v-on="on">
           <v-icon>
             mdi-menu
           </v-icon>
@@ -76,30 +65,34 @@
       <v-list>
         <v-list-item @click="newProject">
           <div>
-            <v-icon style="font-size:32px; float:left; margin-right:5px"
-              >mdi-file-outline</v-icon
-            >
+            <v-icon style="font-size:32px; float:left; margin-right:5px">mdi-file-outline</v-icon>
             <div class="d-none d-sm-flex">
               <span style="font-size:14px; line-height:1; font-weight:200;">
-                <p>
-                  <strong>Neu</strong><br />
-                  Löscht alle Suchabfragen.
-                </p>
+                <p v-html="$t('main_menu_new')"></p>
               </span>
             </div>
           </div>
         </v-list-item>
         <v-list-item @click="newProject">
-          <v-icon style="font-size:32px; float:left; margin-right:5px"
-            >mdi-help-circle-outline</v-icon
-          >
+          <v-icon style="font-size:32px; float:left; margin-right:5px">mdi-help-circle-outline</v-icon>
           <div class="d-none d-sm-flex">
-            <span
-              style="font-size:14px; line-height:1; font-weight:200; margin-top:10px;"
-            >
+            <span style="font-size:14px; line-height:1; font-weight:200; margin-top:10px;">
+              <p v-html="$t('main_menu_videoTutorial')"></p>
+            </span>
+          </div>
+        </v-list-item>
+        <v-list-item>
+          <div class="d-none d-sm-flex">
+            <span style="font-size:14px; line-height:1; font-weight:200; margin-top:10px;">
               <p>
-                <strong>Hilfe anzeigen</strong><br />
-                Zeige das Video-Tutorial erneut an...
+                <strong>{{ $t("main_menu_language") }}</strong
+                ><br />
+                <a @click="setLocale('de')"
+                  ><img src="./locales/de.svg" alt="Deutsch" style="height:24px; margin:10px 10px 5px 0px"
+                /></a>
+                <a @click="setLocale('en')"
+                  ><img src="./locales/gb.svg" alt="Englisch" style="height:24px; margin:10px 10px 5px 0px"
+                /></a>
               </p>
             </span>
           </div>
@@ -111,7 +104,7 @@
       <div class="text-center">
         <v-card>
           <v-card-title class="headline">
-            Herzlich willkommen bei {{this.$config.appName}}
+            {{ $t("app_dialog_welcome_message") }} {{ this.$config.appName }}
           </v-card-title>
           <video
             v-if="tutorial_mp4"
@@ -122,12 +115,7 @@
             ref="tutorial_video"
             style="max-width:600px"
           >
-            <source
-              size="1080"
-              ref="tutorial_video_source"
-              src=""
-              type="video/mp4"
-            />
+            <source size="1080" ref="tutorial_video_source" src="" type="video/mp4" />
           </video>
           <iframe
             v-if="tutorial_iframe"
@@ -137,15 +125,15 @@
             style="width:600px; max-width:600px; height:414px; max-height:414px;"
           ></iframe>
           <v-card-text>
-            Dieses Video gibt Ihnen eine kurze Einführung in die Analyse von Token und N-Grammen.
+            {{ $t("app_dialog_welcome_message_info") }}
           </v-card-text>
           <v-card-actions>
-            <v-btn text @click="tutorial = false"  class="blink">
+            <v-btn text @click="tutorial = false" class="blink">
               <v-icon style="margin-right:10px">
                 mdi-arrow-right-circle-outline
               </v-icon>
               <span>
-              Tutorial beenden
+                {{ $t("app_dialog_welcome_message_btn") }}
               </span>
             </v-btn>
             <v-spacer></v-spacer>
@@ -157,13 +145,9 @@
     <v-overlay :value="alert">
       <div class="text-center">
         <v-card>
-          <v-card-title class="headline">
-            Server-Wartung von {{this.$config.appName}}
-          </v-card-title>
+          <v-card-title class="headline"> {{ $t("app_dialog_serverError_message") }} {{ this.$config.appName }} </v-card-title>
           <v-card-text>
-            Die {{this.$config.appName}}-API ist aktuell nicht erreichbar. Der Server wird
-            gerade gewartet. Bitte probieren Sie es zu einem späteren Zeitpunkt
-            erneut.
+            {{ $t("app_dialog_serverError_message_info") }}             
           </v-card-text>
         </v-card>
       </div>
@@ -179,7 +163,7 @@
   text-align: center;
   line-height: 50px;
 }
-.blink span { 
+.blink span {
   color: white;
   animation: blink 3s linear infinite;
 }
@@ -245,6 +229,9 @@ export default {
     tutorial_iframe: true,
     tutorial_mp4: true,
     alert: false,
+
+    leftIconHref: null,
+    rightIconHref: null,
   }),
 
   methods: {
@@ -257,9 +244,12 @@ export default {
         event.target.style.background = "purple";
       }, 500);
     },
-    scrollToVizPanel(){
+    scrollToVizPanel() {
       document.getElementById("vizPanel").scrollIntoView(true);
       window.scrollBy(0, -100);
+    },
+    setLocale(locale) {
+      this.$i18n.locale = locale;
     },
   },
 
@@ -268,6 +258,11 @@ export default {
     var search = this.$refs.searchComponent;
     var config = this.$config;
 
+    this.leftIconHref = config.leftIconHref;
+    this.rightIconHref = config.rightIconHref;
+
+    // Als Tutorial lassen sich MP4-Video-Dateien (inkl. PNG-Poster => myvideo.mp4.png) oder
+    // eine externe HTML-Datei mit Video-Player laden.
     if (config.tutorialUrl.length < 1) this.tutorial = false;
     else {
       if (config.tutorialUrl.endsWith(".mp4")) {
@@ -281,6 +276,8 @@ export default {
       this.tutorial = true;
     }
 
+    // Der Aufruf INIT sowie NORM lädt notwendige Normdaten herunter.
+    // INIT kann serverseitig zur Flood-Detection und Loging verwendet werden.
     fetch(config.baseUrl + "/init")
       .then((response) => response.text())
       .then((response) => {

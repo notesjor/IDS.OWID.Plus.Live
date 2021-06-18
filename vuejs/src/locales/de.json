@@ -1,0 +1,12 @@
+{
+  "main_menu_new": "<strong>Neu</strong><br />Löscht alle Suchabfragen.",
+  "main_menu_videoTutorial": "<strong>Hilfe anzeigen</strong><br />Zeige das Video-Tutorial erneut an...",
+  "main_menu_language": "Sprache der Anwendungsoberfläche:",
+  "app_dialog_welcome_message": "Herzlich willkommen bei",
+  "app_dialog_welcome_message_info": "Dieses Video gibt Ihnen eine kurze Einführung in die Analyse von Token und N-Grammen.",
+  "app_dialog_welcome_message_btn": "Tutorial beenden",
+  "app_dialog_serverError_message": "Server-Wartung von",
+  "app_dialog_serverError_message_info": "Die API ist aktuell nicht erreichbar. Der Server wird gerade gewartet. Bitte probieren Sie es zu einem späteren Zeitpunkt erneut.",
+  "vizPanel_help": "HILFE: Verfügbare Visualisierungen",
+  "vizPanel_help_info": "Folgende Visualisierungen können Sie nutzen - Je nach gewählter Visualisierung erhalten Sie andere Einblicke in die Daten:<br/><br/><ul><li><strong><v-icon left> mdi-chart-line</v-icon>Zeitverlauf</strong><br/> Der Zeitverlauf erlaubt eine sehr übersichtliche Darstellung aller Daten. Mehrere hintereinader gestellte Abfragen werden parallel visualisiert. Dadurch lassen sich mehrere Abfragen im Zeitverlauf vergleichen. Nutzen Sie die interaktiven Möglichkeiten (z. B. Zeitabschnitt wählen - unterhalb der Grafik). </li><li><strong><v-icon left> mdi-calendar-multiselect</v-icon>Kalenderansicht</strong><br/> Die Kalenderansicht bildet eine Summe alle Abfragen für den ausgewählten Zeitabschnitt (Granulierung). Dadurch lassen sich 'Peeks' zu bestimmten Tagen besser optisch erfassen. Nutzen Sie den Schieberegler, um die Daten einzugrenzen - z. B. um HOT/COLD-Spots zu identifizieren. </li><li><strong><v-icon left> mdi-view-dashboard-variant</v-icon>Sankey-Varianten</strong><br/> Die Sankey-Variante eignet sich insbesondere dann, wenn Sie an der Identifikation von Sprachgebrauchsmustern interessiert sind. Je größer Knoten/Kanten dargestellt werden, desto häufiger ist das entsprechende Token (=Knoten - an der Position) bzw. der entsprechende Übergang (=Kanten - Relation zwischen zwei Token/Knoten). </li></ul><br/><i>Hinweis:</i> Alle Visualisierungen sind interaktiv. Bewegen Sie die Maus über interessante Stellen in der Grafik, um Detailinformationen anzuzeigen."
+}
