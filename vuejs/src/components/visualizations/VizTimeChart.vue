@@ -1,6 +1,6 @@
 <template>
   <div
-    id="timechart"
+    ref="timechart"
     style="width: 110%; height: 68vh; margin:0px 0px 0px 0px"
   ></div>
 </template>
@@ -8,26 +8,14 @@
 <script>
 import * as echarts from "echarts";
 
+var component;
+
 export default {
   name: "VizTimeChart",
   theme: { dark: false },
-  data() {
-    return {
-      component: null,
-    };
-  },
   mounted() {
     // VizTimeChart is the first Visualization, so the component must me initialized in mounted (otherwise in created > $store.watch)
-    var component = document.getElementById("timechart");
-    if (component != null) {
-      try {
-        this.$data.component = echarts.init(component, null, {
-          renderer: "canvas",
-        });
-      } catch {
-        // ignore
-      }
-    }
+    component = echarts.init(this.$refs.timechart, null, { renderer: "canvas" });
 
     // init the Viewport - usefull for other visualizations
     this.$store.commit("updateViewport", {
@@ -121,7 +109,9 @@ export default {
             },
           },
         };
-        this.$data.component.setOption(myChartOption);
+
+        component.clear();
+        component.setOption(myChartOption);
       },
       {
         deep: true,
