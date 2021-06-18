@@ -126,6 +126,7 @@ export default {
             },
           ],
         };
+        this.$data.component.clear();
         this.$data.component.setOption(sankeyOptions);
       },
       {
