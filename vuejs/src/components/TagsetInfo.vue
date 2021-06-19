@@ -15,8 +15,7 @@
       </v-card-title>
       <v-divider></v-divider>
       <v-card-text>
-        <span v-html="$t('tagset_info')">          
-        </span>
+        <span v-html="$t('tagset_info')"> </span>
       </v-card-text>
       <v-divider></v-divider>
       <v-card-actions>

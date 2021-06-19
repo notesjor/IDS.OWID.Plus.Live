@@ -50,8 +50,7 @@
           </v-card-title>
           <v-divider></v-divider>
           <v-card-text>
-            <span v-html="$t('clipboard_help_info')">              
-            </span>
+            <span v-html="$t('clipboard_help_info')"> </span>
           </v-card-text>
           <v-divider></v-divider>
           <v-card-actions>
@@ -79,17 +78,20 @@
                 <v-list>
                   <v-list-item @click="exportLink(i)">
                     <v-list-item-title
-                      ><v-icon style="margin-right:10px">mdi-link-variant</v-icon>{{ $t("clipboard_export_link") }}</v-list-item-title
+                      ><v-icon style="margin-right:10px">mdi-link-variant</v-icon
+                      >{{ $t("clipboard_export_link") }}</v-list-item-title
                     >
                   </v-list-item>
                   <v-list-item @click="exportTsv(i)">
                     <v-list-item-title
-                      ><v-icon style="margin-right:10px">mdi-export</v-icon>{{ $t("clipboard_export_tsv") }}</v-list-item-title
+                      ><v-icon style="margin-right:10px">mdi-export</v-icon
+                      >{{ $t("clipboard_export_tsv") }}</v-list-item-title
                     >
                   </v-list-item>
                   <v-list-item @click="exportJson(i)">
                     <v-list-item-title
-                      ><v-icon style="margin-right:10px">mdi-export</v-icon>{{ $t("clipboard_export_json") }}</v-list-item-title
+                      ><v-icon style="margin-right:10px">mdi-export</v-icon
+                      >{{ $t("clipboard_export_json") }}</v-list-item-title
                     >
                   </v-list-item>
                 </v-list>
@@ -149,7 +151,9 @@
 
     <v-snackbar v-model="snackbar">
       <v-text-field label="Link" :value="snackbarLink" readonly> </v-text-field>
-      <a @click="copyToClipboard"> <v-icon>mdi-content-copy</v-icon><span style="color:white;">{{ $t("lbl_copy") }}</span> </a>
+      <a @click="copyToClipboard">
+        <v-icon>mdi-content-copy</v-icon><span style="color:white;">{{ $t("lbl_copy") }}</span>
+      </a>
 
       <template v-slot:action="{ attrs }">
         <v-btn text v-bind="attrs" @click="snackbar = false">
@@ -236,18 +240,18 @@ export default {
     };
   },
 
-  mounted: function(){
+  mounted: function() {
     this.headers = [
-        { text: this.$t('layer_wordform'), value: "w" },
-        { text: this.$t('layer_lemma'), value: "l" },
-        { text: this.$t('layer_posTag'), value: "p" },
-        { text: this.$t('clipboard_tableHeader_detectedDays'), value: "d", align: "end" },
-        { text: this.$t('clipboard_tableHeader_detectedDaysPercent'), value: "dRel", align: "end" },
-        { text: this.$t('clipboard_tableHeader_sum'), value: "s", align: "end" },
-        { text: this.$t('clipboard_tableHeader_sumRel'), value: "sRel", align: "end" },
-        { text: this.$t('clipboard_tableHeader_miniChart'), value: "spark", align: "end" },
-        { text: this.$t('clipboard_tableHeader_miniChartRel'), value: "sparkNorm" },
-      ];
+      { text: this.$t("layer_wordform"), value: "w" },
+      { text: this.$t("layer_lemma"), value: "l" },
+      { text: this.$t("layer_posTag"), value: "p" },
+      { text: this.$t("clipboard_tableHeader_detectedDays"), value: "d", align: "end" },
+      { text: this.$t("clipboard_tableHeader_detectedDaysPercent"), value: "dRel", align: "end" },
+      { text: this.$t("clipboard_tableHeader_sum"), value: "s", align: "end" },
+      { text: this.$t("clipboard_tableHeader_sumRel"), value: "sRel", align: "end" },
+      { text: this.$t("clipboard_tableHeader_miniChart"), value: "spark", align: "end" },
+      { text: this.$t("clipboard_tableHeader_miniChartRel"), value: "sparkNorm" },
+    ];
   },
 
   watch: {

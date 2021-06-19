@@ -15,7 +15,7 @@
 import * as echarts from "echarts";
 
 var monthMap = {
-  nameMap: null
+  nameMap: null,
 };
 
 var dayMap = {
@@ -44,8 +44,8 @@ export default {
       this.$t("lbl_month_short_september"),
       this.$t("lbl_month_short_october"),
       this.$t("lbl_month_short_november"),
-      this.$t("lbl_month_short_december")
-      ];
+      this.$t("lbl_month_short_december"),
+    ];
     dayMap.nameMap = [
       this.$t("lbl_weekday_short_monday"),
       this.$t("lbl_weekday_short_tuesday"),
@@ -80,7 +80,7 @@ export default {
           Object.keys(this.$store.state.vizData[sK].data).forEach((d) => {
             this.$store.state.vizData[sK].data[d].dates.forEach((i) => {
               if (i in tmp) tmp[i] += parseFloat(this.$store.state.vizData[sK].data[d].value);
-              else tmp[i] = parseFloat(this.$store.state.vizData[sK].data[d].value)
+              else tmp[i] = parseFloat(this.$store.state.vizData[sK].data[d].value);
             });
           });
         });
@@ -90,17 +90,28 @@ export default {
           res.push([k, tmp[k]]);
         });
 
-        var unit = this.$store.state.vizOptionRelative
-          ? " (pro Mio. Token)"
-          : " (Token)";
+        var unit = this.$store.state.vizOptionRelative ? this.$t("lbl_unit_tokenPPM") : this.$t("lbl_unit_token");
+
+        var calendars = [];
+        var top = 35;
+        this.$store.state.owid.AvailableYears.forEach((year) => {
+          calendars.push({
+            range: year,
+            cellSize: ["auto", 20],
+            dayLabel: dayMap,
+            monthLabel: monthMap,
+            top: top,
+          });
+          top += 175;
+        });
 
         let myCalendarOption = {
           toolbox: {
             show: true,
             feature: {
               saveAsImage: {
-                title: "Speichern \xa0 \xa0 \xa0 \xa0 \xa0",
-                name: "OWIDplusLIVE",
+                title: this.$t("lbl_save") + " \xa0 \xa0 \xa0 \xa0 \xa0",
+                name: this.$t("lbl_export_fileName"),
               },
             },
           },
@@ -129,21 +140,7 @@ export default {
               color: ["#1feaea", "#ffd200", "#f72047"],
             },
           },
-          calendar: [
-            {
-              range: "2020",
-              cellSize: ["auto", 20],
-              dayLabel: dayMap,
-              monthLabel: monthMap,
-            },
-            {
-              range: "2021",
-              cellSize: ["auto", 20],
-              dayLabel: dayMap,
-              monthLabel: monthMap,
-              top: 250,
-            },
-          ],
+          calendar: calendars,
           series: [
             {
               type: "heatmap",

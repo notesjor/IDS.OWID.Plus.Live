@@ -145,9 +145,11 @@
     <v-overlay :value="alert">
       <div class="text-center">
         <v-card>
-          <v-card-title class="headline"> {{ $t("app_dialog_serverError_message") }} {{ this.$config.appName }} </v-card-title>
+          <v-card-title class="headline">
+            {{ $t("app_dialog_serverError_message") }} {{ this.$config.appName }}
+          </v-card-title>
           <v-card-text>
-            {{ $t("app_dialog_serverError_message_info") }}             
+            {{ $t("app_dialog_serverError_message_info") }}
           </v-card-text>
         </v-card>
       </div>

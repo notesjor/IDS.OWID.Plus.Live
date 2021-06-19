@@ -98,5 +98,9 @@
   "lbl_weekday_short_friday":"Fr.",
   "lbl_weekday_short_saturday":"Sa.",
   "lbl_weekday_short_sunday":"So.",
-  "lbl_weekday_firstIndex":"1"
+  "lbl_weekday_firstIndex":"1",
+  "lbl_unit_token": "(Token)",
+  "lbl_unit_tokenPPM": "(pro Mio. Token)",
+  "lbl_export_fileName": "OWIDplusLIVE",
+  "lbl_save":"Speichern"
 }

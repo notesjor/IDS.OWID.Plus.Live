@@ -9,6 +9,7 @@ export class OwidLiveStorage {
   #NormTotal;
   #N;
   #Granulation;
+  #AvailableYears;
 
   toJSON() {
     return {
@@ -63,6 +64,11 @@ export class OwidLiveStorage {
     this.#Dates = dates.sort();
     this.#Total = total;
     this.#NormTotal = notal;
+
+    var years = new Set();
+    Object.keys(norm[0]).forEach(k=> years.add(k.substring(0,4)));
+    this.#AvailableYears = Array.from(years);
+    this.#AvailableYears.sort();
   }
 
   /**
@@ -109,6 +115,13 @@ export class OwidLiveStorage {
    */
   clearAll(){
     this.#OwidLiveSearches = {};
+  }
+
+  /**
+   * An array of all available years
+   */
+  get AvailableYears(){
+    return this.#AvailableYears;
   }
 
   /**

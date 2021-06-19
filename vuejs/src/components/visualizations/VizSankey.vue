@@ -1,21 +1,21 @@
 <template>
-<panzoom>
-  <div
-    id="sankey"
-    v-bind:style="
-      'min-width:' +
-        (this.$store.state.vizViewportWidth * 0.95)+
-        'px; min-height:' +
-        this.$store.state.vizViewportHeight +
-        'px; height: auto'
-    "
-  ></div>
-</panzoom>
+  <panzoom>
+    <div
+      id="sankey"
+      v-bind:style="
+        'min-width:' +
+          this.$store.state.vizViewportWidth * 0.95 +
+          'px; min-height:' +
+          this.$store.state.vizViewportHeight +
+          'px; height: auto'
+      "
+    ></div>
+  </panzoom>
 </template>
 
 <script>
-import * as echarts from 'echarts';
-import * as panzoom from 'panzoom';
+import * as echarts from "echarts";
+import * as panzoom from "panzoom";
 
 export default {
   name: "VizSankey",
@@ -38,7 +38,7 @@ export default {
           try {
             this.$data.component = echarts.init(component, "shine", {
               renderer: "svg",
-            });            
+            });
           } catch {
             // ignore
           }
@@ -67,8 +67,7 @@ export default {
               tnodes.add(ntk);
               n++;
 
-              if (last != null)
-                links.push({ source: last, target: ntk, value: sum });
+              if (last != null) links.push({ source: last, target: ntk, value: sum });
 
               last = ntk;
             });
@@ -81,16 +80,16 @@ export default {
           nodes.push({ name: nt.substring(1), id: nt });
         });
 
-        var unit = this.$store.state.vizOptionRelative ? " (pro Mio. Token)" : " (Token)";
+        var unit = this.$store.state.vizOptionRelative ? this.$t("lbl_unit_tokenPPM") : this.$t("lbl_unit_token");
 
         var sankeyOptions = {
           toolbox: {
             show: true,
             feature: {
               saveAsImage: {
-                title: "Speichern \xa0 \xa0 \xa0 \xa0 \xa0",
-                name: "OWIDplusLIVE"
-              }
+                title: this.$t("lbl_save") + " \xa0 \xa0 \xa0 \xa0 \xa0",
+                name: this.$t("lbl_export_fileName"),
+              },
             },
           },
           animation: false,
@@ -99,10 +98,14 @@ export default {
             triggerOn: "mousemove",
             formatter: function(params) {
               return (
-                (params.data.source === "START >>>"
-                  ? ""
-                  : params.data.source.substring(1)) +
-                " --" + params.data.value.toFixed(3).replace(",", "'").replace(".", ",")  + unit+ "-> " +
+                (params.data.source === "START >>>" ? "" : params.data.source.substring(1)) +
+                " --" +
+                params.data.value
+                  .toFixed(3)
+                  .replace(",", "'")
+                  .replace(".", ",") +
+                unit +
+                "-> " +
                 params.data.target.substring(1)
               );
             },

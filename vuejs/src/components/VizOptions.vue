@@ -20,7 +20,8 @@
           <v-divider></v-divider>
           <v-card-text>
             <span>
-              {{ $t("vizOptions_help_info") }}<br/> <br/>
+              {{ $t("vizOptions_help_info") }}<br />
+              <br />
               <ul>
                 <li>
                   <strong>{{ $t("vizOption_name_frequency") }}</strong>
@@ -61,7 +62,9 @@
       </v-row>
       <v-row>
         <v-col class="d-flex justify-left">
-          <label for="granulation" class="v-label theme--light" style="margin-top:-20px">{{ $t("vizOption_name_granulation") }}:</label>
+          <label for="granulation" class="v-label theme--light" style="margin-top:-20px"
+            >{{ $t("vizOption_name_granulation") }}:</label
+          >
           <v-slider
             id="granulation"
             v-model="granulationValue"
@@ -74,7 +77,9 @@
           ></v-slider>
         </v-col>
         <v-col class="d-flex justify-left">
-          <label for="smooth" class="v-label theme--light" style="margin-top:-20px">{{ $t("vizOption_name_smoothing") }}:</label>
+          <label for="smooth" class="v-label theme--light" style="margin-top:-20px"
+            >{{ $t("vizOption_name_smoothing") }}:</label
+          >
           <v-slider
             id="smooth"
             v-model="smoothValue"
@@ -236,8 +241,14 @@ function commit() {
 
 export default {
   name: "VizOptions",
-  created: function(){
-    this.granulationLabels = [this.$t('granulation_lbl_day'), this.$t('granulation_lbl_week'), this.$t('granulation_lbl_month'),this.$t('granulation_lbl_quarter'),this.$t('granulation_lbl_year')];
+  created: function() {
+    this.granulationLabels = [
+      this.$t("granulation_lbl_day"),
+      this.$t("granulation_lbl_week"),
+      this.$t("granulation_lbl_month"),
+      this.$t("granulation_lbl_quarter"),
+      this.$t("granulation_lbl_year"),
+    ];
   },
   data: () => {
     return {

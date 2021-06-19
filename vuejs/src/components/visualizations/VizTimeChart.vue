@@ -67,9 +67,7 @@ export default {
           });
         }
         
-        var unit = this.$store.state.vizOptionRelative
-          ? " (pro Mio. Token)"
-          : " (Token)";
+        var unit = this.$store.state.vizOptionRelative ? this.$t("lbl_unit_tokenPPM") : this.$t("lbl_unit_token");
 
         let myChartOption = {
           toolbox: {
@@ -78,8 +76,8 @@ export default {
             right: "10%",
             feature: {
               saveAsImage: {
-                title: "Speichern \xa0 \xa0 \xa0 \xa0 \xa0",
-                name: "OWIDplusLIVE"
+                title: this.$t("lbl_save") + " \xa0 \xa0 \xa0 \xa0 \xa0",
+                name: this.$t("lbl_export_fileName"),
               },
             },
           },
