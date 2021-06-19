@@ -15,25 +15,12 @@
 import * as echarts from "echarts";
 
 var monthMap = {
-  nameMap: [
-    "JAN",
-    "FEB",
-    "MÄR",
-    "APR",
-    "MAI",
-    "JUN",
-    "JUL",
-    "AUG",
-    "SEP",
-    "OKT",
-    "NOV",
-    "DEZ",
-  ],
+  nameMap: null
 };
 
 var dayMap = {
   firstDay: 1,
-  nameMap: ["So.", "Mo.", "Di.", "Mi.", "Do.", "Fr.", "Sa."],
+  nameMap: null,
 };
 
 export default {
@@ -45,6 +32,31 @@ export default {
     };
   },
   created() {
+    monthMap.nameMap = [
+      this.$t("lbl_month_short_january"),
+      this.$t("lbl_month_short_february"),
+      this.$t("lbl_month_short_march"),
+      this.$t("lbl_month_short_april"),
+      this.$t("lbl_month_short_may"),
+      this.$t("lbl_month_short_june"),
+      this.$t("lbl_month_short_july"),
+      this.$t("lbl_month_short_august"),
+      this.$t("lbl_month_short_september"),
+      this.$t("lbl_month_short_october"),
+      this.$t("lbl_month_short_november"),
+      this.$t("lbl_month_short_december")
+      ];
+    dayMap.nameMap = [
+      this.$t("lbl_weekday_short_monday"),
+      this.$t("lbl_weekday_short_tuesday"),
+      this.$t("lbl_weekday_short_wednesday"),
+      this.$t("lbl_weekday_short_thursday"),
+      this.$t("lbl_weekday_short_friday"),
+      this.$t("lbl_weekday_short_saturday"),
+      this.$t("lbl_weekday_short_sunday"),
+    ];
+    dayMap.firstDay = parseInt(this.$t("lbl_weekday_firstIndex"));
+
     this.$store.watch(
       () => {
         return this.$store.state.version;
