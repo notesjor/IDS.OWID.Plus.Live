@@ -8,7 +8,7 @@
               <div v-bind="attrs" v-on="on" style="float:right; display:block;">
                 <div style="display:block; float:left">
                   <v-icon @click="stopClickSimple" left>mdi-magnify</v-icon>
-                  <span @click="stopClickSimple">SUCHEN: Einfache Suche</span>
+                  <span @click="stopClickSimple">{{ $t("search_simple_head") }}</span>
                   <sup>
                     <v-icon left small style="margin-left:5px">
                       mdi-information-outline
@@ -20,39 +20,17 @@
             </template>
             <v-card>
               <v-card-title class="headline grey lighten-2">
-                HILFE: Einfache Suche
+                {{ $t("search_simple_help_head") }}
               </v-card-title>
               <v-divider></v-divider>
               <v-card-text>
-                <span>
-                  Die "Einfache Suche" nach N-Grammen umfasst folgende Funktionalitäten:<br/> <br/>
-                  <ul>
-                    <li>
-                      <strong>Unterschiedliche N-Gramm-Längen von 1-3</strong>
-                      <br />
-                      z. B. N=1: Virus, N=2: zweite Welle, N=3: Bundeskanzlerin Angela Merkel
-                    </li>
-                    <li>
-                      <strong>Suche nach Grammen</strong> <br />
-                      z. B. bayer (exakte Suche), bayer* (Prefix - z. B. bayern), *bayer (Suffix - z. B. nordbayer)
-                      <br />
-                      oder *bayer* (beliebige Position - z. B. nordbayern)
-                    </li>
-                    <li>
-                      <strong>Verschiedene Annotationsebenen</strong> <br />
-                      Wortform, Lemma oder POS (Part-of-Speech &rarr; Wortart).<br />
-                      Bsp.: 2-Gram: ADJ* Merkel, 3-Gram: ART unglaublich NN
-                    </li>
-                  </ul>
-                  <br/>
-                  <i>Hinweis:</i> Abfragen und Ergebnisse werden immer zur Kleinschreibung reduziert.
-                </span>
+                <span v-html="$t('search_simple_help_info')"> </span>
               </v-card-text>
               <v-divider></v-divider>
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="primary" text @click="dialog_helpSearchSimple = false">
-                  Fenster schließen
+                  {{ $t("lbl_closeWindow") }}
                 </v-btn>
               </v-card-actions>
             </v-card>
@@ -61,7 +39,7 @@
         <v-expansion-panel-content>
           <v-row>
             <v-col>
-              <h5>Suchfenstergröße:</h5>
+              <h5>{{ $t("Suchfenstergröße") }}:</h5>
               <v-tabs>
                 <v-tab @click="search_simple_n_change(1)">
                   <span>N=1</span>
@@ -77,7 +55,7 @@
                   <v-card flat>
                     <v-row>
                       <v-col style="padding:0px; margin: 40px 0 -20px 15px">
-                        <h5>Suchabfrage:</h5>
+                        <h5>{{ $t("search_lbl_query") }}:</h5>
                       </v-col>
                     </v-row>
                     <v-row>
@@ -86,14 +64,14 @@
                           persistent-hint
                           :items="layer"
                           v-model="search_simple_1_layer"
-                          label="Layer"
+                          :label="$t('lbl_layer')"
                           style="display:block-inline;"
                         ></v-overflow-btn>
                         <TagsetInfo v-if="search_simple_1_layer === 'POS'" />
                       </v-col>
                       <v-col cols="9" style="margin-top:7px">
                         <v-text-field
-                          label="Suchausdruck (einzelnes Token)..."
+                          :label="$t('search_lbl_queryExpression') + ' (' + $t('search_simple_singleToken') + ')'"
                           v-model="search_simple_1_value"
                           :rules="inputRules"
                           @keydown.enter="search_simple"
@@ -103,7 +81,7 @@
                     <v-row>
                       <v-col style="padding:0px; margin: -20px 0 15px 15px;">
                         <div>
-                          <h5>Beispiele:</h5>
+                          <h5>{{ $t("lbl_samples") }}:</h5>
                           <div class="sampleSection">
                             <ul>
                               <li v-for="item in this.$config.sample_simple_1" :key="item.label">
@@ -128,7 +106,7 @@
                   <v-card flat>
                     <v-row>
                       <v-col style="padding:0px; margin: 40px 0 -20px 15px">
-                        <h5>Suchabfrage:</h5>
+                        <h5>{{ $t("search_lbl_query") }}:</h5>
                       </v-col>
                     </v-row>
                     <v-row>
@@ -137,13 +115,13 @@
                           persistent-hint
                           :items="layer"
                           v-model="search_simple_1_layer"
-                          label="Layer"
+                          :label="$t('lbl_layer')"
                         ></v-overflow-btn>
                         <TagsetInfo v-if="search_simple_1_layer === 'POS'" />
                       </v-col>
                       <v-col cols="4">
                         <v-text-field
-                          label="Suchausdruck (an 1. Postion)..."
+                          :label="$t('search_lbl_queryExpressionPosition', { pos: 1 })"
                           v-model="search_simple_1_value"
                           :rules="inputRules"
                           @keydown.enter="search_simple"
@@ -154,13 +132,13 @@
                           persistent-hint
                           :items="layer"
                           v-model="search_simple_2_layer"
-                          label="Layer"
+                          :label="$t('lbl_layer')"
                         ></v-overflow-btn>
                         <TagsetInfo v-if="search_simple_2_layer === 'POS'" />
                       </v-col>
                       <v-col cols="4">
                         <v-text-field
-                          label="Suchausdruck (an 2. Postion)..."
+                          :label="$t('search_lbl_queryExpressionPosition', { pos: 2 })"
                           v-model="search_simple_2_value"
                           :rules="inputRules"
                           @keydown.enter="search_simple"
@@ -171,7 +149,7 @@
                     <v-row>
                       <v-col style="padding:0px; margin: -20px 0 15px 15px;">
                         <div>
-                          <h5>Beispiele:</h5>
+                          <h5>{{ $t("lbl_samples") }}:</h5>
                           <div class="sampleSection">
                             <ul>
                               <li v-for="item in this.$config.sample_simple_2" :key="item.label">
@@ -197,7 +175,7 @@
                   <v-card flat>
                     <v-row>
                       <v-col style="padding:0px; margin: 40px 0 -20px 15px">
-                        <h5>Suchabfrage:</h5>
+                        <h5>{{ $t("search_lbl_query") }}:</h5>
                       </v-col>
                     </v-row>
                     <v-row cols="27">
@@ -206,13 +184,13 @@
                           persistent-hint
                           :items="layer"
                           v-model="search_simple_1_layer"
-                          label="Layer"
+                          :label="$t('lbl_layer')"
                         ></v-overflow-btn>
                         <TagsetInfo v-if="search_simple_1_layer === 'POS'" />
                       </v-col>
                       <v-col cols="2">
                         <v-text-field
-                          label="Suchausdruck (an 1. Postion)..."
+                          :label="$t('search_lbl_queryExpressionPosition', { pos: 1 })"
                           v-model="search_simple_1_value"
                           :rules="inputRules"
                           @keydown.enter="search_simple"
@@ -223,13 +201,13 @@
                           persistent-hint
                           :items="layer"
                           v-model="search_simple_2_layer"
-                          label="Layer"
+                          :label="$t('lbl_layer')"
                         ></v-overflow-btn>
                         <TagsetInfo v-if="search_simple_2_layer === 'POS'" />
                       </v-col>
                       <v-col cols="2">
                         <v-text-field
-                          label="Suchausdruck (an 2. Postion)..."
+                          :label="$t('search_lbl_queryExpressionPosition', { pos: 2 })"
                           v-model="search_simple_2_value"
                           :rules="inputRules"
                           @keydown.enter="search_simple"
@@ -240,13 +218,13 @@
                           persistent-hint
                           :items="layer"
                           v-model="search_simple_3_layer"
-                          label="Layer"
+                          :label="$t('lbl_layer')"
                         ></v-overflow-btn>
                         <TagsetInfo v-if="search_simple_3_layer === 'POS'" />
                       </v-col>
                       <v-col cols="2">
                         <v-text-field
-                          label="Suchausdruck (an 3. Postion)..."
+                          :label="$t('search_lbl_queryExpressionPosition', { pos: 3 })"
                           v-model="search_simple_3_value"
                           :rules="inputRules"
                           @keydown.enter="search_simple"
@@ -257,7 +235,7 @@
                     <v-row>
                       <v-col style="padding:0px; margin: -20px 0 15px 15px;">
                         <div>
-                          <h5>Beispiele:</h5>
+                          <h5>{{ $t("lbl_samples") }}:</h5>
                           <div class="sampleSection">
                             <ul>
                               <li v-for="item in this.$config.sample_simple_3" :key="item.label">
@@ -286,13 +264,13 @@
           <v-row>
             <v-col cols="5">
               <v-btn block @click="delete_simple">
-                <v-icon style="color:#c00">mdi-delete-circle-outline</v-icon>Alle Eingaben löschen</v-btn
+                <v-icon style="color:#c00">mdi-delete-circle-outline</v-icon>{{ $t("search_btn_delete") }}</v-btn
               >
             </v-col>
             <v-col cols="2"> </v-col>
             <v-col cols="5">
               <v-btn block @click="search_simple">
-                <v-icon style="color:#1976d2">mdi-magnify</v-icon>Suche ausführen
+                <v-icon style="color:#1976d2">mdi-magnify</v-icon>{{ $t("search_btn_start") }}
               </v-btn>
             </v-col>
           </v-row>
@@ -305,7 +283,7 @@
               <div v-bind="attrs" v-on="on" style="float:right; display:block;">
                 <div style="float:left; display:block;">
                   <v-icon @click="stopClickComplex" left>mdi-magnify</v-icon>
-                  <span @click="stopClickComplex">SUCHEN: Erweiterte Tiefen-Suche</span>
+                  <span @click="stopClickComplex">{{ $t("search_complex_head") }}</span>
                   <a @click="dialog = true">
                     <sup>
                       <v-icon left small style="margin-left:5px">
@@ -319,31 +297,17 @@
             </template>
             <v-card>
               <v-card-title class="headline grey lighten-2">
-                HILFE: Erweiterte Tiefen-Suche
+                {{ $t("search_complex_help_head") }}
               </v-card-title>
               <v-divider></v-divider>
               <v-card-text>
-                <span>
-                  Die "Erweiterte Tiefen-Suche" bietet folgende Zusatzfunktionalität<br />(Basis-Funktionen siehe:
-                  "Einfache Suche"):<br/> <br/>
-                  <ul>
-                    <li>
-                      <strong>Gleichzeitige Suche auf mehreren Annotationsebenen</strong>
-                      <br />
-                      Wortform und/oder Lemma und/oder POS (Part-of-Speech &rarr; Wortart).<br />
-                      Bsp. 1.: 1-Gram: 1. Lemma = gut* &amp; 1. POS = ADJ*<br />
-                      Bsp. 2.: 2-Gram: 1. Lemma = gefährlich &amp; 2. Lemma = Virus &amp; 2. POS = NN
-                    </li>
-                  </ul>
-                  <br/>
-                  <i>Hinweis:</i> Abfragen und Ergebnisse werden immer zur Kleinschreibung reduziert.
-                </span>
+                <span v-html="$t('search_complex_help_info')"> </span>
               </v-card-text>
               <v-divider></v-divider>
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="primary" text @click="dialog_helpSearchComplex = false">
-                  Fenster schließen
+                  {{ $t("lbl_closeWindow") }}
                 </v-btn>
               </v-card-actions>
             </v-card>
@@ -353,7 +317,7 @@
           <v-row>
             <v-col>
               <div>
-                <h5>Suchfenstergröße:</h5>
+                <h5>{{ $t("search_lbl_windowSize") }}:</h5>
               </div>
               <v-tabs>
                 <v-tab @click="search_complex_n_change(1)">
@@ -370,13 +334,13 @@
                   <v-card flat>
                     <v-row>
                       <v-col style="padding:0px; margin: 40px 0 -20px 15px">
-                        <h5>Suchabfrage:</h5>
+                        <h5>{{ $t("search_lbl_query") }}:</h5>
                       </v-col>
                     </v-row>
                     <v-row>
                       <v-col>
                         <p style="text-align:center">
-                          (1. Position)
+                          {{ $t("search_lbl_Position", { pos: 1 }) }}
                         </p>
                       </v-col>
                     </v-row>
@@ -415,7 +379,7 @@
                     <v-row>
                       <v-col style="padding:0px; margin: -20px 0 15px 15px;">
                         <div>
-                          <h5>Beispiele:</h5>
+                          <h5>{{ $t("lbl_samples") }}:</h5>
                           <div class="sampleSection">
                             <ul>
                               <li v-for="item in this.$config.sample_complex_1" :key="item.label">
@@ -438,25 +402,25 @@
                   <v-card flat>
                     <v-row>
                       <v-col style="padding:0px; margin: 40px 0 -20px 15px">
-                        <h5>Suchabfrage:</h5>
+                        <h5>{{ $t("search_lbl_query") }}:</h5>
                       </v-col>
                     </v-row>
                     <v-row>
                       <v-col>
                         <p style="text-align:center">
-                          (1. Position)
+                          {{ $t("search_lbl_Position", { pos: 1 }) }}
                         </p>
                       </v-col>
                       <v-col>
                         <p style="text-align:center">
-                          (2. Position)
+                          {{ $t("search_lbl_Position", { pos: 2 }) }}
                         </p>
                       </v-col>
                     </v-row>
                     <v-row>
                       <v-col>
                         <v-text-field
-                          label="Wortform (1. Position)"
+                          :label="$t('layer_wordform') + ' ' + $t('search_lbl_Position', { pos: 1 })"
                           v-model="search_complex_2_1_w"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
@@ -464,7 +428,7 @@
                       </v-col>
                       <v-col>
                         <v-text-field
-                          label="Wortform (2. Position)"
+                          :label="$t('layer_wordform') + ' ' + $t('search_lbl_Position', { pos: 2 })"
                           v-model="search_complex_2_2_w"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
@@ -474,7 +438,7 @@
                     <v-row>
                       <v-col>
                         <v-text-field
-                          label="Lemma (1. Position)"
+                          :label="$t('layer_lemma') + ' ' + $t('search_lbl_Position', { pos: 1 })"
                           v-model="search_complex_2_1_l"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
@@ -482,7 +446,7 @@
                       </v-col>
                       <v-col>
                         <v-text-field
-                          label="Lemma (2. Position)"
+                          :label="$t('layer_lemma') + ' ' + $t('search_lbl_Position', { pos: 2 })"
                           v-model="search_complex_2_2_l"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
@@ -492,7 +456,7 @@
                     <v-row>
                       <v-col>
                         <v-text-field
-                          label="POS-Tag (1. Position)"
+                          :label="$t('layer_posTag') + ' ' + $t('search_lbl_Position', { pos: 1 })"
                           v-model="search_complex_2_1_p"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
@@ -501,7 +465,7 @@
                       </v-col>
                       <v-col>
                         <v-text-field
-                          label="POS-Tag (2. Position)"
+                          :label="$t('layer_posTag') + ' ' + $t('search_lbl_Position', { pos: 2 })"
                           v-model="search_complex_2_2_p"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
@@ -512,7 +476,7 @@
                     <v-row>
                       <v-col style="padding:0px; margin: -20px 0 15px 15px;">
                         <div>
-                          <h5>Beispiele:</h5>
+                          <h5>{{ $t("lbl_samples") }}:</h5>
                           <div class="sampleSection">
                             <ul>
                               <li v-for="item in this.$config.sample_complex_2" :key="item.label">
@@ -535,30 +499,30 @@
                   <v-card flat>
                     <v-row>
                       <v-col style="padding:0px; margin: 40px 0 -20px 15px">
-                        <h5>Suchabfrage:</h5>
+                        <h5>{{ $t("search_lbl_query") }}:</h5>
                       </v-col>
                     </v-row>
                     <v-row cols="11">
                       <v-col>
                         <p style="text-align:center">
-                          (1. Position)
+                          {{ $t("search_lbl_Position", { pos: 1 }) }}
                         </p>
                       </v-col>
                       <v-col>
                         <p style="text-align:center">
-                          (2. Position)
+                          {{ $t("search_lbl_Position", { pos: 2 }) }}
                         </p>
                       </v-col>
                       <v-col>
                         <p style="text-align:center">
-                          (3. Position)
+                          {{ $t("search_lbl_Position", { pos: 3 }) }}
                         </p>
                       </v-col>
                     </v-row>
                     <v-row cols="11">
                       <v-col>
                         <v-text-field
-                          label="Wortform (1. Position)"
+                          :label="$t('layer_wordform') + ' ' + $t('search_lbl_Position', { pos: 1 })"
                           v-model="search_complex_3_1_w"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
@@ -566,7 +530,7 @@
                       </v-col>
                       <v-col>
                         <v-text-field
-                          label="Wortform (2. Position)"
+                          :label="$t('layer_wordform') + ' ' + $t('search_lbl_Position', { pos: 2 })"
                           v-model="search_complex_3_2_w"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
@@ -574,7 +538,7 @@
                       </v-col>
                       <v-col>
                         <v-text-field
-                          label="Wortform (3. Position)"
+                          :label="$t('layer_wordform') + ' ' + $t('search_lbl_Position', { pos: 3 })"
                           v-model="search_complex_3_3_w"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
@@ -584,7 +548,7 @@
                     <v-row>
                       <v-col>
                         <v-text-field
-                          label="Lemma (1. Position)"
+                          :label="$t('layer_lemma') + ' ' + $t('search_lbl_Position', { pos: 1 })"
                           v-model="search_complex_3_1_l"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
@@ -592,7 +556,7 @@
                       </v-col>
                       <v-col>
                         <v-text-field
-                          label="Lemma (2. Position)"
+                          :label="$t('layer_lemma') + ' ' + $t('search_lbl_Position', { pos: 2 })"
                           v-model="search_complex_3_2_l"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
@@ -600,7 +564,7 @@
                       </v-col>
                       <v-col>
                         <v-text-field
-                          label="Lemma (3. Position)"
+                          :label="$t('layer_lemma') + ' ' + $t('search_lbl_Position', { pos: 3 })"
                           v-model="search_complex_3_3_l"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
@@ -610,7 +574,7 @@
                     <v-row>
                       <v-col>
                         <v-text-field
-                          label="POS-Tag (1. Position)"
+                          :label="$t('layer_posTag') + ' ' + $t('search_lbl_Position', { pos: 1 })"
                           v-model="search_complex_3_1_p"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
@@ -619,7 +583,7 @@
                       </v-col>
                       <v-col>
                         <v-text-field
-                          label="POS-Tag (2. Position)"
+                          :label="$t('layer_posTag') + ' ' + $t('search_lbl_Position', { pos: 2 })"
                           v-model="search_complex_3_2_p"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
@@ -628,7 +592,7 @@
                       </v-col>
                       <v-col>
                         <v-text-field
-                          label="POS-Tag (3. Position)"
+                          :label="$t('layer_posTag') + ' ' + $t('search_lbl_Position', { pos: 3 })"
                           v-model="search_complex_3_3_p"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
@@ -640,7 +604,7 @@
                     <v-row>
                       <v-col style="padding:0px; margin: -20px 0 15px 15px;">
                         <div>
-                          <h5>Beispiele:</h5>
+                          <h5>{{ $t("lbl_samples") }}:</h5>
                           <div class="sampleSection">
                             <ul>
                               <li v-for="item in this.$config.sample_complex_3" :key="item.label">
@@ -665,13 +629,13 @@
           <v-row>
             <v-col cols="5">
               <v-btn block @click="delete_complex">
-                <v-icon style="color:#c00">mdi-delete-circle-outline</v-icon>Alle Eingaben löschen</v-btn
+                <v-icon style="color:#c00">mdi-delete-circle-outline</v-icon>{{ $t("search_btn_delete") }}</v-btn
               >
             </v-col>
             <v-col cols="2"> </v-col>
             <v-col cols="5">
               <v-btn block @click="search_complex">
-                <v-icon style="color:#1976d2">mdi-magnify</v-icon>Suche ausführen</v-btn
+                <v-icon style="color:#1976d2">mdi-magnify</v-icon>{{ $t("search_btn_start") }}</v-btn
               >
             </v-col>
           </v-row>
@@ -682,9 +646,9 @@
     <v-overlay :value="progressWait">
       <div class="text-center">
         <v-progress-circular indeterminate size="64"></v-progress-circular>
-        <h3>Bitte warten...</h3>
+        <h3>{{ $t("lbl_wait") }}</h3>
         <h4>{{ progressMsg }}</h4>
-        <v-btn @click="abortProgress">Abbrechen</v-btn>
+        <v-btn @click="abortProgress">{{ $t("lbl_abort") }}</v-btn>
       </div>
     </v-overlay>
 
@@ -693,7 +657,7 @@
 
       <template v-slot:action="{ attrs }">
         <v-btn text v-bind="attrs" @click="snackbar = false">
-          Ok
+          {{ $t("lbl_ok") }}
         </v-btn>
       </template>
     </v-snackbar>
@@ -853,6 +817,7 @@ async function sendSearchRequest(data, store, n, queryItems) {
     });
 }
 
+var globalT;
 export default {
   name: "Search",
   components: {
@@ -864,10 +829,10 @@ export default {
       dialog_helpSearchComplex: false,
       expensionPanelOpen: 0,
 
-      layer: global_layers,
-      search_simple_1_layer: "Wortform",
-      search_simple_2_layer: "Wortform",
-      search_simple_3_layer: "Wortform",
+      layer: null,
+      search_simple_1_layer: "",
+      search_simple_2_layer: "",
+      search_simple_3_layer: "",
       search_simple_1_value: "",
       search_simple_2_value: "",
       search_simple_3_value: "",
@@ -904,27 +869,31 @@ export default {
       inputRules: [
         function(v) {
           if (v === undefined) return true;
-          return (
-            (v.toString().match("\\s") || []).length < 1 ||
-            "Pro Suchfeld ist nur ein Token erlaubt. Wenn Sie nach N-Grammen suchen möchten, erhöhen Sie die Suchfenstergröße - z. B. auf N=2 oder N=3 (siehe oben)"
-          );
+          console.log(globalT);
+          return (v.toString().match("\\s") || []).length < 1 || globalT.$t("search_ruleError_01");
         },
         function(v) {
           if (v === undefined) return true;
-          return (v.toString().match("[\\*]") || []).length < 3 || "Pro Suchfeld können Sie maximal zwei * verwenden.";
+          return (v.toString().match("[\\*]") || []).length < 3 || globalT.$t("search_ruleError_02");
         },
         function(v) {
           if (v === undefined) return true;
-          return (
-            (v.toString().match("\\.\\*") || []).length < 1 ||
-            "Bitte verwenden Sie anstelle von '.*' nur '*' - OWIDplusLIVE unterstützt nur einfache Abfragen."
-          );
+          return (v.toString().match("\\.\\*") || []).length < 1 || globalT.$t("search_ruleError_03");
         },
       ],
     };
   },
   mounted: function() {
     config = this.$config;
+
+    this.search_simple_1_layer = this.$t("layer_wordform");
+    this.search_simple_2_layer = this.$t("layer_wordform");
+    this.search_simple_3_layer = this.$t("layer_wordform");
+
+    global_layers = [this.$t("layer_wordform"), this.$t("layer_lemma"), this.$t("layer_pos")];
+    this.layer = global_layers;
+
+    globalT = this;
   },
   methods: {
     delete_simple: function() {
@@ -1069,7 +1038,7 @@ export default {
       sendSearchRequest(this.$data, this.$store, this.$data.search_complex_n, queryItems);
     },
     validate_notEmpty: function(value) {
-      return value === "" || value == "*" ? "Das Feld darf nicht leer sein." : true;
+      return value === "" || value == "*" ? this.$t("search_error_notEmpty") : true;
     },
   },
 };

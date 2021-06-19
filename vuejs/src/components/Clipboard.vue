@@ -6,9 +6,7 @@
           <div v-bind="attrs" v-on="on" style="width:100%">
             <div style="display:block; float:left">
               <v-icon>mdi-compare-horizontal</v-icon>
-              <span style="margin-left:10px; font-size:15px"
-                >SUCHVERLAUF: Vorangeganenen Suchen vergleichen &amp; verfeinern</span
-              >
+              <span style="margin-left:10px; font-size:15px">{{ $t("clipboard_head") }}</span>
               <sup>
                 <v-icon left small style="margin-left:5px">
                   mdi-information-outline
@@ -24,7 +22,7 @@
                     </div>
                   </template>
                   <span>
-                    Vollständigen Suchverlauf speichern
+                    {{ $t("clipboard_btn_save") }}
                   </span>
                 </v-tooltip>
               </div>
@@ -36,7 +34,7 @@
                     </div>
                   </template>
                   <span>
-                    Bestehenden Suchverlauf laden
+                    {{ $t("clipboard_btn_load") }}
                   </span>
                 </v-tooltip>
               </div>
@@ -48,48 +46,18 @@
         </template>
         <v-card>
           <v-card-title class="headline grey lighten-2">
-            HILFE: Vorangeganenen Suchen vergleichen &amp; verfeinern
+            {{ $t("clipboard_help_head") }}
           </v-card-title>
           <v-divider></v-divider>
           <v-card-text>
-            <span>
-              Im Abschnitt 'Vorangeganenen Suchen vergleichen &amp; verfeinern' haben Sie folgende Möglichkeiten:<br/> <br/>
-              <ul>                
-                <li>
-                  <strong>Suchen vergleichen</strong> <br />
-                  Wenn Sie mehrere Suchanfragen hintereinander ausführen, werden die Ergebnisse hier archiviert und im Detail angezeigt.                  
-                </li>
-                <li>
-                  <strong>Detailansicht und Suchen verfeinern</strong> <br />
-                  Die Detailansicht führt genau aus, welche Zeitreihen in einem Suchergebnis zusammengefasst wurden.
-                  Sie können einzelne Zeireihen aus- bzw. abwählen. Dadurch können Sie z. B. starke Ausreißer oder ungewollte Ergebnisse filtern.                  
-                </li>
-                <li>
-                  <strong>Suchverlauf komplett speichern und laden</strong>
-                  <br />
-                  Wenn Sie mehrere Suchen speichern möchten, z. B. um sie später - für ein Seminar oder einen Artikel - wiederzuverwenden, dann können Sie die Symbole
-                  (Speichern: <v-icon @click="modelSave">mdi-content-save-outline</v-icon>) und (Laden: <v-icon @click="modelLoad">mdi-folder-outline</v-icon>) nutzen. Die Daten werden dann als
-                  JSON-Objekt auf ihrer Festplatte gespeichert. Dadurch können Sie die Daten auch noch nachträglich modifizieren - z. B. eine andere Glättung oder Granulierung wählen.
-                  Außerdem können Sie die JSON-Datei weitergeben (z. B. mit einer Seminar-Gruppe teilen).
-                </li>
-                <li>
-                  <strong>Einzelne Suche exportieren</strong> <br />
-                  Wenn Sie auf das Dreipunkt-Menü (<v-icon>mdi-dots-vertical</v-icon>) einer einzelnen Suche klicken, können Sie diese Suche exportieren.
-                  Folgende Exportformate stehen zur Verfügung:
-                  <ul>
-                    <li><strong>Link</strong>: Es wird ein Link erzeugt, über den die Suche direkt aufgerufen werden kann (keine extra Eingabe nötig). Dies eigenen sich z. B. wenn Sie eine Suche mit anderen teilen möchten oder wenn Sie die Suche in regelmäßig Abständen wiederholen möchten.</li>
-                    <li><strong>TSV</strong>: Erzeugt eine TSV-Tabelle. Diese Tabelle kann z. B. in Excel oder einem anderen Tabellenkalkulationsprogramm geöffnet werdden.</li>
-                    <li><strong>JSON</strong>: Ein JSON-Objekt eignet sich besonders für die Weiterverarbeitung mit selbst geschriebenen Programmen und Skripten.</li>
-                  </ul>
-                </li>
-              </ul>
+            <span v-html="$t('clipboard_help_info')">              
             </span>
           </v-card-text>
           <v-divider></v-divider>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="primary" text @click="dialog_help = false">
-              Fenster schließen
+              {{ $t("lbl_closeWindow") }}
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -111,20 +79,17 @@
                 <v-list>
                   <v-list-item @click="exportLink(i)">
                     <v-list-item-title
-                      ><v-icon style="margin-right:10px">mdi-link-variant</v-icon>Link erzeugen &amp;
-                      weitergeben</v-list-item-title
+                      ><v-icon style="margin-right:10px">mdi-link-variant</v-icon>{{ $t("clipboard_export_link") }}</v-list-item-title
                     >
                   </v-list-item>
                   <v-list-item @click="exportTsv(i)">
                     <v-list-item-title
-                      ><v-icon style="margin-right:10px">mdi-export</v-icon>TSV-Tabelle (z. B. für
-                      Excel)</v-list-item-title
+                      ><v-icon style="margin-right:10px">mdi-export</v-icon>{{ $t("clipboard_export_tsv") }}</v-list-item-title
                     >
                   </v-list-item>
                   <v-list-item @click="exportJson(i)">
                     <v-list-item-title
-                      ><v-icon style="margin-right:10px">mdi-export</v-icon>JSON-Objekt (für
-                      Entwickler*innen)</v-list-item-title
+                      ><v-icon style="margin-right:10px">mdi-export</v-icon>{{ $t("clipboard_export_json") }}</v-list-item-title
                     >
                   </v-list-item>
                 </v-list>
@@ -184,11 +149,11 @@
 
     <v-snackbar v-model="snackbar">
       <v-text-field label="Link" :value="snackbarLink" readonly> </v-text-field>
-      <a @click="copyToClipboard"> <v-icon>mdi-content-copy</v-icon><span style="color:white;">Kopieren</span> </a>
+      <a @click="copyToClipboard"> <v-icon>mdi-content-copy</v-icon><span style="color:white;">{{ $t("lbl_copy") }}</span> </a>
 
       <template v-slot:action="{ attrs }">
         <v-btn text v-bind="attrs" @click="snackbar = false">
-          Ok
+          {{ $t("lbl_ok") }}
         </v-btn>
       </template>
     </v-snackbar>
@@ -260,17 +225,7 @@ export default {
       expanded: [],
       selected: [],
       search: "",
-      headers: [
-        { text: "Wortform", value: "w" },
-        { text: "Lemma", value: "l" },
-        { text: "POS-Tag", value: "p" },
-        { text: "Erfasst (Tage)", value: "d", align: "end" },
-        { text: "Erfasst (%-Tage)", value: "dRel", align: "end" },
-        { text: "Summe", value: "s", align: "end" },
-        { text: "Summe (rel.)", value: "sRel", align: "end" },
-        { text: "Frequenzkurve", value: "spark", align: "end" },
-        { text: "Frequenzkurve (rel.)", value: "sparkNorm" },
-      ],
+      headers: null,
       entries: [],
 
       syncLock: false,
@@ -279,6 +234,20 @@ export default {
       snackbar: false,
       snackbarLink: "",
     };
+  },
+
+  mounted: function(){
+    this.headers = [
+        { text: this.$t('layer_wordform'), value: "w" },
+        { text: this.$t('layer_lemma'), value: "l" },
+        { text: this.$t('layer_posTag'), value: "p" },
+        { text: this.$t('clipboard_tableHeader_detectedDays'), value: "d", align: "end" },
+        { text: this.$t('clipboard_tableHeader_detectedDaysPercent'), value: "dRel", align: "end" },
+        { text: this.$t('clipboard_tableHeader_sum'), value: "s", align: "end" },
+        { text: this.$t('clipboard_tableHeader_sumRel'), value: "sRel", align: "end" },
+        { text: this.$t('clipboard_tableHeader_miniChart'), value: "spark", align: "end" },
+        { text: this.$t('clipboard_tableHeader_miniChartRel'), value: "sparkNorm" },
+      ];
   },
 
   watch: {
