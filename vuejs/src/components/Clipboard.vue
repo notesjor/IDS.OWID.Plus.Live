@@ -50,7 +50,24 @@
           </v-card-title>
           <v-divider></v-divider>
           <v-card-text>
-            <span v-html="$t('clipboard_help_info')"> </span>
+            <span>
+              <span v-html="$t('clipboard_help_info_intro')"></span>
+              <br /><br />
+              <ul>
+                <li>                  
+                  <span v-html="$t('clipboard_help_info_compare')"></span>
+                </li>
+                <li>                  
+                  <span v-html="$t('clipboard_help_info_detail')"></span>
+                </li>
+                <li>
+                  (<v-icon>mdi-content-save-outline</v-icon> / <v-icon>mdi-folder-outline</v-icon>) <span v-html="$t('clipboard_help_info_saveLoad')"></span>
+                </li>
+                <li>
+                  (<v-icon>mdi-dots-vertical</v-icon>) <span v-html="$t('clipboard_help_info_export')"></span>
+                </li>
+              </ul>
+            </span>
           </v-card-text>
           <v-divider></v-divider>
           <v-card-actions>

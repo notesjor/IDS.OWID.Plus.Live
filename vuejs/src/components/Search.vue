@@ -39,7 +39,7 @@
         <v-expansion-panel-content>
           <v-row>
             <v-col>
-              <h5>{{ $t("Suchfenstergröße") }}:</h5>
+              <h5>{{ $t("search_lbl_windowSize") }}:</h5>
               <v-tabs>
                 <v-tab @click="search_simple_n_change(1)">
                   <span>N=1</span>
@@ -687,7 +687,7 @@
 import { mdiMagnifyPlus } from "@mdi/js";
 import TagsetInfo from "./TagsetInfo";
 
-var global_layers = ["Wortform", "Lemma", "POS"];
+var global_layers = null; // wird in mounted gesetzt
 var config;
 
 class queryItem {
@@ -722,7 +722,7 @@ class queryItem {
 
 async function sendSearchRequest(data, store, n, queryItems) {
   data.progressWait = true;
-  data.progressMsg = "Suche N-Gramme";
+  data.progressMsg = globalT.$t("search_progress_msg01");
 
   fetch(config.baseUrl + "/find", {
     method: "POST",
@@ -737,7 +737,7 @@ async function sendSearchRequest(data, store, n, queryItems) {
         return resp.ok ? resp.json() : null;
       } catch {
         data.snackbar = true;
-        data.progressError = "Keine Ergebnisse - Abfrage zu spezifisch.";
+        data.progressError = globalT.$t("search_progress_err01");
         data.progressWait = false;
         return null;
       }
@@ -745,7 +745,7 @@ async function sendSearchRequest(data, store, n, queryItems) {
     .then((searchResult) => {
       if (searchResult === null || searchResult.Items === null || searchResult.Items.length === 0) {
         data.snackbar = true;
-        data.progressError = "Keine Ergebnisse - Abfrage zu spezifisch.";
+        data.progressError = globalT.$t("search_progress_err01");
         data.progressWait = false;
         return;
       }
@@ -792,7 +792,7 @@ async function sendSearchRequest(data, store, n, queryItems) {
             }
 
             done += Object.keys(page).length;
-            data.progressMsg = `Lade Zeitreihe(n): ${done} von ${searchResult.Items.length}`;
+            data.progressMsg = globalT.$t("search_progress_msg02", { current: done, max: searchResult.Items.length });
 
             if (done === searchResult.Items.length) {
               if (!data.progressWait) {
@@ -800,7 +800,7 @@ async function sendSearchRequest(data, store, n, queryItems) {
                 return;
               }
 
-              data.progressMsg = "Visualisiere die Daten";
+              data.progressMsg = globalT.$t("search_progress_msg02");
               store.commit("search", {
                 n: n,
                 queryItems: queryItems,

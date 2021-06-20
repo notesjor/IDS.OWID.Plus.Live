@@ -251,8 +251,17 @@ export default {
       window.scrollBy(0, -100);
     },
     setLocale(locale) {
-      this.$i18n.locale = locale;
+      this.$cookie.set('locale', locale, 7);
+      location.reload();      
     },
+  },
+
+  created(){
+    var locale = this.$cookie.get('locale');
+    if(locale === null || locale.length < 2)
+      return;
+    this.$i18n.locale = locale;
+    this.$cookie.set('locale', locale, 7);
   },
 
   mounted() {

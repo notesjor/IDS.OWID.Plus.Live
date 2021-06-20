@@ -38,7 +38,7 @@
                 </li>
               </ul>
               <br />
-              <i>{{ $t("lbl_hint") }}:</i>{{ $t("vizPanel_help_additionalInfo") }}
+              <i>{{ $t("lbl_hint") }}:</i> {{ $t("vizPanel_help_additionalInfo") }}
             </span>
           </v-card-text>
           <v-divider></v-divider>
