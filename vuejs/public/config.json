@@ -1,11 +1,17 @@
 {
-    "baseUrl": "http://lexik02.ids-mannheim.de/owid-plus-live-api",
+    "baseUrl": "http://lexik02.ids-mannheim.de:19731/",
     "webUrl": "http://192.168.178.40:8080/?",
     "tutorialUrl": "http://lexik02.ids-mannheim.de:8181/owid-plus-live_video/OWIDplusLIVE_01_player.html",
     "appName": "OWIDplusLIVE",
     "leftIconHref": "https://www.owid.de/plus/index.html",
     "rightIconHref": "https://www.ids-mannheim.de/",
     "appDescription": "OWIDplusLIVE erlaubt die LIVE-Frequenzanalyse von Token und N-Grammen in ausgewählten deutschsprachigen Tageszeitungen.",
+    
+    "readme (de)":
+    "Benutzen Sie für die Beispiele (s. u.) immer die Layer-Bezeichnung Wortform, Lemma und POS. Diese werden automatisch in die UI-Sprache übersetzt.",
+    "readme (en)":
+    "For the examples (see below) always use the layer names 'Wortform' (german: Wordform), 'Lemma' and 'POS'. These 'names' are automatically translated into the selected UI language.",
+
     "sample_simple_1": 
     [
         {

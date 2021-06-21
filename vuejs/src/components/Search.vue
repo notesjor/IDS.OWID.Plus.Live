@@ -87,12 +87,12 @@
                               <li v-for="item in this.$config.sample_simple_1" :key="item.label">
                                 <a
                                   v-on:click="
-                                    sample_simple_click(item.query, [
+                                    sample_simple_click(fixSampleLanguage(item.query), [
                                       ['search_simple_1_layer', 'search_simple_1_value'],
                                     ]);
                                     search_simple();
                                   "
-                                  >{{ item.label }}</a
+                                  >{{ fixSampleLanguage(item.label) }}</a
                                 >
                               </li>
                             </ul>
@@ -155,13 +155,13 @@
                               <li v-for="item in this.$config.sample_simple_2" :key="item.label">
                                 <a
                                   v-on:click="
-                                    sample_simple_click(item.query, [
+                                    sample_simple_click(fixSampleLanguage(item.query), [
                                       ['search_simple_1_layer', 'search_simple_1_value'],
                                       ['search_simple_2_layer', 'search_simple_2_value'],
                                     ]);
                                     search_simple();
                                   "
-                                  >{{ item.label }}</a
+                                  >{{ fixSampleLanguage(item.label) }}</a
                                 >
                               </li>
                             </ul>
@@ -241,14 +241,14 @@
                               <li v-for="item in this.$config.sample_simple_3" :key="item.label">
                                 <a
                                   v-on:click="
-                                    sample_simple_click(item.query, [
+                                    sample_simple_click(fixSampleLanguage(item.query), [
                                       ['search_simple_1_layer', 'search_simple_1_value'],
                                       ['search_simple_2_layer', 'search_simple_2_value'],
                                       ['search_simple_3_layer', 'search_simple_3_value'],
                                     ]);
                                     search_simple();
                                   "
-                                  >{{ item.label }}</a
+                                  >{{ fixSampleLanguage(item.label) }}</a
                                 >
                               </li>
                             </ul>
@@ -385,10 +385,10 @@
                               <li v-for="item in this.$config.sample_complex_1" :key="item.label">
                                 <a
                                   v-on:click="
-                                    sample_complex_click(item.query, 'search_complex_1_');
+                                    sample_complex_click(fixSampleLanguage(item.query), 'search_complex_1_');
                                     search_complex();
                                   "
-                                  >{{ item.label }}</a
+                                  >{{ fixSampleLanguage(item.label) }}</a
                                 >
                               </li>
                             </ul>
@@ -482,10 +482,10 @@
                               <li v-for="item in this.$config.sample_complex_2" :key="item.label">
                                 <a
                                   v-on:click="
-                                    sample_complex_click(item.query, 'search_complex_2_');
+                                    sample_complex_click(fixSampleLanguage(item.query), 'search_complex_2_');
                                     search_complex();
                                   "
-                                  >{{ item.label }}</a
+                                  >{{ fixSampleLanguage(item.label) }}</a
                                 >
                               </li>
                             </ul>
@@ -610,10 +610,10 @@
                               <li v-for="item in this.$config.sample_complex_3" :key="item.label">
                                 <a
                                   v-on:click="
-                                    sample_complex_click(item.query, 'search_complex_3_');
+                                    sample_complex_click(fixSampleLanguage(item.query), 'search_complex_3_');
                                     search_complex();
                                   "
-                                  >{{ item.label }}</a
+                                  >{{ fixSampleLanguage(item.label) }}</a
                                 >
                               </li>
                             </ul>
@@ -931,6 +931,11 @@ export default {
     },
     abortProgress: function() {
       this.$data.progressWait = false;
+    },
+    fixSampleLanguage: function(str){
+      str = str.replace("Wortform", this.$t("layer_wordform"));
+      str = str.replace("Lemma", this.$t("layer_lemma"));
+      return str.replace("POS", this.$t("layer_pos"));  
     },
     sample_simple_click: function(queryStr, controlIds) {
       var query = JSON.parse(queryStr);
