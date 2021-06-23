@@ -1,8 +1,5 @@
 <template>
-  <div
-    id="timechart"
-    style="width: 110%; height: 68vh; margin:0px 0px 0px 0px"
-  ></div>
+  <div id="timechart" style="width: 110%; height: 68vh; margin:0px 0px 0px 0px"></div>
 </template>
 
 <script>
@@ -47,15 +44,14 @@ export default {
         var availableDates = this.$store.state.owid.Dates;
 
         var series = [];
-        
+
         for (const key in this.$store.state.vizData) {
           if (key === "ALLE") continue;
           const data = this.$store.state.vizData[key];
 
           var values = [];
           availableDates.forEach((c) => {
-            if(c in data.data)
-              values.push(data.data[c]);
+            if (c in data.data) values.push(data.data[c]);
           });
 
           series.push({
@@ -66,7 +62,7 @@ export default {
             line: { marker: { enable: false } },
           });
         }
-        
+
         var unit = this.$store.state.vizOptionRelative ? this.$t("lbl_unit_tokenPPM") : this.$t("lbl_unit_token");
 
         let myChartOption = {
@@ -91,7 +87,7 @@ export default {
           },
           yAxis: {
             type: "value",
-            scale: true
+            scale: true,
           },
           series: series,
           dataZoom: [
@@ -114,11 +110,13 @@ export default {
                   .toString()
                   .replace(",", "'")
                   .replace(".", ",") +
+                " " +
                 unit
               );
             },
           },
         };
+
         this.$data.component.clear();
         this.$data.component.setOption(myChartOption);
       },

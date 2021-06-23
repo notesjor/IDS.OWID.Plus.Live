@@ -6,6 +6,7 @@ import VueMeta from 'vue-meta'
 import i18n from './i18n'
 
 Vue.config.productionTip = false;
+Vue.config.performance = false;
 var VueCookie = require('vue-cookie');
 Vue.use(VueCookie);
 Vue.use(VueMeta);

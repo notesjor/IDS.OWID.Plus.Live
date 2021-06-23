@@ -1,5 +1,5 @@
 {
-    "baseUrl": "http://lexik02.ids-mannheim.de:19731/",
+    "baseUrl": "http://lexik02.ids-mannheim.de:19731",
     "webUrl": "http://192.168.178.40:8080/?",
     "tutorialUrl": "http://lexik02.ids-mannheim.de:8181/owid-plus-live_video/OWIDplusLIVE_01_player.html",
     "appName": "OWIDplusLIVE",

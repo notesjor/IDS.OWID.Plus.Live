@@ -5,17 +5,18 @@
         <v-expansion-panel-header class="justify-self-start">
           <v-dialog v-model="dialog_helpSearchSimple" width="600" scrollable>
             <template v-slot:activator="{ on, attrs }">
-              <div v-bind="attrs" v-on="on" style="float:right; display:block;">
-                <div style="display:block; float:left">
+              <div v-bind="attrs" v-on="on" style="float:right; display:block;" @click="stopClickSimple">
+                <div style="display:block; float:left" @click="stopClickSimple">
                   <v-icon @click="stopClickSimple" left>mdi-magnify</v-icon>
                   <span @click="stopClickSimple">{{ $t("search_simple_head") }}</span>
-                  <sup>
-                    <v-icon left small style="margin-left:5px">
-                      mdi-information-outline
-                    </v-icon>
-                  </sup>
+                  <a @click="dialog_helpSearchSimple = true">
+                    <sup>
+                      <v-icon left small style="margin-left:5px">
+                        mdi-information-outline
+                      </v-icon>
+                    </sup>
+                  </a>
                 </div>
-                <div style="display:block; width:100%; height:20px;" @click="stopClickSimple"></div>
               </div>
             </template>
             <v-card>
@@ -280,11 +281,11 @@
         <v-expansion-panel-header class="justify-self-start">
           <v-dialog v-model="dialog_helpSearchComplex" width="600" scrollable>
             <template v-slot:activator="{ on, attrs }">
-              <div v-bind="attrs" v-on="on" style="float:right; display:block;">
-                <div style="float:left; display:block;">
+              <div v-bind="attrs" v-on="on" style="float:right; display:block;" @click="stopClickComplex">
+                <div style="float:left; display:block;" @click="stopClickComplex">
                   <v-icon @click="stopClickComplex" left>mdi-magnify</v-icon>
                   <span @click="stopClickComplex">{{ $t("search_complex_head") }}</span>
-                  <a @click="dialog = true">
+                  <a @click="dialog_helpSearchComplex = true">
                     <sup>
                       <v-icon left small style="margin-left:5px">
                         mdi-information-outline
@@ -292,7 +293,6 @@
                     </sup>
                   </a>
                 </div>
-                <div style="display:block; width:100%; height:20px;" @click="stopClickComplex"></div>
               </div>
             </template>
             <v-card>
@@ -792,7 +792,7 @@ async function sendSearchRequest(data, store, n, queryItems) {
             }
 
             done += Object.keys(page).length;
-            data.progressMsg = globalT.$t("search_progress_msg02", { current: done, max: searchResult.Items.length });
+            data.progressMsg = globalT.$t("search_progress_msg02", {current: done, max: searchResult.Items.length});
 
             if (done === searchResult.Items.length) {
               if (!data.progressWait) {
@@ -800,7 +800,7 @@ async function sendSearchRequest(data, store, n, queryItems) {
                 return;
               }
 
-              data.progressMsg = globalT.$t("search_progress_msg02");
+              data.progressMsg = globalT.$t("search_progress_msg03");
               store.commit("search", {
                 n: n,
                 queryItems: queryItems,
@@ -922,20 +922,20 @@ export default {
       this.search_complex_3_3_p = "";
     },
     stopClickSimple: function(e) {
-      e.stopPropagation();
       this.expensionPanelOpen = 0;
+      e.stopPropagation();      
     },
     stopClickComplex: function(e) {
-      e.stopPropagation();
       this.expensionPanelOpen = 1;
+      e.stopPropagation();      
     },
     abortProgress: function() {
       this.$data.progressWait = false;
     },
-    fixSampleLanguage: function(str){
+    fixSampleLanguage: function(str) {
       str = str.replace("Wortform", this.$t("layer_wordform"));
       str = str.replace("Lemma", this.$t("layer_lemma"));
-      return str.replace("POS", this.$t("layer_pos"));  
+      return str.replace("POS", this.$t("layer_pos"));
     },
     sample_simple_click: function(queryStr, controlIds) {
       var query = JSON.parse(queryStr);

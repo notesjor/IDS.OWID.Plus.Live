@@ -32,7 +32,7 @@ export default {
       },
       () => {
         if (this.$store.state.vizData === null) return;
-
+        
         var component = document.getElementById("sankey");
         if (component != null && this.$data.component === null) {
           try {
@@ -99,13 +99,14 @@ export default {
             formatter: function(params) {
               return (
                 (params.data.source === "START >>>" ? "" : params.data.source.substring(1)) +
-                " --" +
+                " -- " +
                 params.data.value
                   .toFixed(3)
                   .replace(",", "'")
                   .replace(".", ",") +
+                " " +
                 unit +
-                "-> " +
+                " -> " +
                 params.data.target.substring(1)
               );
             },

@@ -80,7 +80,7 @@
       </v-dialog>
     </v-card-title>
     <v-expansion-panels multiple v-model="expanded">
-      <v-expansion-panel v-for="(i, idx) in entries" :key="idx" expand>
+      <v-expansion-panel v-for="(i, idx) in entries" :key="idx">
         <v-expansion-panel-header>
           <div>
             <div style="display:inline;">{{ i.label }}</div>

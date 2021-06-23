@@ -62,7 +62,7 @@ export default {
         return this.$store.state.version;
       },
       () => {
-        if (this.$store.state.vizData === null) return;
+        if (this.$store.state.vizData === null) return;        
 
         var component = document.getElementById("ecalendar");
         if (component != null && this.$data.component === null) {
@@ -125,6 +125,7 @@ export default {
                   .toFixed(3)
                   .replace(",", "'")
                   .replace(".", ",") +
+                " " +
                 unit
               );
             },
