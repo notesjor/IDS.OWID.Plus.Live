@@ -6,7 +6,7 @@ module.exports = {
   },
 
   publicPath: process.env.NODE_ENV === 'production'
-    ? '/owid-plus-live/'
+    ? '/plus/live-2021/'
     : '/',
 
   pluginOptions: {

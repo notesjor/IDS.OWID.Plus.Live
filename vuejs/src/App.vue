@@ -73,7 +73,7 @@
             </div>
           </div>
         </v-list-item>
-        <v-list-item @click="newProject">
+        <v-list-item @click="showTutorial">
           <v-icon style="font-size:32px; float:left; margin-right:5px">mdi-help-circle-outline</v-icon>
           <div class="d-none d-sm-flex">
             <span style="font-size:14px; line-height:1; font-weight:200; margin-top:10px;">
@@ -238,6 +238,10 @@ export default {
 
   methods: {
     newProject: function() {
+      this.$cookie.set('tutorial', "mute", 1);
+      location.reload();
+    },
+    showTutorial: function() {
       location.reload();
     },
     blink(event) {
@@ -252,16 +256,21 @@ export default {
     },
     setLocale(locale) {
       this.$cookie.set('locale', locale, 7);
+      this.$cookie.set('tutorial', "mute", 1);
       location.reload();      
     },
   },
 
   created(){
-    var locale = this.$cookie.get('locale');
+    var locale = this.$cookie.get('locale');        
     if(locale === null || locale.length < 2)
       return;
     this.$i18n.locale = locale;
     this.$cookie.set('locale', locale, 7);
+    console.log(this.$cookie.get('tutorial'))
+
+    this.tutorial = this.$cookie.get('tutorial') != "mute";
+    this.$cookie.set('tutorial', "", 1);
   },
 
   mounted() {
