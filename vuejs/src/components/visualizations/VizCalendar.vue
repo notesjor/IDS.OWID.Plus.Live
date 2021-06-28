@@ -119,7 +119,7 @@ export default {
             position: "top",
             formatter: function(params) {
               return (
-                params.value[0] +
+                params.value[0].substring(0, 10) +
                 ": " +
                 params.value[1]
                   .toFixed(3)
