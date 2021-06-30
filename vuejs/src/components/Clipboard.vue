@@ -306,7 +306,7 @@ export default {
     },
     exportLink(i) {
       var data = this.$store.state.owid.GetSearchHistoryItemRequest(i.label);
-      this.$data.snackbarLink = this.$config.webUrl + btoa(JSON.stringify(data));
+      this.$data.snackbarLink = this.$config.webUrl + "?" + btoa(JSON.stringify(data));
       this.$data.snackbar = true;
     },
     exportTsv(i) {

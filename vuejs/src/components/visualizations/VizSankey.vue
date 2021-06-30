@@ -115,6 +115,9 @@ export default {
             {
               type: "sankey",
               data: nodes,
+              dataLabels:{
+                allowOverlap: false
+              },
               links: links,
               emphasis: {
                 focus: "adjacency",

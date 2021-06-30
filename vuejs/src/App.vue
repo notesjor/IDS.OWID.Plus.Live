@@ -7,7 +7,7 @@
             alt="Logo links"
             class="shrink mr-2"
             contain
-            src="./assets/logo_left.png"
+            src="./assets/logo_left.svg"
             transition="scale-transition"
             height="40"
           />
@@ -22,8 +22,9 @@
             alt="Logo rechts"
             class="shrink mr-2"
             contain
-            src="./assets/logo_right.png"
+            src="./assets/logo_right.svg"
             transition="scale-transition"
+            height="70"
           />
         </a>
       </div>
@@ -48,6 +49,22 @@
         <v-row class="text-center">
           <v-col>
             <Clipboard />
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
+            <v-footer padless>
+              <v-card class="flex" flat tile>
+                <v-card-text class="py-2" style="text-align:right">
+                  <div style="display:inline-block">{{ new Date().getFullYear() }} — <strong>{{ this.$config.appName }}</strong></div>                
+                  <div style="display:inline-block">
+                    <a :href="footerContact" style="margin-left:15px" v-if="footerContact != null && footerContact.length > 1">{{ $t("footer_Contact") }}</a>                    
+                    <a :href="footerImpressum" style="margin-left:15px" v-if="footerImpressum != null && footerImpressum.length > 1">{{ $t("footer_Impressum") }}</a>                    
+                    <a :href="footerDsgvo" style="margin-left:15px" v-if="footerDsgvo != null && footerDsgvo.length > 1">{{ $t("footer_Dsgvo") }}</a>
+                  </div>
+                </v-card-text>
+              </v-card>
+            </v-footer>
           </v-col>
         </v-row>
       </v-container>
@@ -234,11 +251,15 @@ export default {
 
     leftIconHref: null,
     rightIconHref: null,
+
+    footerContact: null,
+    footerImpressum: null,
+    footerDsgvo: null
   }),
 
   methods: {
     newProject: function() {
-      this.$cookie.set('tutorial', "mute", 1);
+      this.$cookie.set("tutorial", "mute", 1);
       location.reload();
     },
     showTutorial: function() {
@@ -255,22 +276,20 @@ export default {
       window.scrollBy(0, -100);
     },
     setLocale(locale) {
-      this.$cookie.set('locale', locale, 7);
-      this.$cookie.set('tutorial', "mute", 1);
-      location.reload();      
+      this.$cookie.set("locale", locale, 7);
+      this.$cookie.set("tutorial", "mute", 1);
+      location.reload();
     },
   },
 
-  created(){
-    var locale = this.$cookie.get('locale');        
-    if(locale === null || locale.length < 2)
-      return;
+  created() {
+    var locale = this.$cookie.get("locale");
+    if (locale === null || locale.length < 2) return;
     this.$i18n.locale = locale;
-    this.$cookie.set('locale', locale, 7);
-    console.log(this.$cookie.get('tutorial'))
+    this.$cookie.set("locale", locale, 7);
 
-    this.tutorial = this.$cookie.get('tutorial') != "mute";
-    this.$cookie.set('tutorial', "", 1);
+    this.tutorial = this.$cookie.get("tutorial") != "mute";
+    this.$cookie.set("tutorial", "", 1);
   },
 
   mounted() {
@@ -280,6 +299,10 @@ export default {
 
     this.leftIconHref = config.leftIconHref;
     this.rightIconHref = config.rightIconHref;
+
+    this.footerContact = config.footerContact;
+    this.footerImpressum = config.footerImpressum;
+    this.footerDsgvo = config.footerDsgvo;
 
     // Als Tutorial lassen sich MP4-Video-Dateien (inkl. PNG-Poster => myvideo.mp4.png) oder
     // eine externe HTML-Datei mit Video-Player laden.
@@ -315,7 +338,14 @@ export default {
           })
           .then(() => {
             var data = window.location.href.replace(config.webUrl, "");
+            if(data.startsWith("/"))
+              data = data.substring(1);
+            if(data.startsWith("?"))
+              data = data.substring(1);
+
             if (data.length < 10) return;
+
+            this.tutorial = false;
 
             try {
               search.search_invoke(JSON.parse(atob(data)));

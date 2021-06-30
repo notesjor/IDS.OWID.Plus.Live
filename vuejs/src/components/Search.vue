@@ -869,7 +869,6 @@ export default {
       inputRules: [
         function(v) {
           if (v === undefined) return true;
-          console.log(globalT);
           return (v.toString().match("\\s") || []).length < 1 || globalT.$t("search_ruleError_01");
         },
         function(v) {
