@@ -359,6 +359,10 @@ export default {
         console.log(ex);
         this.$data.alert = true;
       });
+
+    let trackingScript = document.createElement('script');
+    trackingScript.setAttribute('src', './tracking.js');
+    document.head.appendChild(trackingScript);
   },
 };
 </script>
