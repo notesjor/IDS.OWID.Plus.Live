@@ -1,31 +1,17 @@
 <template>
   <v-app>
     <v-app-bar app dark class="d-print-none" style="z-index:999">
-      <div class="d-flex">
-        <a :href="leftIconHref" target="_blank" rel="nofollow">
-          <img
-            alt="Logo links"
-            class="shrink mr-2"
-            contain
-            src="./assets/logo_left.svg"
-            transition="scale-transition"
-            height="40"
-          />
+      <div>
+        <a :href="leftIconHref" target="_blank">
+          <img alt="Logo" height="40px" src="./assets/logo_left.svg" />
         </a>
       </div>
 
       <v-spacer></v-spacer>
 
-      <div class="d-flex">
-        <a :href="rightIconHref" target="_blank" rel="nofollow">
-          <v-img
-            alt="Logo rechts"
-            class="shrink mr-2"
-            contain
-            src="./assets/logo_right.svg"
-            transition="scale-transition"
-            height="70"
-          />
+      <div>
+        <a :href="rightIconHref" target="_blank">
+          <img alt="Logo" height="70px" src="./assets/logo_right.svg" />
         </a>
       </div>
     </v-app-bar>
@@ -56,11 +42,28 @@
             <v-footer padless>
               <v-card class="flex" flat tile>
                 <v-card-text class="py-2" style="text-align:right">
-                  <div style="display:inline-block">{{ new Date().getFullYear() }} — <strong>{{ this.$config.appName }}</strong></div>                
                   <div style="display:inline-block">
-                    <a :href="footerContact" style="margin-left:15px" v-if="footerContact != null && footerContact.length > 1">{{ $t("footer_Contact") }}</a>                    
-                    <a :href="footerImpressum" style="margin-left:15px" v-if="footerImpressum != null && footerImpressum.length > 1">{{ $t("footer_Impressum") }}</a>                    
-                    <a :href="footerDsgvo" style="margin-left:15px" v-if="footerDsgvo != null && footerDsgvo.length > 1">{{ $t("footer_Dsgvo") }}</a>
+                    {{ new Date().getFullYear() }} — <strong>{{ this.$config.appName }}</strong>
+                  </div>
+                  <div style="display:inline-block">
+                    <a
+                      :href="footerContact"
+                      style="margin-left:15px"
+                      v-if="footerContact != null && footerContact.length > 1"
+                      >{{ $t("footer_Contact") }}</a
+                    >
+                    <a
+                      :href="footerImpressum"
+                      style="margin-left:15px"
+                      v-if="footerImpressum != null && footerImpressum.length > 1"
+                      >{{ $t("footer_Impressum") }}</a
+                    >
+                    <a
+                      :href="footerDsgvo"
+                      style="margin-left:15px"
+                      v-if="footerDsgvo != null && footerDsgvo.length > 1"
+                      >{{ $t("footer_Dsgvo") }}</a
+                    >
                   </div>
                 </v-card-text>
               </v-card>
@@ -254,7 +257,7 @@ export default {
 
     footerContact: null,
     footerImpressum: null,
-    footerDsgvo: null
+    footerDsgvo: null,
   }),
 
   methods: {
@@ -338,10 +341,8 @@ export default {
           })
           .then(() => {
             var data = window.location.href.replace(config.webUrl, "");
-            if(data.startsWith("/"))
-              data = data.substring(1);
-            if(data.startsWith("?"))
-              data = data.substring(1);
+            if (data.startsWith("/")) data = data.substring(1);
+            if (data.startsWith("?")) data = data.substring(1);
 
             if (data.length < 10) return;
 
@@ -360,8 +361,8 @@ export default {
         this.$data.alert = true;
       });
 
-    let trackingScript = document.createElement('script');
-    trackingScript.setAttribute('src', './tracking.js');
+    let trackingScript = document.createElement("script");
+    trackingScript.setAttribute("src", "./tracking.js");
     document.head.appendChild(trackingScript);
   },
 };
