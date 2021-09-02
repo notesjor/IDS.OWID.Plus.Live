@@ -113,6 +113,9 @@
                 <a @click="setLocale('en')"
                   ><img src="./locales/gb.svg" alt="Englisch" style="height:24px; margin:10px 10px 5px 0px"
                 /></a>
+                <a @click="setLocale('th')"
+                  ><img src="./locales/th.svg" alt="Englisch" style="height:24px; margin:10px 10px 5px 0px"
+                /></a>
               </p>
             </span>
           </div>
