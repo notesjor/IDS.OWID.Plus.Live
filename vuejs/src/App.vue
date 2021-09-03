@@ -43,7 +43,12 @@
               <v-card class="flex" flat tile>
                 <v-card-text class="py-2" style="text-align:left">
                   <div style="display:inline-block">
-                    {{ $t("footer_corpusSize") }} Korpusgröße <i>({{ $t("footer_lastUpdate") }}: {{ this.$store.state.owid.LastDate }}):</i>
+                    {{ $t("footer_corpusSize") }} 
+                    <i
+                      >({{ $t("footer_lastUpdate") }}:
+                      {{ this.$store.state.owid === null ? "" : this.$store.state.owid.LastDate }}):</i
+                    >
+                    <br/>
                     {{ totalLabel }}
                   </div>
                 </v-card-text>
@@ -383,6 +388,8 @@ export default {
   },
   computed: {
     totalLabel: function() {
+      if (this.$store.state.owid === null) return "";
+
       var totals = this.$store.state.owid.Total;
       var res = [];
       for (var i = 0; i < totals.length; i++) {

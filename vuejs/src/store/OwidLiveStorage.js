@@ -137,7 +137,7 @@ export class OwidLiveStorage {
    * Return the last date
    */
   get LastDate() {
-    return this.#LastDate;
+    return this.#LastDate === null ? "" : this.#LastDate;
   }
 
   /**
