@@ -347,7 +347,7 @@
                     <v-row>
                       <v-col style="margin-top:7px">
                         <v-text-field
-                          label="Wortform"
+                          :label="$t('layer_wordform')"
                           v-model="search_complex_1_1_w"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
@@ -357,7 +357,7 @@
                     <v-row>
                       <v-col style="margin-top:7px">
                         <v-text-field
-                          label="Lemma"
+                          :label="$t('layer_lemma')"
                           v-model="search_complex_1_1_l"
                           :rules="inputRules"
                           @keydown.enter="search_complex"
@@ -367,7 +367,7 @@
                     <v-row>
                       <v-col style="margin-top:7px">
                         <v-text-field
-                          label="POS-Tag"
+                          :label="$t('layer_posTag')"
                           v-model="search_complex_1_1_p"
                           :rules="inputRules"
                           @keydown.enter="search_complex"

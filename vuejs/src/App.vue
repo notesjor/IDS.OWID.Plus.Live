@@ -309,7 +309,7 @@ export default {
   created() {
     var locale = this.$cookie.get("locale");
     if (locale === null || locale.length < 2) return;
-    this.$i18n.locale = locale;
+    this.$vuetify.lang.current = this.$i18n.locale = locale;
     this.$cookie.set("locale", locale, 7);
 
     this.tutorial = this.$cookie.get("tutorial") != "mute";
