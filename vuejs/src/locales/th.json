@@ -113,5 +113,7 @@
   "lbl_save": "บันทึก",
   "footer_Contact": "ติดต่อ",
   "footer_Impressum": "เกี่ยวกับ",
-  "footer_Dsgvo": "นโยบายความเป็นส่วนตัว"
+  "footer_Dsgvo": "นโยบายความเป็นส่วนตัว",
+  "footer_corpusSize":"ขนาดคลังข้อมูล",
+  "footer_lastUpdate":"อัปเดตล่าสุด"
 }

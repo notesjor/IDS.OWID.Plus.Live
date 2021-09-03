@@ -41,6 +41,19 @@
           <v-col>
             <v-footer padless>
               <v-card class="flex" flat tile>
+                <v-card-text class="py-2" style="text-align:left">
+                  <div style="display:inline-block">
+                    {{ $t("footer_corpusSize") }} Korpusgröße <i>({{ $t("footer_lastUpdate") }}: {{ this.$store.state.owid.LastDate }}):</i>
+                    {{ totalLabel }}
+                  </div>
+                </v-card-text>
+              </v-card>
+            </v-footer>
+          </v-col>
+
+          <v-col>
+            <v-footer padless>
+              <v-card class="flex" flat tile>
                 <v-card-text class="py-2" style="text-align:right">
                   <div style="display:inline-block">
                     {{ new Date().getFullYear() }} — <strong>{{ this.$config.appName }}</strong>
@@ -367,6 +380,17 @@ export default {
     let trackingScript = document.createElement("script");
     trackingScript.setAttribute("src", "./tracking.js");
     document.head.appendChild(trackingScript);
+  },
+  computed: {
+    totalLabel: function() {
+      var totals = this.$store.state.owid.Total;
+      var res = [];
+      for (var i = 0; i < totals.length; i++) {
+        res.push("N=" + (i + 1) + ": " + totals[i]);
+      }
+
+      return res.join(" / ");
+    },
   },
 };
 </script>

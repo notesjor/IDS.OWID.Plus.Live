@@ -113,5 +113,7 @@
   "lbl_save": "save",
   "footer_Contact": "Contact",
   "footer_Impressum": "Legal Disclosure",
-  "footer_Dsgvo": "Privacy Policy"
+  "footer_Dsgvo": "Privacy Policy",
+  "footer_corpusSize":"corpus-size",
+  "footer_lastUpdate":"last update"
 }

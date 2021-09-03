@@ -113,5 +113,7 @@
   "lbl_save": "Speichern",
   "footer_Contact": "Kontakt",
   "footer_Impressum": "Impressum",
-  "footer_Dsgvo": "Datenschutzhinweis"
+  "footer_Dsgvo": "Datenschutzhinweis",
+  "footer_corpusSize":"Korpusgröße",
+  "footer_lastUpdate":"Stand"
 }

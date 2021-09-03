@@ -68,7 +68,7 @@
                           :label="$t('lbl_layer')"
                           style="display:block-inline;"
                         ></v-overflow-btn>
-                        <TagsetInfo v-if="search_simple_1_layer === 'POS'" />
+                        <TagsetInfo v-if="search_simple_1_layer_show_pos" />
                       </v-col>
                       <v-col cols="9" style="margin-top:7px">
                         <v-text-field
@@ -118,7 +118,7 @@
                           v-model="search_simple_1_layer"
                           :label="$t('lbl_layer')"
                         ></v-overflow-btn>
-                        <TagsetInfo v-if="search_simple_1_layer === 'POS'" />
+                        <TagsetInfo v-if="search_simple_1_layer_show_pos" />
                       </v-col>
                       <v-col cols="4">
                         <v-text-field
@@ -135,7 +135,7 @@
                           v-model="search_simple_2_layer"
                           :label="$t('lbl_layer')"
                         ></v-overflow-btn>
-                        <TagsetInfo v-if="search_simple_2_layer === 'POS'" />
+                        <TagsetInfo v-if="search_simple_2_layer_show_pos" />
                       </v-col>
                       <v-col cols="4">
                         <v-text-field
@@ -187,7 +187,7 @@
                           v-model="search_simple_1_layer"
                           :label="$t('lbl_layer')"
                         ></v-overflow-btn>
-                        <TagsetInfo v-if="search_simple_1_layer === 'POS'" />
+                        <TagsetInfo v-if="search_simple_1_layer_show_pos" />
                       </v-col>
                       <v-col cols="2">
                         <v-text-field
@@ -204,7 +204,7 @@
                           v-model="search_simple_2_layer"
                           :label="$t('lbl_layer')"
                         ></v-overflow-btn>
-                        <TagsetInfo v-if="search_simple_2_layer === 'POS'" />
+                        <TagsetInfo v-if="search_simple_2_layer_show_pos" />
                       </v-col>
                       <v-col cols="2">
                         <v-text-field
@@ -221,7 +221,7 @@
                           v-model="search_simple_3_layer"
                           :label="$t('lbl_layer')"
                         ></v-overflow-btn>
-                        <TagsetInfo v-if="search_simple_3_layer === 'POS'" />
+                        <TagsetInfo v-if="search_simple_3_layer_show_pos" />
                       </v-col>
                       <v-col cols="2">
                         <v-text-field
@@ -893,6 +893,18 @@ export default {
     this.layer = global_layers;
 
     globalT = this;
+  },
+  computed: {
+    search_simple_1_layer_show_pos: function () {
+      console.log(this.search_simple_1_layer);
+      return this.search_simple_1_layer === this.$t("layer_pos");
+    },
+    search_simple_2_layer_show_pos: function () {
+      return this.search_simple_2_layer === this.$t("layer_pos");
+    },
+    search_simple_3_layer_show_pos: function () {
+      return this.search_simple_3_layer === this.$t("layer_pos");
+    }
   },
   methods: {
     delete_simple: function() {

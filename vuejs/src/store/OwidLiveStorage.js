@@ -5,6 +5,7 @@ export class OwidLiveStorage {
   #OwidLiveSearches;
   #Norm;
   #Dates;
+  #LastDate;
   #Total;
   #NormTotal;
   #N;
@@ -62,6 +63,7 @@ export class OwidLiveStorage {
     }
 
     this.#Dates = dates.sort();
+    this.#LastDate = this.#Dates[this.#Dates.length - 1];
     this.#Total = total;
     this.#NormTotal = notal;
 
@@ -129,6 +131,13 @@ export class OwidLiveStorage {
    */
   get Norm() {
     return this.#Norm;
+  }
+
+  /**
+   * Return the last date
+   */
+  get LastDate() {
+    return this.#LastDate;
   }
 
   /**
