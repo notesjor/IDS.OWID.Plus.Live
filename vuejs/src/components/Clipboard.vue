@@ -54,18 +54,17 @@
               <span v-html="$t('clipboard_help_info_intro')"></span>
               <br /><br />
               <ul>
-                <li>                  
+                <li>
                   <span v-html="$t('clipboard_help_info_compare')"></span>
                 </li>
-                <li>                  
+                <li>
                   <span v-html="$t('clipboard_help_info_detail')"></span>
                 </li>
                 <li>
-                  (<v-icon>mdi-content-save-outline</v-icon> / <v-icon>mdi-folder-outline</v-icon>) <span v-html="$t('clipboard_help_info_saveLoad')"></span>
+                  (<v-icon>mdi-content-save-outline</v-icon> / <v-icon>mdi-folder-outline</v-icon>)
+                  <span v-html="$t('clipboard_help_info_saveLoad')"></span>
                 </li>
-                <li>
-                  (<v-icon>mdi-dots-vertical</v-icon>) <span v-html="$t('clipboard_help_info_export')"></span>
-                </li>
+                <li>(<v-icon>mdi-dots-vertical</v-icon>) <span v-html="$t('clipboard_help_info_export')"></span></li>
               </ul>
             </span>
           </v-card-text>
@@ -306,7 +305,9 @@ export default {
     },
     exportLink(i) {
       var data = this.$store.state.owid.GetSearchHistoryItemRequest(i.label);
-      this.$data.snackbarLink = this.$config.webUrl + "?" + btoa(JSON.stringify(data));
+      var locale = this.$cookie.get("locale");
+      this.$data.snackbarLink =
+        this.$config.webUrl + "?" + (locale != "de" ? "locale=" + locale + "&" : "") + "data=" + btoa(JSON.stringify(data));
       this.$data.snackbar = true;
     },
     exportTsv(i) {

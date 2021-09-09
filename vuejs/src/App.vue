@@ -43,12 +43,12 @@
               <v-card class="flex" flat tile>
                 <v-card-text class="py-2" style="text-align:left">
                   <div style="display:inline-block">
-                    {{ $t("footer_corpusSize") }} 
+                    {{ $t("footer_corpusSize") }}
                     <i
                       >({{ $t("footer_lastUpdate") }}:
                       {{ this.$store.state.owid === null ? "" : this.$store.state.owid.LastDate }}):</i
                     >
-                    <br/>
+                    <br />
                     {{ totalLabel }}
                   </div>
                 </v-card-text>
@@ -302,6 +302,7 @@ export default {
     setLocale(locale) {
       this.$cookie.set("locale", locale, 7);
       this.$cookie.set("tutorial", "mute", 1);
+      this.$cookie.set("reload", 1, 1);
       location.reload();
     },
   },
@@ -317,6 +318,12 @@ export default {
   },
 
   mounted() {
+    if(this.$cookie.get("reload") == 1) {
+      this.$cookie.set("reload", 0, 1);
+      location.reload();
+    }
+
+    var self = this;
     var store = this.$store;
     var search = this.$refs.searchComponent;
     var config = this.$config;
@@ -361,14 +368,21 @@ export default {
             store.commit("init", obj);
           })
           .then(() => {
-            var data = window.location.href.replace(config.webUrl, "");
-            if (data.startsWith("/")) data = data.substring(1);
-            if (data.startsWith("?")) data = data.substring(1);
+            const queries = new URLSearchParams(window.location.search);
+            var data = "";
+            if (queries.has("data")) {
+              data = queries.get("data");
+            }
+            if (queries.has("locale")) {
+              var locale = queries.get("locale");
+              // vermeidet reload
+              if (this.$cookie.get("locale") != locale)                
+                self.setLocale(locale);
+            }
 
             if (data.length < 10) return;
 
             this.tutorial = false;
-
             try {
               search.search_invoke(JSON.parse(atob(data)));
             } catch {
