@@ -896,7 +896,6 @@ export default {
   },
   computed: {
     search_simple_1_layer_show_pos: function () {
-      console.log(this.search_simple_1_layer);
       return this.search_simple_1_layer === this.$t("layer_pos");
     },
     search_simple_2_layer_show_pos: function () {
