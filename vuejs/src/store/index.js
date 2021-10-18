@@ -65,14 +65,7 @@ export default new Vuex.Store({
     },
 
     modelLoad(state, o) {
-      state.owid = OwidLiveStorage.load(
-        o.Norm,
-        o.OwidLiveSearches,
-        o.N,
-        o.Dates,
-        o.Total,
-        o.NormTotal
-      );
+      state.owid = OwidLiveStorage.load(o.Norm, o.OwidLiveSearches, o.N, o.Dates, o.Total, o.NormTotal);
     },
 
     calculate(state) {
@@ -207,10 +200,7 @@ export default new Vuex.Store({
           res[key] = Normalize(res[key], normData);
           if (res[key].items != null) {
             Object.keys(res[key].items).forEach((subKey) => {
-              res[key].items[subKey] = Normalize(
-                res[key].items[subKey],
-                normData
-              );
+              res[key].items[subKey] = Normalize(res[key].items[subKey], normData);
             });
           }
         });
@@ -221,10 +211,7 @@ export default new Vuex.Store({
           res[key] = Prefill(res[key], normData);
           if (res[key].items != null) {
             Object.keys(res[key].items).forEach((subKey) => {
-              res[key].items[subKey] = Prefill(
-                res[key].items[subKey],
-                normData
-              );
+              res[key].items[subKey] = Prefill(res[key].items[subKey], normData);
             });
           }
         });
@@ -244,6 +231,7 @@ export default new Vuex.Store({
 
         var halfVOS = state.vizOptionSmoothing * 2.0;
 
+        var warnings = new Set();
         Object.keys(res).forEach((key) => {
           var item = res[key].data;
           var keys = state.owid.Dates;
@@ -252,16 +240,16 @@ export default new Vuex.Store({
             var dates = new Set();
             var sum = 0.0;
             for (var j = 0 - carret; j <= carret; j++) {
-              item[keys[i + j]].dates.forEach((d) => dates.add(d));
+              try {
+                item[keys[i + j]].dates.forEach((d) => dates.add(d));
 
-              if (!(keys[i + j] in item)) continue;
+                if (!(keys[i + j] in item)) continue;
 
-              if (!odd && (j === 0 - carret || j === carret))
-                sum +=
-                  item[keys[i + j]].value * (1.0 / halfVOS);
-              else
-                sum +=
-                  item[keys[i + j]].value * (1.0 / state.vizOptionSmoothing);
+                if (!odd && (j === 0 - carret || j === carret)) sum += item[keys[i + j]].value * (1.0 / halfVOS);
+                else sum += item[keys[i + j]].value * (1.0 / state.vizOptionSmoothing);
+              } catch (e) {
+                warnings.add(keys[i+j]);
+              }
             }
 
             nval[keys[i]] = {
@@ -272,6 +260,15 @@ export default new Vuex.Store({
 
           res[key].data = nval;
         });
+
+        if(warnings.size > 0)
+          {
+            console.log(">>> WARN: missing norm-data:"); 
+            warnings.forEach(w => {
+              console.log(w);
+            });
+            console.log("<<< WARN: missing norm-data (END)");
+          }
       }
 
       state.vizData = res;
