@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div style="display:block; position:relative; top:0px; left:-49.5%">
+    <div :style="{'min-height': `${vizMinHeight}px; display:block; position:relative; top:0px; left:-49.5%;`}">
       <v-dialog v-model="dialog_help" width="600" scrollable>
         <template v-slot:activator="{ on, attrs }">
           <div v-bind="attrs" v-on="on">
@@ -144,7 +144,7 @@ export default {
   methods: {
     tabChange: function() {
       this.$forceUpdate();
-    },
+    }
   },
 };
 </script>
