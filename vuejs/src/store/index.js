@@ -19,7 +19,7 @@ export default new Vuex.Store({
     vizOptionSmoothing: 7,
 
     vizViewportWidth: 1200,
-    vizViewportHeight: 500,
+    vizViewportHeight: 600,
 
     vizData: null,
   },
@@ -36,9 +36,8 @@ export default new Vuex.Store({
       state.owid.clearAll();
     },
 
-    updateViewport(state, { w, h }) {
+    updateViewport(state, w) {
       state.vizViewportWidth = (w / 110) * 100;
-      state.vizViewportHeight = h;
     },
 
     updateN(state, N) {
