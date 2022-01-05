@@ -3,10 +3,10 @@
     id="ecalendar"
     v-bind:style="
       'margin-left: -20px; min-width:' +
-        this.$store.state.vizViewportWidth +
-        'px; min-height:' +
-        this.$store.state.vizViewportHeight +
-        'px'
+      this.$store.state.vizViewportWidth +
+      'px; min-height:' +
+      this.$store.state.vizViewportHeight +
+      'px'
     "
   ></div>
 </template>
@@ -62,7 +62,7 @@ export default {
         return this.$store.state.version;
       },
       () => {
-        if (this.$store.state.vizData === null) return;        
+        if (this.$store.state.vizData === null) return;
 
         var component = document.getElementById("ecalendar");
         if (component != null && this.$data.component === null) {
@@ -89,6 +89,25 @@ export default {
         Object.keys(tmp).forEach((k) => {
           res.push([k, tmp[k]]);
         });
+
+        var min = 9999;
+        var max = 0;
+        res.forEach((r) => {
+          var val = parseInt(r[0].substring(0, 4));
+
+          if (val < min) min = val;
+          if (val > max) max = val;
+        });
+        var diff = max - min + 1;
+        var series = [];
+        for (let si = 0; si < diff; si++) {
+          series.push({
+            type: "heatmap",
+            coordinateSystem: "calendar",
+            calendarIndex: si,
+            data: res,
+          });
+        }
 
         var unit = this.$store.state.vizOptionRelative ? this.$t("lbl_unit_tokenPPM") : this.$t("lbl_unit_token");
 
@@ -117,14 +136,11 @@ export default {
           },
           tooltip: {
             position: "top",
-            formatter: function(params) {
+            formatter: function (params) {
               return (
                 params.value[0].substring(0, 10) +
                 ": " +
-                params.value[1]
-                  .toFixed(3)
-                  .replace(",", "'")
-                  .replace(".", ",") +
+                params.value[1].toFixed(3).replace(",", "'").replace(".", ",") +
                 " " +
                 unit
               );
@@ -142,20 +158,7 @@ export default {
             },
           },
           calendar: calendars,
-          series: [
-            {
-              type: "heatmap",
-              coordinateSystem: "calendar",
-              calendarIndex: 0,
-              data: res,
-            },
-            {
-              type: "heatmap",
-              coordinateSystem: "calendar",
-              calendarIndex: 1,
-              data: res,
-            },
-          ],
+          series: series,
         };
         this.$data.component.clear();
         this.$data.component.setOption(myCalendarOption);

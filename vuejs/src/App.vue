@@ -24,7 +24,7 @@
         </v-row>
         <v-row class="text-center">
           <v-col>
-            <VizPanel id="vizPanel" />
+            <VizPanel id="vizPanel" style="min-height:700px" />
           </v-col>
         </v-row>
         <v-row class="text-center">
