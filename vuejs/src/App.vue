@@ -24,9 +24,18 @@
         </v-row>
         <v-row class="text-center">
           <v-col>
-            <VizPanel id="vizPanel" style="min-height:700px" />
+            <VizPanel id="vizPanel" :style="{'min-height': `${vizMinHeight}px`}" />
           </v-col>
         </v-row>
+        <!--
+        <v-row>
+          <v-col><hr style="margin-top:25px"/></v-col>
+          <v-col cols="2" style="text-align:center">
+            <v-btn class="ma-2" outlined @click="resizeVizPanel"> Ansicht vergrößern </v-btn>
+          </v-col>
+          <v-col><hr style="margin-top:25px"/></v-col>
+        </v-row>
+        -->
         <v-row class="text-center">
           <v-col>
             <VizOptions />
@@ -44,10 +53,10 @@
                 <v-card-text class="py-2" style="text-align:left">
                   <div style="display:inline-block">
                     {{ $t("footer_corpusSize") }}
-                    <i
-                      >({{ $t("footer_lastUpdate") }}:
-                      {{ this.$store.state.owid === null ? "" : this.$store.state.owid.LastDate }}):</i
-                    >
+                    <i>
+                      ({{ $t("footer_lastUpdate") }}:
+                      {{ this.$store.state.owid === null ? "" : this.$store.state.owid.LastDate }}):
+                    </i>
                     <br />
                     {{ totalLabel }}
                   </div>
@@ -279,6 +288,8 @@ export default {
     footerContact: null,
     footerImpressum: null,
     footerDsgvo: null,
+
+    vizMinHeight: 700,
   }),
 
   methods: {
@@ -305,6 +316,9 @@ export default {
       this.$cookie.set("reload", 1, 1);
       location.reload();
     },
+    resizeVizPanel(){
+      this.vizMinHeight *= 1.75;
+    }
   },
 
   created() {

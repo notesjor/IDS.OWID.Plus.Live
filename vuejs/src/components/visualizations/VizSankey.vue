@@ -1,14 +1,8 @@
 <template>
-  <panzoom>
+  <panzoom style="min-height: 600px; height: auto;">
     <div
       id="sankey"
-      v-bind:style="
-        'min-width:' +
-          this.$store.state.vizViewportWidth * 0.95 +
-          'px; min-height:' +
-          this.$store.state.vizViewportHeight +
-          'px; height: auto'
-      "
+      style="min-width: 100%; min-height: 600px;"
     ></div>
   </panzoom>
 </template>

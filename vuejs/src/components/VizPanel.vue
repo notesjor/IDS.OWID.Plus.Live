@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="height:100%">
     <div style="display:block; position:relative; top:0px; left:-49.5%">
       <v-dialog v-model="dialog_help" width="600" scrollable>
         <template v-slot:activator="{ on, attrs }">
@@ -51,9 +51,9 @@
         </v-card>
       </v-dialog>
     </div>
-    <div>
-      <div style="width=100%">
-        <v-tabs vertical @change="tabChange">
+    <div style="width:100%; height:100%">
+      <div style="width:100%; height:100%">
+        <v-tabs vertical @change="tabChange" style="width:100%; height:100%">
           <v-tab>
             <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
@@ -96,21 +96,21 @@
               </span>
             </v-tooltip>
           </v-tab>
-          <v-tab-item>
+          <v-tab-item style="width:100%; height:100%">
             <v-row>
               <v-col>
                 <VizTimeChart></VizTimeChart>
               </v-col>
             </v-row>
           </v-tab-item>
-          <v-tab-item>
+          <v-tab-item style="width:100%; height:100%">
             <v-row>
               <v-col>
                 <VizCalendar></VizCalendar>
               </v-col>
             </v-row>
           </v-tab-item>
-          <v-tab-item>
+          <v-tab-item style="width:100%; height:100%">
             <v-row>
               <v-col>
                 <VizSankey></VizSankey>

@@ -1,13 +1,7 @@
 <template>
   <div
     id="ecalendar"
-    v-bind:style="
-      'margin-left: -20px; min-width:' +
-      this.$store.state.vizViewportWidth +
-      'px; min-height:' +
-      this.$store.state.vizViewportHeight +
-      'px'
-    "
+    style="min-width: 100%; min-height: 600px; margin-left:-20px"
   ></div>
 </template>
 

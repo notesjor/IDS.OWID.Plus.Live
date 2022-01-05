@@ -26,8 +26,6 @@ export default {
       }
     }
 
-    // init the Viewport - usefull for other visualizations
-    this.$store.commit("updateViewport", component.clientWidth);
     this.$store.commit("calculate");
   },
   created() {
