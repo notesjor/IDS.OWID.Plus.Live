@@ -141,7 +141,10 @@
                   ><img src="./locales/gb.svg" alt="Englisch" style="height:24px; margin:10px 10px 5px 0px"
                 /></a>
                 <a @click="setLocale('th')"
-                  ><img src="./locales/th.svg" alt="Englisch" style="height:24px; margin:10px 10px 5px 0px"
+                  ><img src="./locales/th.svg" alt="Thai" style="height:24px; margin:10px 10px 5px 0px"
+                /></a>
+                <a @click="setLocale('cmn')"
+                  ><img src="./locales/cn.svg" alt="Mandarin" style="height:24px; margin:10px 10px 5px 0px"
                 /></a>
               </p>
             </span>
