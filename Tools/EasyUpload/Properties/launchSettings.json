@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "IDS.Lexik.OWIDplusLIVE.Upload": {
+      "commandName": "Project",
+      "commandLineArgs": "http://127.0.0.1:19898 2021-03-18 C:\\Users\\Jan\\Desktop\\2021-03-18.csv 43de7346ef884d4ab3bfdfc43d6d0ce2"
+    }
+  }
+}

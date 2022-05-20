@@ -1,1 +1,4 @@
 *.dccache
+bin
+obj
+publish
