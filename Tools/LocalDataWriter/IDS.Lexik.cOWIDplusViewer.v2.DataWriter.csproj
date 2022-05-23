@@ -94,7 +94,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\CorpusExplorerV2\CorpusExplorer\CorpusExplorer.Sdk.Db.RocksDb\CorpusExplorer.Sdk.Db.RocksDb.csproj">
+    <ProjectReference Include="..\..\..\..\CorpusExplorerV2\CorpusExplorer\CorpusExplorer.Sdk.Db.RocksDb\CorpusExplorer.Sdk.Db.RocksDb.csproj">
       <Project>{ffb2a8e6-df09-440f-9f8d-a3c9fc63219b}</Project>
       <Name>CorpusExplorer.Sdk.Db.RocksDb</Name>
     </ProjectReference>

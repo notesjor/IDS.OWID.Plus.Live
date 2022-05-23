@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\IDS.Lexik.cOWIDplusViewer.v2.WebService\Model\Request\CowidPlusUpdateRequest.cs" Link="CowidPlusUpdateRequest.cs" />
+    <Compile Include="..\..\API\Model\Request\CowidPlusUpdateRequest.cs" Link="CowidPlusUpdateRequest.cs" />
   </ItemGroup>
 
   <ItemGroup>
