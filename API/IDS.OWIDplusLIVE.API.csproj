@@ -24,10 +24,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Projekte-Kooperation\TfresWebserver\TefresWebserver\TFRES.csproj" />
     <ProjectReference Include="..\..\..\CorpusExplorerV2\CorpusExplorer\CorpusExplorer.Sdk.Db.RocksDb\CorpusExplorer.Sdk.Db.RocksDb.csproj" />
     <ProjectReference Include="..\..\IDS.Lexik.WebService\IDS.Lexik.WebService.Sdk\IDS.Lexik.WebService.Sdk.csproj" />
     <ProjectReference Include="..\Tools\LocalDataWriter\IDS.Lexik.cOWIDplusViewer.v2.DataWriter.csproj" />
-    <ProjectReference Include="W:\Kooperationsprojekte\TfresWebserver\TefresWebserver\TFRES.csproj" />
   </ItemGroup>
 
 </Project>
