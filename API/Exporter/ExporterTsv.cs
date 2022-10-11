@@ -12,6 +12,8 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService.Exporter
 {
   public class ExporterTsv : AbstractExporter
   {
+    private static char[] _separator = { 'µ' };
+
     private CultureInfo _format = new CultureInfo("en-US");
     public override string Id => "TSV";
 
@@ -23,7 +25,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService.Exporter
         return;
       }
 
-      var norm = JsonConvert.DeserializeObject<Dictionary<DateTime, double>>(db.Get($">{n}")+"}");
+      var norm = JsonConvert.DeserializeObject<Dictionary<DateTime, double>>(db.Get($">{n}") + "}");
 
       arg.Response.SendChunk("N\tWortform\tLemma\tPOS\tDatum\tFrequenz\tFrequenz (rel.)\r\n", Encoding.UTF8);
       foreach (var request in requests)
@@ -32,7 +34,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService.Exporter
         if (string.IsNullOrEmpty(ts))
           continue;
 
-        var wlp = request.Split(new[] {"µ"}, StringSplitOptions.RemoveEmptyEntries);
+        var wlp = request.Split(_separator, StringSplitOptions.RemoveEmptyEntries);
         var key = $"{n}\t{wlp[0]}\t{wlp[1]}\t{wlp[2]}\t";
 
         var dates = JsonConvert.DeserializeObject<Dictionary<DateTime, double>>(ts + "}");

@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="Elasticsearch.Net" Version="7.17.4" />
-    <PackageReference Include="Microsoft.OpenApi" Version="1.4.1" />
+    <PackageReference Include="Microsoft.OpenApi" Version="1.4.3" />
     <PackageReference Include="NEST" Version="7.17.4" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="RocksDbNative" Version="6.2.2" />
