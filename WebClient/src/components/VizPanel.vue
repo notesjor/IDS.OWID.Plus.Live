@@ -1,5 +1,5 @@
 <template>
-  <div style="height:100%">
+  <div style="min-height:700px">
     <div style="display:block; position:relative; top:0px; left:-49.5%">
       <v-dialog v-model="dialog_help" width="600" scrollable>
         <template v-slot:activator="{ on, attrs }">
@@ -51,9 +51,9 @@
         </v-card>
       </v-dialog>
     </div>
-    <div style="width:100%; height:100%">
-      <div style="width:100%; height:100%">
-        <v-tabs vertical @change="tabChange" style="width:100%; height:100%">
+    <div style="width:100%;">
+      <div style="width:100%;">
+        <v-tabs vertical @change="tabChange" style="width:100%;">
           <v-tab>
             <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
@@ -96,26 +96,14 @@
               </span>
             </v-tooltip>
           </v-tab>
-          <v-tab-item style="width:100%; height:100%">
-            <v-row>
-              <v-col>
-                <VizTimeChart></VizTimeChart>
-              </v-col>
-            </v-row>
+          <v-tab-item  :transition="false">
+            <VizTimeChart style="min-height:650px"></VizTimeChart>
           </v-tab-item>
-          <v-tab-item style="width:100%; height:100%">
-            <v-row>
-              <v-col>
-                <VizCalendar></VizCalendar>
-              </v-col>
-            </v-row>
+          <v-tab-item  :transition="false">
+            <VizCalendar style="min-height:650px"></VizCalendar>
           </v-tab-item>
-          <v-tab-item style="width:100%; height:100%">
-            <v-row>
-              <v-col>
-                <VizSankey></VizSankey>
-              </v-col>
-            </v-row>
+          <v-tab-item  :transition="false">
+            <VizSankey style="min-height:650px"></VizSankey>
           </v-tab-item>
         </v-tabs>
       </div>
@@ -136,13 +124,13 @@ export default {
     VizCalendar,
     VizSankey,
   },
-  data: function() {
+  data: function () {
     return {
       dialog_help: false,
     };
   },
   methods: {
-    tabChange: function() {
+    tabChange: function () {
       this.$forceUpdate();
     },
   },

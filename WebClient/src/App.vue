@@ -24,21 +24,12 @@
         </v-row>
         <v-row class="text-center">
           <v-col>
-            <VizPanel id="vizPanel" :style="{'min-height': `${vizMinHeight}px`}" />
+            <VizPanel id="vizPanel" v-show="this.$store.state.vizData != null"/>
           </v-col>
         </v-row>
-        <!--
-        <v-row>
-          <v-col><hr style="margin-top:25px"/></v-col>
-          <v-col cols="2" style="text-align:center">
-            <v-btn class="ma-2" outlined @click="resizeVizPanel"> Ansicht vergrößern </v-btn>
-          </v-col>
-          <v-col><hr style="margin-top:25px"/></v-col>
-        </v-row>
-        -->
         <v-row class="text-center">
           <v-col>
-            <VizOptions />
+            <VizOptions v-show="this.$store.state.vizData != null"/>          
           </v-col>
         </v-row>
         <v-row class="text-center">
@@ -242,6 +233,7 @@
 </style>
 
 <script>
+//import VizTimeChart from "./components/visualizations/VizTimeChart";
 import VizPanel from "./components/VizPanel";
 import VizOptions from "./components/VizOptions";
 import Search from "./components/Search";
@@ -277,6 +269,8 @@ export default {
     VizOptions,
     Search,
     Clipboard,
+
+    //VizTimeChart
   },
 
   data: () => ({
@@ -291,8 +285,6 @@ export default {
     footerContact: null,
     footerImpressum: null,
     footerDsgvo: null,
-
-    vizMinHeight: 700,
   }),
 
   methods: {
@@ -318,9 +310,6 @@ export default {
       this.$cookie.set("tutorial", "mute", 1);
       this.$cookie.set("reload", 1, 1);
       location.reload();
-    },
-    resizeVizPanel(){
-      this.vizMinHeight *= 1.75;
     }
   },
 

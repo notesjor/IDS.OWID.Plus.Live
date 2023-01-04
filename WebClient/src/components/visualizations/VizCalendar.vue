@@ -1,12 +1,39 @@
 <template>
-  <div
-    id="ecalendar"
-    style="min-width: 100%; min-height: 600px; margin-left:-20px"
-  ></div>
+  <v-chart autoresize :option="chartOptions" :init-options="initOptions" />
 </template>
 
 <script>
-import * as echarts from "echarts";
+import Vue from "vue";
+import VueECharts, { THEME_KEY } from "vue-echarts";
+
+import {  use } from "echarts/core";
+import {
+  HeatmapChart 
+} from "echarts/charts";
+import {
+  GridComponent,
+  TooltipComponent,
+  LegendComponent,
+  TitleComponent,
+  VisualMapComponent,
+  ToolboxComponent,
+  DataZoomComponent
+} from "echarts/components";
+import { CanvasRenderer } from "echarts/renderers";
+
+use([
+  HeatmapChart,
+  GridComponent,
+  TooltipComponent,
+  LegendComponent,
+  TitleComponent,
+  VisualMapComponent,
+  CanvasRenderer,
+  ToolboxComponent,
+  DataZoomComponent
+]);
+
+Vue.component('v-chart', VueECharts);
 
 var monthMap = {
   nameMap: null,
@@ -20,9 +47,14 @@ var dayMap = {
 export default {
   name: "VizCalendar",
   theme: { dark: false },
+  provide: {
+    [THEME_KEY]: "light"
+  },
   data() {
     return {
-      component: null,
+      initOptions: {
+        renderer: "canvas"
+      },
     };
   },
   created() {
@@ -51,23 +83,11 @@ export default {
     ];
     dayMap.firstDay = parseInt(this.$t("lbl_weekday_firstIndex"));
 
-    this.$store.watch(
-      () => {
-        return this.$store.state.version;
-      },
-      () => {
-        if (this.$store.state.vizData === null) return;
-
-        var component = document.getElementById("ecalendar");
-        if (component != null && this.$data.component === null) {
-          try {
-            this.$data.component = echarts.init(component, null, {
-              renderer: "canvas",
-            });
-          } catch {
-            // ignore
-          }
-        }
+    this.$store.commit("calculate");
+  },
+  computed:{
+    chartOptions(){
+      if (this.$store.state.vizData === null) return;
 
         var tmp = {};
         Object.keys(this.$store.state.vizData).forEach((sK) => {
@@ -110,15 +130,15 @@ export default {
         this.$store.state.owid.AvailableYears.forEach((year) => {
           calendars.push({
             range: year,
-            cellSize: ["auto", 20],
+            cellSize: ["auto", 15],
             dayLabel: dayMap,
             monthLabel: monthMap,
             top: top,
           });
-          top += 175;
+          top += 140;
         });
 
-        let myCalendarOption = {
+        return {
           toolbox: {
             show: true,
             feature: {
@@ -154,15 +174,7 @@ export default {
           calendar: calendars,
           series: series,
         };
-        this.$data.component.clear();
-        this.$data.component.setOption(myCalendarOption);
-      },
-      {
-        deep: true,
-      }
-    );
-
-    this.$store.commit("calculate");
+    },
   },
 };
 </script>

@@ -1,40 +1,58 @@
 <template>
-  <div id="timechart" style="width: 110%; height: 68vh; margin:0px 0px 0px 0px"></div>
+  <v-chart autoresize :option="chartOptions" :init-options="initOptions" />
 </template>
 
 <script>
-import * as echarts from "echarts";
+import Vue from "vue";
+import VueECharts, { THEME_KEY } from "vue-echarts";
+
+import {  use } from "echarts/core";
+import {
+  LineChart
+} from "echarts/charts";
+import {
+  CalendarComponent,
+  GridComponent,
+  TooltipComponent,
+  LegendComponent,
+  TitleComponent,
+  VisualMapComponent,
+  ToolboxComponent,
+  DataZoomComponent
+} from "echarts/components";
+import { CanvasRenderer } from "echarts/renderers";
+
+use([
+  LineChart,
+  CalendarComponent,
+  GridComponent,
+  TooltipComponent,
+  LegendComponent,
+  TitleComponent,
+  VisualMapComponent,
+  CanvasRenderer,
+  ToolboxComponent,
+  DataZoomComponent
+]);
+
+Vue.component('v-chart', VueECharts);
 
 export default {
   name: "VizTimeChart",
   theme: { dark: false },
+  provide: {
+    [THEME_KEY]: "light"
+  },
   data() {
     return {
-      component: null,
+      initOptions: {
+        renderer: "canvas"
+      },
     };
   },
-  mounted() {
-    // VizTimeChart is the first Visualization, so the component must me initialized in mounted (otherwise in created > $store.watch)
-    var component = document.getElementById("timechart");
-    if (component != null) {
-      try {
-        this.$data.component = echarts.init(component, null, {
-          renderer: "canvas",
-        });
-      } catch {
-        // ignore
-      }
-    }
-
-    this.$store.commit("calculate");
-  },
-  created() {
-    this.$store.watch(
-      () => {
-        return this.$store.state.version;
-      },
-      () => {
-        if (this.$store.state.vizData === null) return;
+  computed:{
+    chartOptions(){
+      if (this.$store.state.vizData === null) return null;
 
         var availableDates = this.$store.state.owid.Dates;
 
@@ -60,7 +78,7 @@ export default {
 
         var unit = this.$store.state.vizOptionRelative ? this.$t("lbl_unit_tokenPPM") : this.$t("lbl_unit_token");
 
-        let myChartOption = {
+        return {
           toolbox: {
             show: true,
             top: "3%",
@@ -111,14 +129,7 @@ export default {
             },
           },
         };
-
-        this.$data.component.clear();
-        this.$data.component.setOption(myChartOption);
-      },
-      {
-        deep: true,
-      }
-    );
+    },
   },
 };
 </script>
