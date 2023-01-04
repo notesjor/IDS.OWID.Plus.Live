@@ -51,9 +51,9 @@
         </v-card>
       </v-dialog>
     </div>
-    <div style="width:100%;">
-      <div style="width:100%;">
-        <v-tabs vertical @change="tabChange" style="width:100%;">
+    <div>
+      <div>
+        <v-tabs vertical @change="tabChange">
           <v-tab>
             <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
@@ -96,14 +96,14 @@
               </span>
             </v-tooltip>
           </v-tab>
-          <v-tab-item  :transition="false">
+          <v-tab-item :transition="false">
             <VizTimeChart style="min-height:650px"></VizTimeChart>
           </v-tab-item>
-          <v-tab-item  :transition="false">
+          <v-tab-item :transition="false">
             <VizCalendar style="min-height:650px"></VizCalendar>
           </v-tab-item>
-          <v-tab-item  :transition="false">
-            <VizSankey style="min-height:650px"></VizSankey>
+          <v-tab-item :transition="false">
+            <VizSankey></VizSankey>
           </v-tab-item>
         </v-tabs>
       </div>

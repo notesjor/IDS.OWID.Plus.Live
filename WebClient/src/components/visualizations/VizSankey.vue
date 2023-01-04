@@ -1,5 +1,5 @@
 <template>
-  <v-chart autoresize :option="chartOptions" :init-options="initOptions" />
+  <v-chart ref="myChart" autoresize :option="chartOptions" :init-options="initOptions" />
 </template>
 
 <script>
@@ -41,8 +41,16 @@ export default {
     return {
       initOptions: {
         renderer: "canvas"
-      },
+      }
     };
+  },
+  methods:{
+    setChartHeight: function (height) {
+      var refs = this.$refs;
+      setTimeout(() => {
+        refs.myChart.resize({ height: height });
+      }, 0);
+    }
   },
   computed: {
     chartOptions() {
@@ -50,6 +58,8 @@ export default {
 
       var tnodes = new Set();
       var links = [];
+
+      console.log(this.$store.state.vizData);
 
       for (const key in this.$store.state.vizData) {
         if (key === "ALLE") continue;
@@ -81,6 +91,8 @@ export default {
       Array.from(tnodes).forEach((nt) => {
         nodes.push({ name: nt.substring(1), id: nt });
       });
+
+      this.setChartHeight(nodes.length * 20);
 
       var unit = this.$store.state.vizOptionRelative ? this.$t("lbl_unit_tokenPPM") : this.$t("lbl_unit_token");
 

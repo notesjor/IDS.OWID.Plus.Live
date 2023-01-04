@@ -1,14 +1,14 @@
 <template>
-  <v-chart autoresize :option="chartOptions" :init-options="initOptions" />
+  <v-chart ref="myChart" autoresize :option="chartOptions" :init-options="initOptions" />
 </template>
 
 <script>
 import Vue from "vue";
 import VueECharts, { THEME_KEY } from "vue-echarts";
 
-import {  use } from "echarts/core";
+import { use } from "echarts/core";
 import {
-  HeatmapChart 
+  HeatmapChart
 } from "echarts/charts";
 import {
   GridComponent,
@@ -55,7 +55,16 @@ export default {
       initOptions: {
         renderer: "canvas"
       },
+      chartStyle: "min-height:650px;"
     };
+  },
+  methods: {
+    setChartHeight: function (height) {
+      var refs = this.$refs;
+      setTimeout(() => {
+        refs.myChart.resize({ height: height });
+      }, 0);
+    }
   },
   created() {
     monthMap.nameMap = [
@@ -82,98 +91,99 @@ export default {
       this.$t("lbl_weekday_short_sunday"),
     ];
     dayMap.firstDay = parseInt(this.$t("lbl_weekday_firstIndex"));
-
-    this.$store.commit("calculate");
   },
-  computed:{
-    chartOptions(){
+  computed: {
+    chartOptions() {
       if (this.$store.state.vizData === null) return;
 
-        var tmp = {};
-        Object.keys(this.$store.state.vizData).forEach((sK) => {
-          Object.keys(this.$store.state.vizData[sK].data).forEach((d) => {
-            this.$store.state.vizData[sK].data[d].dates.forEach((i) => {
-              if (i in tmp) tmp[i] += parseFloat(this.$store.state.vizData[sK].data[d].value);
-              else tmp[i] = parseFloat(this.$store.state.vizData[sK].data[d].value);
-            });
+      var tmp = {};
+      Object.keys(this.$store.state.vizData).forEach((sK) => {
+        Object.keys(this.$store.state.vizData[sK].data).forEach((d) => {
+          this.$store.state.vizData[sK].data[d].dates.forEach((i) => {
+            if (i in tmp) tmp[i] += parseFloat(this.$store.state.vizData[sK].data[d].value);
+            else tmp[i] = parseFloat(this.$store.state.vizData[sK].data[d].value);
           });
         });
+      });
 
-        var res = [];
-        Object.keys(tmp).forEach((k) => {
-          res.push([k, tmp[k]]);
+      var res = [];
+      Object.keys(tmp).forEach((k) => {
+        res.push([k, tmp[k]]);
+      });
+
+      var min = 9999;
+      var max = 0;
+      res.forEach((r) => {
+        var val = parseInt(r[0].substring(0, 4));
+
+        if (val < min) min = val;
+        if (val > max) max = val;
+      });
+      var diff = max - min + 1;
+      var series = [];
+      for (let si = 0; si < diff; si++) {
+        series.push({
+          type: "heatmap",
+          coordinateSystem: "calendar",
+          calendarIndex: si,
+          data: res,
         });
+      }
 
-        var min = 9999;
-        var max = 0;
-        res.forEach((r) => {
-          var val = parseInt(r[0].substring(0, 4));
+      var calenderHeight = 175;
+      this.setChartHeight(series.length * calenderHeight + 75);
 
-          if (val < min) min = val;
-          if (val > max) max = val;
+      var unit = this.$store.state.vizOptionRelative ? this.$t("lbl_unit_tokenPPM") : this.$t("lbl_unit_token");
+
+      var calendars = [];
+      var top = 35;
+      this.$store.state.owid.AvailableYears.forEach((year) => {
+        calendars.push({
+          range: year,
+          cellSize: ["auto", 20],
+          dayLabel: dayMap,
+          monthLabel: monthMap,
+          top: top,
         });
-        var diff = max - min + 1;
-        var series = [];
-        for (let si = 0; si < diff; si++) {
-          series.push({
-            type: "heatmap",
-            coordinateSystem: "calendar",
-            calendarIndex: si,
-            data: res,
-          });
-        }
+        top += calenderHeight;
+      });
 
-        var unit = this.$store.state.vizOptionRelative ? this.$t("lbl_unit_tokenPPM") : this.$t("lbl_unit_token");
-
-        var calendars = [];
-        var top = 35;
-        this.$store.state.owid.AvailableYears.forEach((year) => {
-          calendars.push({
-            range: year,
-            cellSize: ["auto", 15],
-            dayLabel: dayMap,
-            monthLabel: monthMap,
-            top: top,
-          });
-          top += 140;
-        });
-
-        return {
-          toolbox: {
-            show: true,
-            feature: {
-              saveAsImage: {
-                title: this.$t("lbl_save") + " \xa0 \xa0 \xa0 \xa0 \xa0",
-                name: this.$t("lbl_export_fileName"),
-              },
+      return {
+        toolbox: {
+          show: true,
+          feature: {
+            saveAsImage: {
+              title: this.$t("lbl_save") + " \xa0 \xa0 \xa0 \xa0 \xa0",
+              name: this.$t("lbl_export_fileName"),
             },
           },
-          tooltip: {
-            position: "top",
-            formatter: function (params) {
-              return (
-                params.value[0].substring(0, 10) +
-                ": " +
-                params.value[1].toFixed(3).replace(",", "'").replace(".", ",") +
-                " " +
-                unit
-              );
-            },
+        },
+        tooltip: {
+          position: "top",
+          formatter: function (params) {
+            return (
+              params.value[0].substring(0, 10) +
+              ": " +
+              params.value[1].toFixed(3).replace(",", "'").replace(".", ",") +
+              " " +
+              unit
+            );
           },
-          visualMap: {
-            min: Math.min(...res.map((o) => o[1]), 0),
-            max: Math.max(...res.map((o) => o[1]), 0),
-            calculable: true,
-            orient: "horizontal",
-            left: "center",
-            top: "bottom",
-            inRange: {
-              color: ["#1feaea", "#ffd200", "#f72047"],
-            },
+        },
+        visualMap: {
+          min: Math.min(...res.map((o) => o[1]), 0),
+          max: Math.max(...res.map((o) => o[1]), 0),
+          calculable: true,
+          orient: "horizontal",
+          left: "center",
+          top: "bottom",
+          inRange: {
+            color: ["#1feaea", "#ffd200", "#f72047"],
           },
-          calendar: calendars,
-          series: series,
-        };
+        },
+        calendar: calendars,
+        series: series,
+      };
     },
   },
 };
