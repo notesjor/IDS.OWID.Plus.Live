@@ -165,14 +165,15 @@
       </v-expansion-panel>
     </v-expansion-panels>
 
-    <v-snackbar v-model="snackbar">
+    <v-snackbar v-model="snackbar">      
+      <img :src="'https://owid.de/api/qrcode/png?p=' + this.$data.snackbarQrcode"/>
       <v-text-field label="Link" :value="snackbarLink" readonly> </v-text-field>
       <a @click="copyToClipboard">
         <v-icon>mdi-content-copy</v-icon><span style="color:white;">{{ $t("lbl_copy") }}</span>
-      </a>
+      </a>      
 
       <template v-slot:action="{ attrs }">
-        <v-btn text v-bind="attrs" @click="snackbar = false">
+        <v-btn text v-bind="attrs" @click="snackbar = false" style="vertical-aign:bottom">
           {{ $t("lbl_ok") }}
         </v-btn>
       </template>
@@ -253,6 +254,7 @@ export default {
 
       snackbar: false,
       snackbarLink: "",
+      snackbarQrcode: "",
     };
   },
 
@@ -308,6 +310,7 @@ export default {
       var locale = this.$cookie.get("locale");
       this.$data.snackbarLink =
         this.$config.webUrl + "?" + (locale != "de" ? "locale=" + locale + "&" : "") + "data=" + btoa(JSON.stringify(data));
+      this.$data.snackbarQrcode = encodeURIComponent(this.$data.snackbarLink.replace("https://www.owid.de/"));
       this.$data.snackbar = true;
     },
     exportTsv(i) {
