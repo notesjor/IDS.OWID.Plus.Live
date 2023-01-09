@@ -259,7 +259,7 @@ export default {
       { text: this.$t("clipboard_tableHeader_sum"), value: "s", align: "end" },
       { text: this.$t("clipboard_tableHeader_sumRel"), value: "sRel", align: "end" },
       { text: this.$t("clipboard_tableHeader_miniChartRel"), value: "sparkNorm", align: "end" },
-      { text: "KorAP", value: "korap" },    
+      { text: "KorAP", value: "korap", sortable: false },    
     ];
   },
 
