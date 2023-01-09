@@ -271,8 +271,6 @@ export class OwidLiveStorage {
         korap += `[orth=${wS[i]}/i & pos=${pS[i]}] `;
       }
 
-      console.log(korap);
-
       res.push({
         key: item.Key,
 

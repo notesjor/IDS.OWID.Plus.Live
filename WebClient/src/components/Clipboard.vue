@@ -198,23 +198,25 @@
                 
                   <v-card>
                     <v-card-title class="text-h5 grey lighten-2" style="margin-bottom:20px">
-                      Anmeldung
+                      KorAP-Anmeldung
                     </v-card-title>
                   
                     <v-card-text>
-                      <v-row class="signinFormRow">
-                        <v-text-field outlined label="Benutzername" v-model="user"></v-text-field>
-                      </v-row>
-                      <v-row class="signinFormRow">
-                        <v-text-field outlined label="Kennwort" type="password" v-model="password"></v-text-field>
-                      </v-row>
+                      <div>
+                        <v-row>
+                          <v-text-field outlined label="Benutzername" v-model="user"></v-text-field>
+                        </v-row>
+                        <v-row>
+                          <v-text-field outlined label="Kennwort" type="password" v-model="password"></v-text-field>
+                        </v-row>
+                      </div>
                     </v-card-text>
                   
                     <v-divider></v-divider>
                   
                     <v-card-actions>
                       <v-col>
-                        <a class="signinLink" href="https://perso.ids-mannheim.de/registration/" rel="_blank">Registrieren</a>
+                        <a class="signinLink" href="https://perso.ids-mannheim.de/registration/" rel="_blank">Registrieren</a><br/>
                         <a class="signinLink" href="https://perso.ids-mannheim.de/registration/" rel="_blank">Passwort
                           vergessen?</a>
                       </v-col>
