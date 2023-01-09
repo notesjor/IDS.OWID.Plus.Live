@@ -257,13 +257,21 @@ export class OwidLiveStorage {
         s += item.Date[key].value;
       });
 
-      var spark = [];
       var sparkNorm = [];
       for (var i in normd) {
-        var v = i in item.Date ? item.Date[i] : 0;
-        spark.push(v);
-        sparkNorm.push(Math.round((v / normd[i]) * 1000000.0));
+        var v = i in item.Date ? item.Date[i].value : 0;  
+        sparkNorm.push(Math.round((v / normd[i] * 1000000.0), 0));
+      }      
+
+      var wS = tokens[0].split(" ");
+      var pS = tokens[2].split(" ");
+
+      var korap = "";
+      for (let i = 0; i < wS.length; i++) {
+        korap += `[orth=${wS[i]}/i & pos=${pS[i]}] `;
       }
+
+      console.log(korap);
 
       res.push({
         key: item.Key,
@@ -276,8 +284,9 @@ export class OwidLiveStorage {
         dRel: ((d / dates.length) * 100.0).toFixed(5),
         s: s,
         sRel: ((s / total) * 1000000.0).toFixed(5),
-        spark: spark,
         sparkNorm: sparkNorm,
+
+        korap: korap.trim(),
 
         checked: item.IsSelected,
       });

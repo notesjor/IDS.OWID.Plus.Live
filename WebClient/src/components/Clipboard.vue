@@ -121,7 +121,7 @@
             :items="i.grid"
             :search="search"
             :single-select="false"
-            :footer-props="{ itemsPerPageOptions: [10, 20, 50, 100, 250, -1] }"
+            :footer-props="{ itemsPerPageOptions: [3, 5, 10, 25, 50, 100, 250, -1], options: { itemsPerPage: 5 } }"
             @input="selectionChanged"
             v-model="selected"
             item-key="key"
@@ -131,9 +131,9 @@
             show-select
           >
             <!-- eslint-disable -->
-            <template v-slot:item.spark="x">
+            <template v-slot:item.sparkNorm="x">
               <v-sparkline
-                :value="x.item.spark"
+                :value="x.item.sparkNorm"
                 :gradient="gradient"
                 :smooth="true"
                 :padding="0"
@@ -145,19 +145,10 @@
                 auto-draw
               ></v-sparkline>
             </template>
-            <template v-slot:item.sparkNorm="x">
-              <v-sparkline
-                :value="x.item.spark"
-                :gradient="gradient"
-                :smooth="true"
-                :padding="0"
-                :gradient-direction="gradientDirection"
-                :fill="false"
-                :type="type"
-                :auto-line-width="true"
-                auto-draw-easing="none"
-                auto-draw
-              ></v-sparkline>
+            <template v-slot:item.korap="x">
+              <v-btn icon @click="openKorap(x.item.korap)">
+                <v-icon>mdi-open-in-new</v-icon>
+              </v-btn>
             </template>
             <!-- eslint-enable -->
           </v-data-table>
@@ -267,8 +258,8 @@ export default {
       { text: this.$t("clipboard_tableHeader_detectedDaysPercent"), value: "dRel", align: "end" },
       { text: this.$t("clipboard_tableHeader_sum"), value: "s", align: "end" },
       { text: this.$t("clipboard_tableHeader_sumRel"), value: "sRel", align: "end" },
-      { text: this.$t("clipboard_tableHeader_miniChart"), value: "spark", align: "end" },
-      { text: this.$t("clipboard_tableHeader_miniChartRel"), value: "sparkNorm" },
+      { text: this.$t("clipboard_tableHeader_miniChartRel"), value: "sparkNorm", align: "end" },
+      { text: "KorAP", value: "korap" },    
     ];
   },
 
