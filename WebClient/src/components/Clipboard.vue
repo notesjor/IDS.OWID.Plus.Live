@@ -153,7 +153,7 @@
                     <v-icon style="margin-left:10px" v-bind="attrs" v-on="on" color="primary" @click="kwicSearch(x.item.korap)">mdi-open-in-new</v-icon>
                   </template>
                 
-                  <v-card style="margin-top:25px">
+                  <v-card style="margin-top:15px">
                     <v-card-title class="text-h5 grey lighten-2" style="margin-bottom:20px">
                       KorAP-Belege für: <span style="font-weight:lighter; margin-left:10px; margin-right:5px">{{ x.item.korap }}</span>
                       <a :href="getKorapLink(x.item.korap)" target="_blank" style="text-decoration:none"><v-icon>mdi-open-in-new</v-icon></a>
@@ -170,7 +170,7 @@
                         <v-alert color="#f9b211" dense outlined text type="warning">
                           <strong>Hinweis:</strong> Diese Funktion befindet sich aktuell in der Entwicklung (Beta-Status). OWIDplusLIVE fragt zufällige Belege aus KorAP ab. Diese Belege sind <u>nicht</u> Teil der Datenmenge von OWIDplusLIVE.
                         </v-alert>
-                        <div style="display: flex; justify-content: center; align-items: center; margin-top:20px">
+                        <div style="display: flex; justify-content: center; align-items: center; margin-top:15px">
                           <table style="display:block">
                             <tr v-for="item in kwic" :key="item.matchID" style="font-size: 10px">
                               <td style="padding-top:3px; text-align: right; font-size: 14px;">{{ item.left }}</td>
@@ -191,7 +191,7 @@
               </div>
               <div v-else>
                 <!-- ANMELDEFORMULAR START -->
-                <v-dialog v-model="dialog_signin" width="500">
+                <v-dialog v-model="dialog_signin" width="500" persistent>
                   <template v-slot:activator="{ on, attrs }">
                     <v-icon style="margin-left:10px" v-bind="attrs" v-on="on">mdi-open-in-new</v-icon>
                   </template>
@@ -209,19 +209,25 @@
                         <v-row>
                           <v-text-field outlined label="Kennwort" type="password" v-model="password"></v-text-field>
                         </v-row>
+                        <v-alert color="red" dense outlined text type="error" v-if="dialog_signin_error">
+                          Bitte überprüfen Sie ihre Eingabe.<br/>Benutzername und/oder Kennwort sind falsch.
+                        </v-alert>
                       </div>
                     </v-card-text>
                   
                     <v-divider></v-divider>
                   
                     <v-card-actions>
-                      <v-col>
-                        <a class="signinLink" href="https://perso.ids-mannheim.de/registration/" rel="_blank">Registrieren</a><br/>
-                        <a class="signinLink" href="https://perso.ids-mannheim.de/registration/" rel="_blank">Passwort
+                      <v-col cols="5">
+                        <a class="signinLink" href="https://perso.ids-mannheim.de/registration/" target="_blank">Registrieren</a><br/>
+                        <a class="signinLink" href="https://perso.ids-mannheim.de/registration/" target="_blank">Passwort
                           vergessen?</a>
                       </v-col>
-                      <v-col style="text-align:right">
-                        <v-btn color="primary" @click="signIn">Anmelden</v-btn>
+                      <v-col style="text-align:right" cols="3">
+                        <v-btn color="primary" @click="signIn(x.item.korap)">Anmelden</v-btn>                        
+                      </v-col>
+                      <v-col style="text-align:right" cols="3">
+                        <v-btn color="orange" @click="dialog_signin = false">Abbrechen</v-btn>
                       </v-col>
                     </v-card-actions>
                   </v-card>
@@ -236,7 +242,7 @@
     </v-expansion-panels>
 
     <v-snackbar v-model="snackbar">      
-      <img :src="'https://owid.de/api/qrcode/png?p=' + this.$data.snackbarQrcode"/>
+      <img :src="'https://www.owid.de/api/qrcode/png?p=' + this.$data.snackbarQrcode"/>
       <v-text-field label="Link" :value="snackbarLink" readonly> </v-text-field>
       <a @click="copyToClipboard">
         <v-icon>mdi-content-copy</v-icon><span style="color:white;">{{ $t("lbl_copy") }}</span>
@@ -334,9 +340,10 @@ export default {
 
       dialog_search: false,
       dialog_signin: false,
+      dialog_signin_error: false,
       user: "",
       password: "",
-      isSignedIn: false,
+      isSignedIn: false,      
       timer: null,
       authentication: null,
       kwic: null
@@ -467,7 +474,7 @@ export default {
       var self = this;
       console.log("start");
 
-      fetch('https://owid.de/api/kwic/search?query=' + encodeURIComponent(query), {
+      fetch('https://www.owid.de/api/kwic/search?query=' + encodeURIComponent(query), {
             method: 'GET',
             redirect: 'follow',
             headers: {
@@ -481,13 +488,18 @@ export default {
             })
             .catch((error) => console.log('error', error))
     },
-    async signIn(){
-      if(await authentication.signIn(this.$data.user, this.$data.password))
-        {
-          this.$data.dialog_signin = false;
-          this.kwicSearch();
-          this.$data.dialog_search = true;
+    signIn(query){
+      var self = this;
+      authentication.signIn(this.$data.user, this.$data.password).then(r=>{
+        if(r){
+          self.$data.dialog_signin = false;
+          self.kwicSearch(query);
+          self.$data.dialog_search = true;
+        }else{
+          self.$data.dialog_signin_error = true;
+          self.$data.dialog_signin = true;
         }
+      });
     },
     signOut(){
       authentication.signOut();

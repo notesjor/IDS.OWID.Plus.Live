@@ -16,6 +16,11 @@ export default class auth {
 
     var url = "https://www.owid.de/api/auth/signin";
     return fetch(url, requestOptions)
+      .then(response => {
+        if(response.status != 200)
+          throw new Error("unauthorized") 
+        return response;
+      })
       .then(response => response.text())
       .then(result => {
         var now = new Date();
