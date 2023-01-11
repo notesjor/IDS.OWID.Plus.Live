@@ -111,7 +111,7 @@
             </div>
           </div>
         </v-list-item>
-        <v-list-item @click="showTutorial">
+        <v-list-item @click="showTutorial" v-if="config.tutorialUrl.length > 0">
           <v-icon style="font-size:32px; float:left; margin-right:5px">mdi-help-circle-outline</v-icon>
           <div class="d-none d-sm-flex">
             <span style="font-size:14px; line-height:1; font-weight:200; margin-top:10px;">
@@ -144,25 +144,13 @@
       </v-list>
     </v-menu>
 
-    <v-overlay :value="tutorial">
+    <v-overlay :value="!tutorial">
       <div class="text-center">
         <v-card>
           <v-card-title class="headline">
             {{ $t("app_dialog_welcome_message") }} {{ this.$config.appName }}
           </v-card-title>
-          <video
-            v-if="tutorial_mp4"
-            controls
-            crossorigin
-            playsinline
-            autoplay
-            ref="tutorial_video"
-            style="max-width:600px"
-          >
-            <source size="1080" ref="tutorial_video_source" src="" type="video/mp4" />
-          </video>
           <iframe
-            v-if="tutorial_iframe"
             ref="tutorial_iframe"
             src=""
             title="Video-Tutorial"
@@ -172,7 +160,7 @@
             {{ $t("app_dialog_welcome_message_info") }}
           </v-card-text>
           <v-card-actions>
-            <v-btn text @click="tutorial = false" class="blink">
+            <v-btn text @click="closeTutorial" class="blink">
               <v-icon style="margin-right:10px">
                 mdi-arrow-right-circle-outline
               </v-icon>
@@ -274,9 +262,7 @@ export default {
   },
 
   data: () => ({
-    tutorial: true,
-    tutorial_iframe: true,
-    tutorial_mp4: true,
+    tutorial: false,
     alert: false,
 
     leftIconHref: null,
@@ -289,11 +275,10 @@ export default {
 
   methods: {
     newProject: function() {
-      this.$cookie.set("tutorial", "mute", 1);
       location.reload();
     },
     showTutorial: function() {
-      location.reload();
+      this.tutorial = false;
     },
     blink(event) {
       event.target.style.background = "red";
@@ -306,29 +291,24 @@ export default {
       window.scrollBy(0, -100);
     },
     setLocale(locale) {
-      this.$cookie.set("locale", locale, 7);
-      this.$cookie.set("tutorial", "mute", 1);
-      this.$cookie.set("reload", 1, 1);
-      location.reload();
+      localStorage.setItem("locale", locale);
+      this.$vuetify.lang.current = this.$i18n.locale = locale;      
+    },
+    closeTutorial(){
+      this.tutorial = true;
+      localStorage.setItem("tutorial", true);
     }
   },
 
   created() {
-    var locale = this.$cookie.get("locale");
-    if (locale === null || locale.length < 2) return;
-    this.$vuetify.lang.current = this.$i18n.locale = locale;
-    this.$cookie.set("locale", locale, 7);
-
-    this.tutorial = this.$cookie.get("tutorial") != "mute";
-    this.$cookie.set("tutorial", "", 1);
+    var locale = localStorage.getItem("locale", locale);
+    if (locale != null)
+      this.setLocale(locale);
+    
+    this.tutorial = localStorage.getItem("tutorial") ?? false;
   },
 
   mounted() {
-    if(this.$cookie.get("reload") == 1) {
-      this.$cookie.set("reload", 0, 1);
-      location.reload();
-    }
-
     var self = this;
     var store = this.$store;
     var search = this.$refs.searchComponent;
@@ -341,21 +321,6 @@ export default {
     this.footerImpressum = config.footerImpressum;
     this.footerDsgvo = config.footerDsgvo;
 
-    // Als Tutorial lassen sich MP4-Video-Dateien (inkl. PNG-Poster => myvideo.mp4.png) oder
-    // eine externe HTML-Datei mit Video-Player laden.
-    if (config.tutorialUrl.length < 1) this.tutorial = false;
-    else {
-      if (config.tutorialUrl.endsWith(".mp4")) {
-        this.$refs.tutorial_video.poster = config.tutorialUrl + ".png";
-        this.$refs.tutorial_video_source.src = config.tutorialUrl;
-        this.tutorial_iframe = false;
-      } else {
-        this.$refs.tutorial_iframe.src = config.tutorialUrl;
-        this.tutorial_mp4 = false;
-      }
-      this.tutorial = true;
-    }
-
     // Der Aufruf INIT sowie NORM lädt notwendige Normdaten herunter.
     // INIT kann serverseitig zur Flood-Detection und Loging verwendet werden.
     fetch(config.baseUrl + "/init")
@@ -367,10 +332,16 @@ export default {
           method: "GET",
         })
           .then((resp) => {
+            if(resp.status != 200)
+              throw new Error("Server Error");
+            return resp;
+          })
+          .then((resp) => {
             return resp.ok ? resp.json() : null;
           })
           .then((obj) => {
-            if (obj === null) return;
+            if (obj === null)
+              throw new Error("No Data");
             store.commit("init", obj);
           })
           .then(() => {
@@ -388,7 +359,7 @@ export default {
 
             if (data.length < 10) return;
 
-            this.tutorial = false;
+            this.tutorial = true;
             try {
               search.search_invoke(JSON.parse(atob(data)));
             } catch {
@@ -405,6 +376,13 @@ export default {
     let trackingScript = document.createElement("script");
     trackingScript.setAttribute("src", "./tracking.js");
     document.head.appendChild(trackingScript);
+    
+    // Als Tutorial lassen sich MP4-Video-Dateien (inkl. PNG-Poster => myvideo.mp4.png) oder
+    // eine externe HTML-Datei mit Video-Player laden.
+    if (config.tutorialUrl.length < 1) 
+      this.tutorial = true;
+    else 
+      this.$refs.tutorial_iframe.src = config.tutorialUrl;
   },
   computed: {
     totalLabel: function() {

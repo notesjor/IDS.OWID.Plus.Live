@@ -8,7 +8,6 @@ export default class auth {
       "psw": password
     });
 
-    var self = this;
     var requestOptions = {
       method: 'POST',
       body: raw,

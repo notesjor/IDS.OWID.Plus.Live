@@ -21,6 +21,10 @@
               <h2 style="text-align:center;">Bitte warten...</h2>
               <h4 style="text-align:center;">Die KorAP-Abfrage nimmt wenige Sekunden in Anspruch.</h4>
             </div>
+            <div v-else-if="kwic === -1">
+              <h2 style="text-align:center;">Keine Ergebnisse</h2>
+              <h4 style="text-align:center;">Die KorAP-Abfrage lieferte keine passenden Ergebnisse. Bitte probieren Sie eine andere Abfrage aus.</h4>
+            </div>
             <div v-else>
               <v-alert color="#f9b211" dense outlined text type="warning">
                 <strong>Hinweis:</strong> Diese Funktion befindet sich aktuell in der Entwicklung (Beta-Status).
@@ -160,10 +164,24 @@ export default {
           'Authorization': self.authentication.bearerToken,
         }
       })
+        .then((response) => {
+          if (response.status != 200) {
+            self.$data.kwic = -1;
+            throw new Error('Error while fetching KWIC');
+          }
+          return response;
+        })
         .then((response) => response.json())
-        .then((result) => {
-          console.log(result)
-          self.$data.kwic = kwicHelper.optimizeKwic(result)
+        .then((response) => {
+          console.log('response', response);
+          if(response === null || response.Results === null || response.Results.length === 0)
+          {
+            self.$data.kwic = -1;
+          }
+          else
+          {
+            self.$data.kwic = kwicHelper.optimizeKwic(response)
+          }          
         })
         .catch((error) => console.log('error', error))
     },

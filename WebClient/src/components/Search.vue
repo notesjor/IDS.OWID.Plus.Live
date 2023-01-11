@@ -799,7 +799,7 @@ async function sendSearchRequest(data, store, n, queryItems) {
                 error = true;
                 return;
               }
-
+              
               data.progressMsg = globalT.$t("search_progress_msg03");
               store.commit("search", {
                 n: n,
