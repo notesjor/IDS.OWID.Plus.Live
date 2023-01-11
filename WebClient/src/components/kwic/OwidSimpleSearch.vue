@@ -153,9 +153,7 @@ export default {
   methods: {
     kwicSearch: function () {
       var self = this;
-      console.log("start");
-
-      fetch('https://www.owid.de/api/kwic/search?query=' + self.query + '/i', {
+      fetch('https://www.owid.de/api/kwic/search?query=' + encodeURIComponent(self.query), {
         method: 'GET',
         redirect: 'follow',
         headers: {
