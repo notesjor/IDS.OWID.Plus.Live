@@ -13,7 +13,7 @@ export default class kwic{
     
         txt = this.removeAll(txt, '</span>', '');
         txt = this.removeAll(txt, '<span class="more">', '');
-        txt = this.removeAll(txt, '<span class="more">', '');
+        txt = this.removeAll(txt, '<span class=\"more\">', '');
         txt = this.removeAll(txt, '<span class="context-left">', '');
         txt = this.removeAll(txt, '<span class="match">', '');
         txt = this.removeAll(txt, '<span class="context-right">', '');
