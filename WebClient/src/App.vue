@@ -111,7 +111,7 @@
             </div>
           </div>
         </v-list-item>
-        <v-list-item @click="showTutorial" v-if="config.tutorialUrl.length > 0">
+        <v-list-item @click="showTutorial" v-if="$config.tutorialUrl.length > 0">
           <v-icon style="font-size:32px; float:left; margin-right:5px">mdi-help-circle-outline</v-icon>
           <div class="d-none d-sm-flex">
             <span style="font-size:14px; line-height:1; font-weight:200; margin-top:10px;">
@@ -151,8 +151,7 @@
             {{ $t("app_dialog_welcome_message") }} {{ this.$config.appName }}
           </v-card-title>
           <iframe
-            ref="tutorial_iframe"
-            src=""
+            :src="tutorial_iframe_src"
             title="Video-Tutorial"
             style="width:600px; max-width:600px; height:414px; max-height:414px;"
           ></iframe>
@@ -263,6 +262,7 @@ export default {
 
   data: () => ({
     tutorial: false,
+    tutorial_iframe_src: "",
     alert: false,
 
     leftIconHref: null,
@@ -382,7 +382,7 @@ export default {
     if (config.tutorialUrl.length < 1) 
       this.tutorial = true;
     else 
-      this.$refs.tutorial_iframe.src = config.tutorialUrl;
+      this.$data.tutorial_iframe_src = config.tutorialUrl;
   },
   computed: {
     totalLabel: function() {
