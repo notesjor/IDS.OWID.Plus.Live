@@ -146,7 +146,7 @@
               ></v-sparkline>
             </template>
             <template v-slot:item.korap="x">
-              <OwidSimpleSearch :query="x.item.korap" />
+              <kwicBtnSearch :query="x.item.korap" />
             </template>
             <!-- eslint-enable -->
           </v-data-table>
@@ -222,13 +222,13 @@ export function onFileLoaded(e) {
 
 export var storeGlobal;
 
-import OwidSimpleSearch from './kwic/OwidSimpleSearch.vue';
+import kwicBtnSearch from './kwicBtnSearch.vue';
 
 export default {
   name: "Clipboard",
 
   components: {
-    OwidSimpleSearch
+    kwicBtnSearch
   },
 
   data: () => {
