@@ -173,28 +173,6 @@ export function saveClipboard(str) {
   document.body.removeChild(el);
 }
 
-export function handleFileSelect(e) {
-  var files = e.target.files;
-  if (files.length < 1) {
-    alert("select a file...");
-    return;
-  }
-  var file = files[0];
-  var reader = new FileReader();
-  reader.onload = onFileLoaded;
-  reader.readAsDataURL(file);
-}
-
-export function onFileLoaded(e) {
-  var match = /^data:(.*);base64,(.*)$/.exec(e.target.result);
-  if (match == null) {
-    throw "Could not parse result";
-  }
-  var obj = JSON.parse(decodeURIComponent(escape(atob(match[2]))));
-  storeGlobal.commit("modelLoad", obj.Owid);
-  storeGlobal.commit("calculate");
-}
-
 export var storeGlobal;
 
 import kwicBtnSearch from './kwicBtnSearch.vue';
@@ -330,23 +308,35 @@ export default {
     modelLoad() {
       storeGlobal = this.$store;
       var fileinput = document.getElementById("fileinput");
-      fileinput.addEventListener("change", handleFileSelect);
+      fileinput.addEventListener("change", this.handleFileSelect);
       fileinput.click();
     },
     copyToClipboard() {
       saveClipboard(this.$data.snackbarLink);
     },
-  },
-
-  created() {
-    var data = this.$data;
-
-    this.$store.watch(
-      () => {
-        return this.$store.state.searches;
-      },
-      () => {
-        if (this.$store.state.owid === null) return;
+    handleFileSelect(e) {
+      var files = e.target.files;
+      if (files.length < 1) {
+        alert("select a file...");
+        return;
+      }
+      var file = files[0];
+      var reader = new FileReader();
+      reader.onload = this.onFileLoaded;
+      reader.readAsDataURL(file);
+    },
+    onFileLoaded(e) {
+      var match = /^data:(.*);base64,(.*)$/.exec(e.target.result);
+      if (match == null) {
+        throw "Could not parse result";
+      }
+      var obj = JSON.parse(decodeURIComponent(escape(atob(match[2]))));
+      storeGlobal.commit("modelLoad", obj.Owid);
+      storeGlobal.commit("calculate");
+      this.refreshData();
+    },
+    refreshData(){
+      if (this.$store.state.owid === null) return;
 
         var selected = new Set();
         var selectedSums = [];
@@ -366,17 +356,29 @@ export default {
           if (this.$store.state.owid.OwidLiveSearches[key].IsSelected) selectedSums.push(key);
         });
 
-        data.syncLock = true;
-        data.selected = Array.from(selected);
-        data.syncSumSelection = selectedSums;
-        data.entries = res;
+        this.$data.syncLock = true;
+        this.$data.selected = Array.from(selected);
+        this.$data.syncSumSelection = selectedSums;
+        this.$data.entries = res;
 
         var exp = [];
         var max = res.length > 3 ? 3 : res.length;
         for (var ei = 0; ei < max; ei++) exp.push(ei);
-        data.expanded = exp;
+        this.$data.expanded = exp;
 
-        data.syncLock = false;
+        this.$data.syncLock = false;
+    }
+  },
+
+  created() {
+    var self = this;
+
+    this.$store.watch(
+      () => {
+        return self.$store.state.searches;
+      },
+      () => {
+        self.refreshData();
       },
       {
         deep: true,
