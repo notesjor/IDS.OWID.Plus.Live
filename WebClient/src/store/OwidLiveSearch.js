@@ -24,7 +24,9 @@ export class OwidLiveSearch {
     obj.OwidLiveStorageTimeItems.forEach((x) => {
       olsti.push(OwidLiveStorageTimeItem.load(x));
     });
+
     var res = new OwidLiveSearch(obj.N, obj.Request, null);
+    res.#Key = obj.Key;
     res.#IsSelected = obj.IsSelected;
     res.#OwidLiveStorageTimeItems = olsti;
     res.#TimeStamp = obj.TimeStamp;

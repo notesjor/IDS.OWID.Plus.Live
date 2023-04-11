@@ -44,7 +44,7 @@
                     <div
                       style="display: table-cell; padding: 3px 3px 3px 3px; font-weight: 600; text-align: center; font-size: 14px;">
                       <div>{{ item.match }}</div>
-                      <div style="position:relative; top:-3px; font-size: 10px; font-weight: 300; width: 100%;">
+                      <div style="position:relative; top:-3px; font-size: 11px; font-weight: 300; width: 100%;">
                         {{ item.sigle }}</div>
                     </div>
                     <div class="truncate"

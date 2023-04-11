@@ -93,22 +93,16 @@
 
                 <v-list>
                   <v-list-item @click="exportLink(i)">
-                    <v-list-item-title
-                      ><v-icon style="margin-right:10px">mdi-link-variant</v-icon
-                      >{{ $t("clipboard_export_link") }}</v-list-item-title
-                    >
+                    <v-list-item-title><v-icon style="margin-right:10px">mdi-link-variant</v-icon>{{
+                      $t("clipboard_export_link") }}</v-list-item-title>
                   </v-list-item>
                   <v-list-item @click="exportTsv(i)">
-                    <v-list-item-title
-                      ><v-icon style="margin-right:10px">mdi-export</v-icon
-                      >{{ $t("clipboard_export_tsv") }}</v-list-item-title
-                    >
+                    <v-list-item-title><v-icon style="margin-right:10px">mdi-export</v-icon>{{ $t("clipboard_export_tsv")
+                    }}</v-list-item-title>
                   </v-list-item>
                   <v-list-item @click="exportJson(i)">
-                    <v-list-item-title
-                      ><v-icon style="margin-right:10px">mdi-export</v-icon
-                      >{{ $t("clipboard_export_json") }}</v-list-item-title
-                    >
+                    <v-list-item-title><v-icon style="margin-right:10px">mdi-export</v-icon>{{ $t("clipboard_export_json")
+                    }}</v-list-item-title>
                   </v-list-item>
                 </v-list>
               </v-menu>
@@ -116,34 +110,15 @@
           </div>
         </v-expansion-panel-header>
         <v-expansion-panel-content>
-          <v-data-table
-            :headers="headers"
-            :items="i.grid"
-            :search="search"
-            :single-select="false"
+          <v-data-table :headers="headers" :items="i.grid" :search="search" :single-select="false"
             :footer-props="{ itemsPerPageOptions: [3, 5, 10, 25, 50, 100, 250, -1], options: { itemsPerPage: 5 } }"
-            @input="selectionChanged"
-            v-model="selected"
-            item-key="key"
-            mutli-sort
-            :sort-by="['dRel']"
-            :sort-desc="[true]"
-            show-select
-          >
+            @input="selectionChanged" v-model="selected" item-key="key" mutli-sort :sort-by="['dRel']" :sort-desc="[true]"
+            show-select>
             <!-- eslint-disable -->
             <template v-slot:item.sparkNorm="x">
-              <v-sparkline
-                :value="x.item.sparkNorm"
-                :gradient="gradient"
-                :smooth="true"
-                :padding="0"
-                :gradient-direction="gradientDirection"
-                :fill="false"
-                :type="type"
-                :auto-line-width="true"
-                auto-draw-easing="none"
-                auto-draw
-              ></v-sparkline>
+              <v-sparkline :value="x.item.sparkNorm" :gradient="gradient" :smooth="true" :padding="0"
+                :gradient-direction="gradientDirection" :fill="false" :type="type" :auto-line-width="true"
+                auto-draw-easing="none" auto-draw></v-sparkline>
             </template>
             <template v-slot:item.korap="x">
               <kwicBtnSearch :query="x.item.korap" />
@@ -154,12 +129,12 @@
       </v-expansion-panel>
     </v-expansion-panels>
 
-    <v-snackbar v-model="snackbar">      
-      <img :src="'https://www.owid.de/api/qrcode/png?p=' + this.$data.snackbarQrcode"/>
+    <v-snackbar v-model="snackbar">
+      <img :src="'https://www.owid.de/api/qrcode/png?p=' + this.$data.snackbarQrcode" />
       <v-text-field label="Link" :value="snackbarLink" readonly> </v-text-field>
       <a @click="copyToClipboard">
         <v-icon>mdi-content-copy</v-icon><span style="color:white;">{{ $t("lbl_copy") }}</span>
-      </a>      
+      </a>
 
       <template v-slot:action="{ attrs }">
         <v-btn text v-bind="attrs" @click="snackbar = false" style="vertical-aign:bottom">
@@ -184,7 +159,7 @@ function saveBlob(blob, fileType, fileName) {
   link.href = data;
   link.download = fileName;
   link.click();
-  setTimeout(function() {
+  setTimeout(function () {
     window.URL.revokeObjectURL(data);
   }, 100);
 }
@@ -215,7 +190,7 @@ export function onFileLoaded(e) {
   if (match == null) {
     throw "Could not parse result";
   }
-  var obj = JSON.parse(atob(match[2]));
+  var obj = JSON.parse(decodeURIComponent(escape(atob(match[2]))));
   storeGlobal.commit("modelLoad", obj.Owid);
   storeGlobal.commit("calculate");
 }
@@ -253,7 +228,7 @@ export default {
     };
   },
 
-  mounted: function() {
+  mounted: function () {
     this.headers = [
       { text: this.$t("layer_wordform"), value: "w" },
       { text: this.$t("layer_lemma"), value: "l" },
@@ -263,12 +238,12 @@ export default {
       { text: this.$t("clipboard_tableHeader_sum"), value: "s", align: "end" },
       { text: this.$t("clipboard_tableHeader_sumRel"), value: "sRel", align: "end" },
       { text: this.$t("clipboard_tableHeader_miniChartRel"), value: "sparkNorm", align: "end" },
-      { text: "KorAP", value: "korap", sortable: false },    
+      { text: "KorAP", value: "korap", sortable: false },
     ];
   },
 
   watch: {
-    selected: function(val) {
+    selected: function (val) {
       if (this.$data.syncLock) return;
 
       var sel = [];
@@ -282,7 +257,7 @@ export default {
   },
 
   methods: {
-    changeSumSelection: function() {
+    changeSumSelection: function () {
       if (this.$data.syncLock) return;
 
       this.$data.syncLock = true;
@@ -321,13 +296,13 @@ export default {
         method: "post",
         body: JSON.stringify({ Format: "TSV", N: raw.N, Requests: keys }),
       })
-        .then(function(r) {
+        .then(function (r) {
           return r.arrayBuffer();
         })
-        .then(function(buffer) {
+        .then(function (buffer) {
           saveBlob(buffer, "text/tab-separated-value", "data.tsv");
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log("Request failed", error);
         });
     },
@@ -415,28 +390,35 @@ export default {
 .v-data-table-header {
   font-weight: 400;
 }
+
 th {
   border-left-style: solid;
   border-left-color: #1976d2;
   border-left-width: 4px;
 }
+
 th.active {
   background-color: rgba(0, 0, 0, 0.05);
 }
+
 th:hover {
   background: #1976d2;
   color: white !important;
 }
+
 th:hover i {
   color: white !important;
 }
+
 td {
   background-color: white !important;
 }
+
 td.text-start .v-simple-checkbox {
   text-align: center;
 }
-.v-card__title{
-  margin-bottom: 0px!important;
+
+.v-card__title {
+  margin-bottom: 0px !important;
 }
 </style>

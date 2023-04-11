@@ -66,7 +66,7 @@ export default {
           availableDates.forEach((c) => {
             if (c in data.data) values.push(data.data[c]);
           });
-
+          
           series.push({
             name: data.name,
             type: "line",

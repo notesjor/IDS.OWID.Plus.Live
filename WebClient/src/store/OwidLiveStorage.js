@@ -24,7 +24,7 @@ export class OwidLiveStorage {
   }
 
   static load(norm, ols, n, dates, total, ntotal) {
-    var res = new OwidLiveStorage([]);
+    var res = new OwidLiveStorage(norm);
     res.#Norm = norm;
     res.#OwidLiveSearches = {};
     Object.keys(ols).forEach((x) => {
