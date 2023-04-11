@@ -30,7 +30,8 @@
             </div>
             <div v-else>
               <v-alert color="#f9b211" dense outlined text type="warning">
-                <strong>Hinweis:</strong> Diese Funktion fragt zufällige Belege aus KorAP ab.
+                <strong>Hinweis:</strong> Diese Funktion fragt zufällige Belege via KorAP ab. 
+                Die Daten sind nicht identisch mit OWIDplusLIVE. 
               </v-alert>
               <div style="display: flex; justify-content: center; align-items: center; margin-top:20px">
                 <div style="display: table; font-size: 10px; width: 100%; line-height: 18px;">
