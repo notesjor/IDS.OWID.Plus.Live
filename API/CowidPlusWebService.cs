@@ -512,7 +512,11 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
     protected override void LoadData()
     {
+      Console.WriteLine();
+      Console.Write("Start ElasticSearch...");
       _es = CreateClient("http://127.0.0.1:9200", "", "", "entries");
+      Console.WriteLine("OK");
+
       _dbs = new Dictionary<byte, EasyRocksDb>();
       for (byte i = 0; i < _n; i++)
       {
@@ -522,7 +526,9 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
           if(File.Exists(lockFile))
             File.Delete(lockFile);
 
+          Console.Write($"Start RocksDB N{(i + 1):D2}...");
           _dbs.Add((byte)(i + 1), new EasyRocksDb(Path.Combine(_dbPath, $"N{(i + 1):D2}"), true));
+          Console.WriteLine("OK");
         }
         catch (Exception ex)
         {
@@ -544,6 +550,18 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       ((ConnectionSettings)client.ConnectionSettings).DefaultIndex(index);
 
       return client;
+    }
+
+    private static void WriteLog(Exception ex)
+    {
+      try
+      {
+        File.AppendAllText("error.log", $"-----\r\n{ex.Message}\r\n{ex.StackTrace}\r\n");
+      }
+      catch
+      {
+        // ignore
+      }
     }
   }
 }
