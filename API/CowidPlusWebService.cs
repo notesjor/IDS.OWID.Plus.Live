@@ -22,6 +22,7 @@ using Nest;
 using Newtonsoft.Json;
 using Tfres;
 using HttpContext = Tfres.HttpContext;
+using IDS.Lexik.WebService.Sdk.WaitBehaviour.Abstract;
 
 namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 {
@@ -148,7 +149,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       }
     }
 
-    private void Find(HttpContext arg) 
+    private void Find(HttpContext arg)
       => FindCall(arg, 10000);
 
     private void FindCall(HttpContext arg, int max)
@@ -523,7 +524,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         try
         {
           var lockFile = Path.Combine(_dbPath, $"N{(i + 1):D2}") + "/LOCK";
-          if(File.Exists(lockFile))
+          if (File.Exists(lockFile))
             File.Delete(lockFile);
 
           Console.Write($"Start RocksDB N{(i + 1):D2}...");
