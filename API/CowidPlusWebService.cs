@@ -23,6 +23,7 @@ using Newtonsoft.Json;
 using Tfres;
 using HttpContext = Tfres.HttpContext;
 using IDS.Lexik.WebService.Sdk.WaitBehaviour.Abstract;
+using System.ComponentModel;
 
 namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 {
@@ -61,7 +62,35 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     {
       try
       {
+        #region RocksDB-Check
+        for (byte i = 1; i <= _n; i++)
+          if(string.IsNullOrWhiteSpace(_dbs[i].Get($">{i}")))
+            throw new Exception($"N{i} is empty!");
+        #endregion
+        
+        #region ElasticSearch-Check
+        var subq = new List<QueryContainer>
+        {
+          new TermQuery
+          {
+            Field = "n",
+            Value = 1
+          },
+          new QueryStringQuery
+          {
+            Query = "die",
+            Fields = "l0"
+          }
+        };
 
+        var container = new QueryContainer(new BoolQuery { Must = subq });
+
+        var items = _es.Search<EsEntry>(s => s.Query(q => container).Source(src => src.Includes(i => i.Field("key"))).Size(1));
+        if (items.Hits.Count != 1)
+          throw new Exception("ElasticSearch - Connection Error!");
+        #endregion
+
+        arg.Response.Send(HttpStatusCode.OK);
       }
       catch (Exception ex)
       {
