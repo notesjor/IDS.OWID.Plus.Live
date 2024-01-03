@@ -53,6 +53,23 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/token", Token);
       server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/update", Update);
+
+      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/heartbeat", Validate);
+    }
+
+    private void Validate(HttpContext arg)
+    {
+      try
+      {
+
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine(ex.Message);
+        Console.WriteLine(ex.StackTrace);
+
+        arg.Response.Send(HttpStatusCode.InternalServerError);
+      }
     }
 
     private void Token(HttpContext arg)
@@ -487,6 +504,25 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
                     Responses = new OpenApiResponses
                     {
                       {"200", new OpenApiResponse {Description = "OK"}}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "/heartbeat", new OpenApiPathItem
+            {
+              Operations = new Dictionary<OperationType, OpenApiOperation>
+              {
+                {
+                  OperationType.Get, new OpenApiOperation
+                  {
+                    Description = "Führt eine schnelle Validierung durch, die überprüft, ob alles wie erwartet funktioniert. Sollte in der Regel nur von Monitoring-Services aufgerufen werden.",
+                    Responses = new OpenApiResponses
+                    {
+                      {"200", new OpenApiResponse {Description = "Alles ok!"}},
+                      {"500", new OpenApiResponse {Description = "Es gibt Probleme (z. B. Server / Datenbank)"}}
                     }
                   }
                 }

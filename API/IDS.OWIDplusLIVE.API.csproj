@@ -6,12 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\Tools\LocalDataWriter\Model\ElasticSearch\EsEntry.cs" Link="Model\ElasticSearch\EsEntry.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Elasticsearch.Net" Version="7.17.5" />
-    <PackageReference Include="Microsoft.OpenApi" Version="1.6.9" />
+    <PackageReference Include="Microsoft.OpenApi" Version="1.6.11" />
     <PackageReference Include="NEST" Version="7.17.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="RocksDbNative" Version="6.2.2" />
@@ -19,15 +15,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Model\ElasticSearch\" />
-    <Folder Include="Model\Response\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\..\..\Projekte-Kooperation\TfresWebserver\TFRES.DotNet5\TFRES.DotNet5.csproj" />
     <ProjectReference Include="..\..\..\CorpusExplorerV2\CorpusExplorer\CorpusExplorer.Sdk.Db.RocksDb\CorpusExplorer.Sdk.Db.RocksDb.csproj" />
     <ProjectReference Include="..\..\IDS.Lexik.WebService\IDS.Lexik.WebService.Sdk.DotNet\IDS.Lexik.WebService.Sdk.DotNet.csproj" />
-    <ProjectReference Include="..\Tools\LocalDataWriter\IDS.Lexik.cOWIDplusViewer.v2.DataWriter.csproj" />
   </ItemGroup>
 
 </Project>
