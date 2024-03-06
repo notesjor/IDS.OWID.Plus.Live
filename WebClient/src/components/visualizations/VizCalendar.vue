@@ -1,5 +1,5 @@
 <template>
-  <v-chart ref="myChart" autoresize :option="chartOptions" :init-options="initOptions" />
+  <v-chart ref="myChart" autoresize :option="chartOptions" :init-options="initOptions" :style="chartStyle" />
 </template>
 
 <script>
@@ -60,6 +60,8 @@ export default {
   },
   methods: {
     setChartHeight: function (height) {
+      this.$data.chartStyle = `min-height:${height}px;`;
+
       var refs = this.$refs;
       setTimeout(() => {
         refs.myChart.resize({ height: height });
@@ -131,7 +133,9 @@ export default {
       }
 
       var calenderHeight = 175;
-      this.setChartHeight(series.length * calenderHeight + 75);
+      var chartSize = series.length * calenderHeight + 425;
+      console.log(chartSize)
+      this.setChartHeight(chartSize);      
 
       var unit = this.$store.state.vizOptionRelative ? this.$t("lbl_unit_tokenPPM") : this.$t("lbl_unit_token");
 

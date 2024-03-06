@@ -100,7 +100,7 @@
             <VizTimeChart style="min-height:650px"></VizTimeChart>
           </v-tab-item>
           <v-tab-item :transition="false">
-            <VizCalendar style="min-height:650px"></VizCalendar>
+            <VizCalendar></VizCalendar>
           </v-tab-item>
           <v-tab-item :transition="false">
             <VizSankey></VizSankey>
