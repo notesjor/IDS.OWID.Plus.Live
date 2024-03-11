@@ -113,14 +113,16 @@ export default {
         res.push([k, tmp[k]]);
       });
 
-      var min = 9999;
+      var min = 2020;
       var max = 0;
+
       res.forEach((r) => {
         var val = parseInt(r[0].substring(0, 4));
 
         if (val < min) min = val;
         if (val > max) max = val;
       });
+
       var diff = max - min + 1;
       var series = [];
       for (let si = 0; si < diff; si++) {
