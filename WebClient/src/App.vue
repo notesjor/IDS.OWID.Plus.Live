@@ -343,6 +343,8 @@ export default {
             if (obj === null)
               throw new Error("No Data");
             store.commit("init", obj);
+
+            store.commit("vizOption", { r: true, s: 16, g: 1 });
           })
           .then(() => {
             const queries = new URLSearchParams(window.location.search);

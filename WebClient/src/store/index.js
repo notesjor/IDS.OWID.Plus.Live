@@ -16,7 +16,7 @@ export default new Vuex.Store({
     vizNoCommit: 0,
     vizOptionRelative: true,
     vizOptionGranulation: 0,
-    vizOptionSmoothing: 7,
+    vizOptionSmoothing: 16,
 
     vizData: null,
   },
@@ -186,11 +186,11 @@ export default new Vuex.Store({
           normData = state.owid.NormDate;
           break;
       }
-      // relativ Frquency
+      // relativ Frquency      
       if (state.vizOptionRelative) {
         Object.keys(res).forEach((key) => {
           res[key] = Normalize(res[key], normData);
-          if (res[key].items != null) {
+          if (res[key].items != null) {            
             Object.keys(res[key].items).forEach((subKey) => {
               res[key].items[subKey] = Normalize(res[key].items[subKey], normData);
             });

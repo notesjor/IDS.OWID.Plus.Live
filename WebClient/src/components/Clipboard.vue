@@ -115,11 +115,6 @@
             @input="selectionChanged" v-model="selected" item-key="key" mutli-sort :sort-by="['dRel']" :sort-desc="[true]"
             show-select>
             <!-- eslint-disable -->
-            <template v-slot:item.sparkNorm="x">
-              <v-sparkline :value="x.item.sparkNorm" :gradient="gradient" :smooth="true" :padding="0"
-                :gradient-direction="gradientDirection" :fill="false" :type="type" :auto-line-width="true"
-                auto-draw-easing="none" auto-draw></v-sparkline>
-            </template>
             <template v-slot:item.korap="x">
               <kwicBtnSearch :query="x.item.korap" />
             </template>
@@ -215,7 +210,6 @@ export default {
       { text: this.$t("clipboard_tableHeader_detectedDaysPercent"), value: "dRel", align: "end" },
       { text: this.$t("clipboard_tableHeader_sum"), value: "s", align: "end" },
       { text: this.$t("clipboard_tableHeader_sumRel"), value: "sRel", align: "end" },
-      { text: this.$t("clipboard_tableHeader_miniChartRel"), value: "sparkNorm", align: "end" },
       { text: "KorAP", value: "korap", sortable: false },
     ];
   },
