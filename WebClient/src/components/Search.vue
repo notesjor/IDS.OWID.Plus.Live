@@ -61,22 +61,15 @@
                     </v-row>
                     <v-row>
                       <v-col cols="2">
-                        <v-overflow-btn
-                          persistent-hint
-                          :items="layer"
-                          v-model="search_simple_1_layer"
-                          :label="$t('lbl_layer')"
-                          style="display:block-inline;"
-                        ></v-overflow-btn>
+                        <v-overflow-btn persistent-hint :items="layer" v-model="search_simple_1_layer"
+                          :label="$t('lbl_layer')" style="display:block-inline;"></v-overflow-btn>
                         <TagsetInfo v-if="search_simple_1_layer_show_pos" />
                       </v-col>
                       <v-col cols="9" style="margin-top:7px">
                         <v-text-field
                           :label="$t('search_lbl_queryExpression') + ' (' + $t('search_simple_singleToken') + ')'"
-                          v-model="search_simple_1_value"
-                          :rules="inputRules"
-                          @keydown.enter="search_simple"
-                        ></v-text-field>
+                          v-model="search_simple_1_value" :rules="inputRules"
+                          @keydown.enter="search_simple"></v-text-field>
                       </v-col>
                     </v-row>
                     <v-row>
@@ -86,15 +79,12 @@
                           <div class="sampleSection">
                             <ul>
                               <li v-for="item in this.$config.sample_simple_1" :key="item.label">
-                                <a
-                                  v-on:click="
-                                    sample_simple_click(fixSampleLanguage(item.query), [
-                                      ['search_simple_1_layer', 'search_simple_1_value'],
-                                    ]);
-                                    search_simple();
-                                  "
-                                  >{{ fixSampleLanguage(item.label) }}</a
-                                >
+                                <a v-on:click="
+                                  sample_simple_click(fixSampleLanguage(item.query), [
+                                    ['search_simple_1_layer', 'search_simple_1_value'],
+                                  ]);
+                                search_simple();
+                                ">{{ fixSampleLanguage(item.label) }}</a>
                               </li>
                             </ul>
                           </div>
@@ -112,38 +102,24 @@
                     </v-row>
                     <v-row>
                       <v-col cols="2">
-                        <v-overflow-btn
-                          persistent-hint
-                          :items="layer"
-                          v-model="search_simple_1_layer"
-                          :label="$t('lbl_layer')"
-                        ></v-overflow-btn>
+                        <v-overflow-btn persistent-hint :items="layer" v-model="search_simple_1_layer"
+                          :label="$t('lbl_layer')"></v-overflow-btn>
                         <TagsetInfo v-if="search_simple_1_layer_show_pos" />
                       </v-col>
                       <v-col cols="4">
-                        <v-text-field
-                          :label="$t('search_lbl_queryExpressionPosition', { pos: 1 })"
-                          v-model="search_simple_1_value"
-                          :rules="inputRules"
-                          @keydown.enter="search_simple"
-                        ></v-text-field>
+                        <v-text-field :label="$t('search_lbl_queryExpressionPosition', { pos: 1 })"
+                          v-model="search_simple_1_value" :rules="inputRules"
+                          @keydown.enter="search_simple"></v-text-field>
                       </v-col>
                       <v-col cols="2">
-                        <v-overflow-btn
-                          persistent-hint
-                          :items="layer"
-                          v-model="search_simple_2_layer"
-                          :label="$t('lbl_layer')"
-                        ></v-overflow-btn>
+                        <v-overflow-btn persistent-hint :items="layer" v-model="search_simple_2_layer"
+                          :label="$t('lbl_layer')"></v-overflow-btn>
                         <TagsetInfo v-if="search_simple_2_layer_show_pos" />
                       </v-col>
                       <v-col cols="4">
-                        <v-text-field
-                          :label="$t('search_lbl_queryExpressionPosition', { pos: 2 })"
-                          v-model="search_simple_2_value"
-                          :rules="inputRules"
-                          @keydown.enter="search_simple"
-                        ></v-text-field>
+                        <v-text-field :label="$t('search_lbl_queryExpressionPosition', { pos: 2 })"
+                          v-model="search_simple_2_value" :rules="inputRules"
+                          @keydown.enter="search_simple"></v-text-field>
                       </v-col>
                     </v-row>
 
@@ -154,16 +130,13 @@
                           <div class="sampleSection">
                             <ul>
                               <li v-for="item in this.$config.sample_simple_2" :key="item.label">
-                                <a
-                                  v-on:click="
-                                    sample_simple_click(fixSampleLanguage(item.query), [
-                                      ['search_simple_1_layer', 'search_simple_1_value'],
-                                      ['search_simple_2_layer', 'search_simple_2_value'],
-                                    ]);
-                                    search_simple();
-                                  "
-                                  >{{ fixSampleLanguage(item.label) }}</a
-                                >
+                                <a v-on:click="
+                                  sample_simple_click(fixSampleLanguage(item.query), [
+                                    ['search_simple_1_layer', 'search_simple_1_value'],
+                                    ['search_simple_2_layer', 'search_simple_2_value'],
+                                  ]);
+                                search_simple();
+                                ">{{ fixSampleLanguage(item.label) }}</a>
                               </li>
                             </ul>
                           </div>
@@ -181,55 +154,34 @@
                     </v-row>
                     <v-row cols="27">
                       <v-col cols="2">
-                        <v-overflow-btn
-                          persistent-hint
-                          :items="layer"
-                          v-model="search_simple_1_layer"
-                          :label="$t('lbl_layer')"
-                        ></v-overflow-btn>
+                        <v-overflow-btn persistent-hint :items="layer" v-model="search_simple_1_layer"
+                          :label="$t('lbl_layer')"></v-overflow-btn>
                         <TagsetInfo v-if="search_simple_1_layer_show_pos" />
                       </v-col>
                       <v-col cols="2">
-                        <v-text-field
-                          :label="$t('search_lbl_queryExpressionPosition', { pos: 1 })"
-                          v-model="search_simple_1_value"
-                          :rules="inputRules"
-                          @keydown.enter="search_simple"
-                        ></v-text-field>
+                        <v-text-field :label="$t('search_lbl_queryExpressionPosition', { pos: 1 })"
+                          v-model="search_simple_1_value" :rules="inputRules"
+                          @keydown.enter="search_simple"></v-text-field>
                       </v-col>
                       <v-col cols="2">
-                        <v-overflow-btn
-                          persistent-hint
-                          :items="layer"
-                          v-model="search_simple_2_layer"
-                          :label="$t('lbl_layer')"
-                        ></v-overflow-btn>
+                        <v-overflow-btn persistent-hint :items="layer" v-model="search_simple_2_layer"
+                          :label="$t('lbl_layer')"></v-overflow-btn>
                         <TagsetInfo v-if="search_simple_2_layer_show_pos" />
                       </v-col>
                       <v-col cols="2">
-                        <v-text-field
-                          :label="$t('search_lbl_queryExpressionPosition', { pos: 2 })"
-                          v-model="search_simple_2_value"
-                          :rules="inputRules"
-                          @keydown.enter="search_simple"
-                        ></v-text-field>
+                        <v-text-field :label="$t('search_lbl_queryExpressionPosition', { pos: 2 })"
+                          v-model="search_simple_2_value" :rules="inputRules"
+                          @keydown.enter="search_simple"></v-text-field>
                       </v-col>
                       <v-col cols="2">
-                        <v-overflow-btn
-                          persistent-hint
-                          :items="layer"
-                          v-model="search_simple_3_layer"
-                          :label="$t('lbl_layer')"
-                        ></v-overflow-btn>
+                        <v-overflow-btn persistent-hint :items="layer" v-model="search_simple_3_layer"
+                          :label="$t('lbl_layer')"></v-overflow-btn>
                         <TagsetInfo v-if="search_simple_3_layer_show_pos" />
                       </v-col>
                       <v-col cols="2">
-                        <v-text-field
-                          :label="$t('search_lbl_queryExpressionPosition', { pos: 3 })"
-                          v-model="search_simple_3_value"
-                          :rules="inputRules"
-                          @keydown.enter="search_simple"
-                        ></v-text-field>
+                        <v-text-field :label="$t('search_lbl_queryExpressionPosition', { pos: 3 })"
+                          v-model="search_simple_3_value" :rules="inputRules"
+                          @keydown.enter="search_simple"></v-text-field>
                       </v-col>
                     </v-row>
 
@@ -240,17 +192,14 @@
                           <div class="sampleSection">
                             <ul>
                               <li v-for="item in this.$config.sample_simple_3" :key="item.label">
-                                <a
-                                  v-on:click="
-                                    sample_simple_click(fixSampleLanguage(item.query), [
-                                      ['search_simple_1_layer', 'search_simple_1_value'],
-                                      ['search_simple_2_layer', 'search_simple_2_value'],
-                                      ['search_simple_3_layer', 'search_simple_3_value'],
-                                    ]);
-                                    search_simple();
-                                  "
-                                  >{{ fixSampleLanguage(item.label) }}</a
-                                >
+                                <a v-on:click="
+                                  sample_simple_click(fixSampleLanguage(item.query), [
+                                    ['search_simple_1_layer', 'search_simple_1_value'],
+                                    ['search_simple_2_layer', 'search_simple_2_value'],
+                                    ['search_simple_3_layer', 'search_simple_3_value'],
+                                  ]);
+                                search_simple();
+                                ">{{ fixSampleLanguage(item.label) }}</a>
                               </li>
                             </ul>
                           </div>
@@ -265,8 +214,7 @@
           <v-row>
             <v-col cols="5">
               <v-btn block @click="delete_simple">
-                <v-icon style="color:#c00">mdi-delete-circle-outline</v-icon>{{ $t("search_btn_delete") }}</v-btn
-              >
+                <v-icon style="color:#c00">mdi-delete-circle-outline</v-icon>{{ $t("search_btn_delete") }}</v-btn>
             </v-col>
             <v-col cols="2"> </v-col>
             <v-col cols="5">
@@ -346,32 +294,20 @@
                     </v-row>
                     <v-row>
                       <v-col style="margin-top:7px">
-                        <v-text-field
-                          :label="$t('layer_wordform')"
-                          v-model="search_complex_1_1_w"
-                          :rules="inputRules"
-                          @keydown.enter="search_complex"
-                        ></v-text-field>
+                        <v-text-field :label="$t('layer_wordform')" v-model="search_complex_1_1_w" :rules="inputRules"
+                          @keydown.enter="search_complex"></v-text-field>
                       </v-col>
                     </v-row>
                     <v-row>
                       <v-col style="margin-top:7px">
-                        <v-text-field
-                          :label="$t('layer_lemma')"
-                          v-model="search_complex_1_1_l"
-                          :rules="inputRules"
-                          @keydown.enter="search_complex"
-                        ></v-text-field>
+                        <v-text-field :label="$t('layer_lemma')" v-model="search_complex_1_1_l" :rules="inputRules"
+                          @keydown.enter="search_complex"></v-text-field>
                       </v-col>
                     </v-row>
                     <v-row>
                       <v-col style="margin-top:7px">
-                        <v-text-field
-                          :label="$t('layer_posTag')"
-                          v-model="search_complex_1_1_p"
-                          :rules="inputRules"
-                          @keydown.enter="search_complex"
-                        ></v-text-field>
+                        <v-text-field :label="$t('layer_posTag')" v-model="search_complex_1_1_p" :rules="inputRules"
+                          @keydown.enter="search_complex"></v-text-field>
                         <TagsetInfo />
                       </v-col>
                     </v-row>
@@ -383,13 +319,10 @@
                           <div class="sampleSection">
                             <ul>
                               <li v-for="item in this.$config.sample_complex_1" :key="item.label">
-                                <a
-                                  v-on:click="
-                                    sample_complex_click(fixSampleLanguage(item.query), 'search_complex_1_');
-                                    search_complex();
-                                  "
-                                  >{{ fixSampleLanguage(item.label) }}</a
-                                >
+                                <a v-on:click="
+                                  sample_complex_click(fixSampleLanguage(item.query), 'search_complex_1_');
+                                search_complex();
+                                ">{{ fixSampleLanguage(item.label) }}</a>
                               </li>
                             </ul>
                           </div>
@@ -419,57 +352,39 @@
                     </v-row>
                     <v-row>
                       <v-col>
-                        <v-text-field
-                          :label="$t('layer_wordform') + ' ' + $t('search_lbl_Position', { pos: 1 })"
-                          v-model="search_complex_2_1_w"
-                          :rules="inputRules"
-                          @keydown.enter="search_complex"
-                        ></v-text-field>
+                        <v-text-field :label="$t('layer_wordform') + ' ' + $t('search_lbl_Position', { pos: 1 })"
+                          v-model="search_complex_2_1_w" :rules="inputRules"
+                          @keydown.enter="search_complex"></v-text-field>
                       </v-col>
                       <v-col>
-                        <v-text-field
-                          :label="$t('layer_wordform') + ' ' + $t('search_lbl_Position', { pos: 2 })"
-                          v-model="search_complex_2_2_w"
-                          :rules="inputRules"
-                          @keydown.enter="search_complex"
-                        ></v-text-field>
+                        <v-text-field :label="$t('layer_wordform') + ' ' + $t('search_lbl_Position', { pos: 2 })"
+                          v-model="search_complex_2_2_w" :rules="inputRules"
+                          @keydown.enter="search_complex"></v-text-field>
                       </v-col>
                     </v-row>
                     <v-row>
                       <v-col>
-                        <v-text-field
-                          :label="$t('layer_lemma') + ' ' + $t('search_lbl_Position', { pos: 1 })"
-                          v-model="search_complex_2_1_l"
-                          :rules="inputRules"
-                          @keydown.enter="search_complex"
-                        ></v-text-field>
+                        <v-text-field :label="$t('layer_lemma') + ' ' + $t('search_lbl_Position', { pos: 1 })"
+                          v-model="search_complex_2_1_l" :rules="inputRules"
+                          @keydown.enter="search_complex"></v-text-field>
                       </v-col>
                       <v-col>
-                        <v-text-field
-                          :label="$t('layer_lemma') + ' ' + $t('search_lbl_Position', { pos: 2 })"
-                          v-model="search_complex_2_2_l"
-                          :rules="inputRules"
-                          @keydown.enter="search_complex"
-                        ></v-text-field>
+                        <v-text-field :label="$t('layer_lemma') + ' ' + $t('search_lbl_Position', { pos: 2 })"
+                          v-model="search_complex_2_2_l" :rules="inputRules"
+                          @keydown.enter="search_complex"></v-text-field>
                       </v-col>
                     </v-row>
                     <v-row>
                       <v-col>
-                        <v-text-field
-                          :label="$t('layer_posTag') + ' ' + $t('search_lbl_Position', { pos: 1 })"
-                          v-model="search_complex_2_1_p"
-                          :rules="inputRules"
-                          @keydown.enter="search_complex"
-                        ></v-text-field>
+                        <v-text-field :label="$t('layer_posTag') + ' ' + $t('search_lbl_Position', { pos: 1 })"
+                          v-model="search_complex_2_1_p" :rules="inputRules"
+                          @keydown.enter="search_complex"></v-text-field>
                         <TagsetInfo />
                       </v-col>
                       <v-col>
-                        <v-text-field
-                          :label="$t('layer_posTag') + ' ' + $t('search_lbl_Position', { pos: 2 })"
-                          v-model="search_complex_2_2_p"
-                          :rules="inputRules"
-                          @keydown.enter="search_complex"
-                        ></v-text-field>
+                        <v-text-field :label="$t('layer_posTag') + ' ' + $t('search_lbl_Position', { pos: 2 })"
+                          v-model="search_complex_2_2_p" :rules="inputRules"
+                          @keydown.enter="search_complex"></v-text-field>
                         <TagsetInfo />
                       </v-col>
                     </v-row>
@@ -480,13 +395,10 @@
                           <div class="sampleSection">
                             <ul>
                               <li v-for="item in this.$config.sample_complex_2" :key="item.label">
-                                <a
-                                  v-on:click="
-                                    sample_complex_click(fixSampleLanguage(item.query), 'search_complex_2_');
-                                    search_complex();
-                                  "
-                                  >{{ fixSampleLanguage(item.label) }}</a
-                                >
+                                <a v-on:click="
+                                  sample_complex_click(fixSampleLanguage(item.query), 'search_complex_2_');
+                                search_complex();
+                                ">{{ fixSampleLanguage(item.label) }}</a>
                               </li>
                             </ul>
                           </div>
@@ -521,82 +433,55 @@
                     </v-row>
                     <v-row cols="11">
                       <v-col>
-                        <v-text-field
-                          :label="$t('layer_wordform') + ' ' + $t('search_lbl_Position', { pos: 1 })"
-                          v-model="search_complex_3_1_w"
-                          :rules="inputRules"
-                          @keydown.enter="search_complex"
-                        ></v-text-field>
+                        <v-text-field :label="$t('layer_wordform') + ' ' + $t('search_lbl_Position', { pos: 1 })"
+                          v-model="search_complex_3_1_w" :rules="inputRules"
+                          @keydown.enter="search_complex"></v-text-field>
                       </v-col>
                       <v-col>
-                        <v-text-field
-                          :label="$t('layer_wordform') + ' ' + $t('search_lbl_Position', { pos: 2 })"
-                          v-model="search_complex_3_2_w"
-                          :rules="inputRules"
-                          @keydown.enter="search_complex"
-                        ></v-text-field>
+                        <v-text-field :label="$t('layer_wordform') + ' ' + $t('search_lbl_Position', { pos: 2 })"
+                          v-model="search_complex_3_2_w" :rules="inputRules"
+                          @keydown.enter="search_complex"></v-text-field>
                       </v-col>
                       <v-col>
-                        <v-text-field
-                          :label="$t('layer_wordform') + ' ' + $t('search_lbl_Position', { pos: 3 })"
-                          v-model="search_complex_3_3_w"
-                          :rules="inputRules"
-                          @keydown.enter="search_complex"
-                        ></v-text-field>
+                        <v-text-field :label="$t('layer_wordform') + ' ' + $t('search_lbl_Position', { pos: 3 })"
+                          v-model="search_complex_3_3_w" :rules="inputRules"
+                          @keydown.enter="search_complex"></v-text-field>
                       </v-col>
                     </v-row>
                     <v-row>
                       <v-col>
-                        <v-text-field
-                          :label="$t('layer_lemma') + ' ' + $t('search_lbl_Position', { pos: 1 })"
-                          v-model="search_complex_3_1_l"
-                          :rules="inputRules"
-                          @keydown.enter="search_complex"
-                        ></v-text-field>
+                        <v-text-field :label="$t('layer_lemma') + ' ' + $t('search_lbl_Position', { pos: 1 })"
+                          v-model="search_complex_3_1_l" :rules="inputRules"
+                          @keydown.enter="search_complex"></v-text-field>
                       </v-col>
                       <v-col>
-                        <v-text-field
-                          :label="$t('layer_lemma') + ' ' + $t('search_lbl_Position', { pos: 2 })"
-                          v-model="search_complex_3_2_l"
-                          :rules="inputRules"
-                          @keydown.enter="search_complex"
-                        ></v-text-field>
+                        <v-text-field :label="$t('layer_lemma') + ' ' + $t('search_lbl_Position', { pos: 2 })"
+                          v-model="search_complex_3_2_l" :rules="inputRules"
+                          @keydown.enter="search_complex"></v-text-field>
                       </v-col>
                       <v-col>
-                        <v-text-field
-                          :label="$t('layer_lemma') + ' ' + $t('search_lbl_Position', { pos: 3 })"
-                          v-model="search_complex_3_3_l"
-                          :rules="inputRules"
-                          @keydown.enter="search_complex"
-                        ></v-text-field>
+                        <v-text-field :label="$t('layer_lemma') + ' ' + $t('search_lbl_Position', { pos: 3 })"
+                          v-model="search_complex_3_3_l" :rules="inputRules"
+                          @keydown.enter="search_complex"></v-text-field>
                       </v-col>
                     </v-row>
                     <v-row>
                       <v-col>
-                        <v-text-field
-                          :label="$t('layer_posTag') + ' ' + $t('search_lbl_Position', { pos: 1 })"
-                          v-model="search_complex_3_1_p"
-                          :rules="inputRules"
-                          @keydown.enter="search_complex"
-                        ></v-text-field>
+                        <v-text-field :label="$t('layer_posTag') + ' ' + $t('search_lbl_Position', { pos: 1 })"
+                          v-model="search_complex_3_1_p" :rules="inputRules"
+                          @keydown.enter="search_complex"></v-text-field>
                         <TagsetInfo />
                       </v-col>
                       <v-col>
-                        <v-text-field
-                          :label="$t('layer_posTag') + ' ' + $t('search_lbl_Position', { pos: 2 })"
-                          v-model="search_complex_3_2_p"
-                          :rules="inputRules"
-                          @keydown.enter="search_complex"
-                        ></v-text-field>
+                        <v-text-field :label="$t('layer_posTag') + ' ' + $t('search_lbl_Position', { pos: 2 })"
+                          v-model="search_complex_3_2_p" :rules="inputRules"
+                          @keydown.enter="search_complex"></v-text-field>
                         <TagsetInfo />
                       </v-col>
                       <v-col>
-                        <v-text-field
-                          :label="$t('layer_posTag') + ' ' + $t('search_lbl_Position', { pos: 3 })"
-                          v-model="search_complex_3_3_p"
-                          :rules="inputRules"
-                          @keydown.enter="search_complex"
-                        ></v-text-field>
+                        <v-text-field :label="$t('layer_posTag') + ' ' + $t('search_lbl_Position', { pos: 3 })"
+                          v-model="search_complex_3_3_p" :rules="inputRules"
+                          @keydown.enter="search_complex"></v-text-field>
                         <TagsetInfo />
                       </v-col>
                     </v-row>
@@ -608,13 +493,10 @@
                           <div class="sampleSection">
                             <ul>
                               <li v-for="item in this.$config.sample_complex_3" :key="item.label">
-                                <a
-                                  v-on:click="
-                                    sample_complex_click(fixSampleLanguage(item.query), 'search_complex_3_');
-                                    search_complex();
-                                  "
-                                  >{{ fixSampleLanguage(item.label) }}</a
-                                >
+                                <a v-on:click="
+                                  sample_complex_click(fixSampleLanguage(item.query), 'search_complex_3_');
+                                search_complex();
+                                ">{{ fixSampleLanguage(item.label) }}</a>
                               </li>
                             </ul>
                           </div>
@@ -629,14 +511,12 @@
           <v-row>
             <v-col cols="5">
               <v-btn block @click="delete_complex">
-                <v-icon style="color:#c00">mdi-delete-circle-outline</v-icon>{{ $t("search_btn_delete") }}</v-btn
-              >
+                <v-icon style="color:#c00">mdi-delete-circle-outline</v-icon>{{ $t("search_btn_delete") }}</v-btn>
             </v-col>
             <v-col cols="2"> </v-col>
             <v-col cols="5">
               <v-btn block @click="search_complex">
-                <v-icon style="color:#1976d2">mdi-magnify</v-icon>{{ $t("search_btn_start") }}</v-btn
-              >
+                <v-icon style="color:#1976d2">mdi-magnify</v-icon>{{ $t("search_btn_start") }}</v-btn>
             </v-col>
           </v-row>
         </v-expansion-panel-content>
@@ -669,15 +549,18 @@
   overflow: hidden;
   margin: 1em;
 }
+
 .sampleSection ul {
   list-style: none;
   padding: 0;
   margin-left: -4px;
 }
+
 .sampleSection ul li {
   display: inline;
   white-space: nowrap;
 }
+
 .sampleSection ul li:before {
   content: " | ";
 }
@@ -724,97 +607,147 @@ async function sendSearchRequest(data, store, n, queryItems) {
   data.progressWait = true;
   data.progressMsg = globalT.$t("search_progress_msg01");
 
-  fetch(config.baseUrl + "/find", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      sessionKey: store.state.sessionKey,
-    },
-    body: JSON.stringify({ N: n, Items: queryItems }),
-  })
-    .then((resp) => {
-      try {
-        return resp.ok ? resp.json() : null;
-      } catch {
-        data.snackbar = true;
-        data.progressError = globalT.$t("search_progress_err01");
-        data.progressWait = false;
-        return null;
-      }
-    })
-    .then((searchResult) => {
-      if (searchResult === null || searchResult.Items === null || searchResult.Items.length === 0) {
-        data.snackbar = true;
-        data.progressError = globalT.$t("search_progress_err01");
-        data.progressWait = false;
-        return;
-      }
+  console.log(queryItems)
 
-      searchResult.Items = searchResult.Items.slice(i, 1000);
-
-      var packageSize = 250;
-      var result = {};
-      var error = false;
-      var done = 0;
-
-      for (var i = 0; i < searchResult.Items.length; i += packageSize) {
-        if (!data.progressWait) {
-          error = true;
-          break;
-        }
-
-        var request = searchResult.Items.slice(i, i + packageSize);
-
-        fetch(config.baseUrl + "/pull", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ N: n, Items: request }),
-        })
-          .then((resp2) => {
-            if (!resp2.ok) {
-              error = true;
-              return;
-            }
-            return resp2.json();
-          })
-          .then((page) => {
-            if (page === null) return;
-            if (error === true) return;
-            if (!data.progressWait) {
-              error = true;
-              return;
-            }
-
-            if (page != null) {
-              result = Object.assign({}, result, page);
-            } else {
-              error = true;
-            }
-
-            done += Object.keys(page).length;
-            data.progressMsg = globalT.$t("search_progress_msg02", {current: done, max: searchResult.Items.length});
-
-            if (done === searchResult.Items.length) {
-              if (!data.progressWait) {
-                error = true;
-                return;
-              }
-              
-              data.progressMsg = globalT.$t("search_progress_msg03");
-              store.commit("search", {
-                n: n,
-                queryItems: queryItems,
-                items: result,
-              });
-              store.state.vizNoCommit = 1;
-              store.commit("calculate");
-              data.progressWait = false;
-            }
-          });
-      }
-
-      if (error) if (!store.state.progressAbort) data.snackbar = true;
+  try {
+    const response = await fetch(config.baseUrl + "/find", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        sessionKey: store.state.sessionKey,
+      },
+      body: JSON.stringify({ N: n, Items: queryItems }),
     });
+
+    if (!response.ok) {
+      throw new Error(globalT.$t("search_progress_err01"));
+    }
+
+    const searchResult = await response.json();
+
+    if (!searchResult || !searchResult.Items || searchResult.Items.length === 0) {
+      throw new Error(globalT.$t("search_progress_err01"));
+    }
+
+    searchResult.Items = searchResult.Items.slice(0, 1000);
+
+    const packageSize = 250;
+    let result = {};
+    let done = 0;
+
+    for (let i = 0; i < searchResult.Items.length; i += packageSize) {
+      const request = searchResult.Items.slice(i, i + packageSize);
+
+      const pullResponse = await fetch(config.baseUrl + "/pull", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ N: n, Items: request }),
+      });
+
+      const page = await pullResponse.json();
+      result = { ...result, ...page };
+      done += Object.keys(page).length;
+      data.progressMsg = globalT.$t("search_progress_msg02", { current: done, max: searchResult.Items.length });
+
+      if (done === searchResult.Items.length) {
+        data.progressMsg = globalT.$t("search_progress_msg03");
+        store.commit("search", {
+          n: n,
+          queryItems: queryItems,
+          items: result,
+        });
+        store.state.vizNoCommit = 1;
+        store.commit("calculate");
+        data.progressWait = false;
+      }
+    }
+  } catch (error) {
+    data.snackbar = true;
+    data.progressError = error.message;
+    data.progressWait = false;
+  }
+
+  const fetchWithTimeout = async (url, options, timeout = 60000) => {
+    return Promise.race([
+      fetch(url, options),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error(globalT.$t("search_progress_msg01"))), timeout)
+      ),
+    ]);
+  };
+
+  const retryFetch = async (url, options, retries = 3) => {
+    for (let i = 0; i < retries; i++) {
+      try {
+        return await fetchWithTimeout(url, options);
+      } catch (error) {
+        if (i < retries - 1) {
+          data.progressError = `${globalT.$t("search_progress_msg01")} (${i + 1})`;
+        } else {
+          throw error;
+        }
+      }
+    }
+  };
+
+  try {
+    const response = await retryFetch(config.baseUrl + "/find", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        sessionKey: store.state.sessionKey,
+      },
+      body: JSON.stringify({ N: n, Items: queryItems }),
+    });
+
+    if (!response.ok) {
+      throw new Error(globalT.$t("search_progress_err01"));
+    }
+
+    const searchResult = await response.json();
+
+    if (!searchResult || !searchResult.Items || searchResult.Items.length === 0) {
+      throw new Error(globalT.$t("search_progress_err01"));
+    }
+
+    searchResult.Items = searchResult.Items.slice(0, 1000);
+
+    const packageSize = 250;
+    let result = {};
+    let done = 0;
+
+    for (let i = 0; i < searchResult.Items.length; i += packageSize) {
+      const request = searchResult.Items.slice(i, i + packageSize);
+
+      const pullResponse = await retryFetch(config.baseUrl + "/pull", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ N: n, Items: request }),
+      });
+
+      const page = await pullResponse.json();
+
+      result = { ...result, ...page };
+      done += Object.keys(page).length;
+      data.progressMsg = globalT.$t("search_progress_msg02", { current: done, max: searchResult.Items.length });
+
+      if (done === searchResult.Items.length) {
+        data.progressMsg = globalT.$t("search_progress_msg03");
+        store.commit("search", {
+          n: n,
+          queryItems: queryItems,
+          items: result,
+        });
+        store.state.vizNoCommit = 1;
+        store.commit("calculate");
+        data.progressWait = false;
+      }
+    }
+  } catch (error) {
+    data.snackbar = true;
+    data.progressError = error.message;
+    data.progressWait = false;
+  }
 }
 
 var globalT;
@@ -867,22 +800,22 @@ export default {
 
       iconSeachExt: mdiMagnifyPlus,
       inputRules: [
-        function(v) {
+        function (v) {
           if (v === undefined) return true;
           return (v.toString().match("\\s") || []).length < 1 || globalT.$t("search_ruleError_01");
         },
-        function(v) {
+        function (v) {
           if (v === undefined) return true;
           return (v.toString().match("[\\*]") || []).length < 3 || globalT.$t("search_ruleError_02");
         },
-        function(v) {
+        function (v) {
           if (v === undefined) return true;
           return (v.toString().match("\\.\\*") || []).length < 1 || globalT.$t("search_ruleError_03");
         },
       ],
     };
   },
-  mounted: function() {
+  mounted: function () {
     config = this.$config;
 
     this.search_simple_1_layer = this.$t("layer_wordform");
@@ -906,12 +839,12 @@ export default {
     }
   },
   methods: {
-    delete_simple: function() {
+    delete_simple: function () {
       this.search_simple_1_value = "";
       this.search_simple_2_value = "";
       this.search_simple_3_value = "";
     },
-    delete_complex: function() {
+    delete_complex: function () {
       this.search_complex_1_1_w = "";
       this.search_complex_1_1_l = "";
       this.search_complex_1_1_p = "";
@@ -931,23 +864,23 @@ export default {
       this.search_complex_3_3_l = "";
       this.search_complex_3_3_p = "";
     },
-    stopClickSimple: function(e) {
+    stopClickSimple: function (e) {
       this.expensionPanelOpen = 0;
-      e.stopPropagation();      
+      e.stopPropagation();
     },
-    stopClickComplex: function(e) {
+    stopClickComplex: function (e) {
       this.expensionPanelOpen = 1;
-      e.stopPropagation();      
+      e.stopPropagation();
     },
-    abortProgress: function() {
+    abortProgress: function () {
       this.$data.progressWait = false;
     },
-    fixSampleLanguage: function(str) {
+    fixSampleLanguage: function (str) {
       str = str.replace("Wortform", this.$t("layer_wordform"));
       str = str.replace("Lemma", this.$t("layer_lemma"));
       return str.replace("POS", this.$t("layer_pos"));
     },
-    sample_simple_click: function(queryStr, controlIds) {
+    sample_simple_click: function (queryStr, controlIds) {
       var query = JSON.parse(queryStr);
       for (let i = 0; i < query.length; i++) {
         const position = query[i];
@@ -957,7 +890,7 @@ export default {
         this.$data[controlIds[i][1]] = position[key];
       }
     },
-    sample_complex_click: function(queryStr, controlIdTemplate) {
+    sample_complex_click: function (queryStr, controlIdTemplate) {
       var query = JSON.parse(queryStr);
       for (let i = 0; i < query.length; i++) {
         const position = query[i];
@@ -966,15 +899,15 @@ export default {
         });
       }
     },
-    search_simple_n_change: function(n) {
+    search_simple_n_change: function (n) {
       this.$data.search_simple_n = n;
       this.$store.commit("updateN", n);
     },
-    search_complex_n_change: function(n) {
+    search_complex_n_change: function (n) {
       this.$data.search_complex_n = n;
       this.$store.commit("updateN", n);
     },
-    search_invoke: function(queries) {
+    search_invoke: function (queries) {
       var set = new Set();
       var qs = [];
       queries.forEach((x) => {
@@ -987,7 +920,7 @@ export default {
       this.$emit("searchRequestSubmitted");
       sendSearchRequest(this.$data, this.$store, set.size, qs);
     },
-    search_simple: function() {
+    search_simple: function () {
       var queryItems = [
         new queryItem(
           this.$data.layer.indexOf(this.$data.search_simple_1_layer),
@@ -1018,7 +951,7 @@ export default {
       this.$emit("searchRequestSubmitted");
       sendSearchRequest(this.$data, this.$store, this.$data.search_simple_n, queryItems);
     },
-    search_complex: function() {
+    search_complex: function () {
       var queryItems = [];
       if (this.$data.search_complex_n === 1) {
         queryItems = [
@@ -1052,7 +985,7 @@ export default {
       this.$emit("searchRequestSubmitted");
       sendSearchRequest(this.$data, this.$store, this.$data.search_complex_n, queryItems);
     },
-    validate_notEmpty: function(value) {
+    validate_notEmpty: function (value) {
       return value === "" || value == "*" ? this.$t("search_error_notEmpty") : true;
     },
   },
