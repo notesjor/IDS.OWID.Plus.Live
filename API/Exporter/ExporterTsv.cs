@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
-using System.Threading.Tasks;
-using CorpusExplorer.Sdk.Db.RocksDb;
 using IDS.Lexik.cOWIDplusViewer.v2.WebService.Exporter.Abstract;
 using Newtonsoft.Json;
 using Tfres;

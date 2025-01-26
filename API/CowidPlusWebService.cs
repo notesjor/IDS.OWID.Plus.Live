@@ -1,24 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Net;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using System.Web;
-using CorpusExplorer.Sdk.Db.RocksDb;
-using Elasticsearch.Net;
-using IDS.Lexik.cOWIDplusViewer.v2.DataWriter;
-using IDS.Lexik.cOWIDplusViewer.v2.DataWriter.Model;
 using IDS.Lexik.cOWIDplusViewer.v2.WebService.Exporter;
 using IDS.Lexik.cOWIDplusViewer.v2.WebService.Exporter.Abstract;
 using IDS.Lexik.cOWIDplusViewer.v2.WebService.Model.Configuration;
 using IDS.Lexik.cOWIDplusViewer.v2.WebService.Model.Request;
 using IDS.Lexik.WebService.Sdk.WebService.Abstract;
 using Microsoft.OpenApi.Models;
-using Nest;
 using Newtonsoft.Json;
 using Tfres;
 using HttpContext = Tfres.HttpContext;
@@ -29,20 +21,17 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 {
   public class CowidPlusWebService : AbstractEasyWebService<CowidPlusWebConfiguration>
   {
-    private int _n = 3;
+    private int _nMax = 5;
+    private int _normData; // TODO
 
-    private ElasticClient _es;
-    private Dictionary<byte, EasyRocksDb> _dbs;
-    private string _dbPath;
     private long _maxPostSize;
-    private bool _enableLogging;
     private string _secureUpdateToken;
     private string _lastUpdateToken;
 
     private AbstractExporter[] _exporter =
     {
       new ExporterTsv(),
-    };
+    };    
 
     protected override void ConfigureEndpoints(Server server)
     {
@@ -62,6 +51,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     {
       try
       {
+        /* TODO
         #region RocksDB-Check
         for (byte i = 1; i <= _n; i++)
           if(string.IsNullOrWhiteSpace(_dbs[i].Get($">{i}")))
@@ -89,6 +79,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         if (items.Hits.Count != 1)
           throw new Exception("ElasticSearch - Connection Error!");
         #endregion
+        */
 
         arg.Response.Send(HttpStatusCode.OK);
       }
@@ -168,6 +159,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
     private void Down(HttpContext arg)
     {
+      /* TODO
       try
       {
         if (arg.Request.ContentLength > _maxPostSize)
@@ -193,13 +185,15 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
         arg.Response.Send(HttpStatusCode.InternalServerError);
       }
+      */
     }
 
     private void Find(HttpContext arg)
-      => FindCall(arg, 10000);
+      => FindCall(arg, 1000);
 
     private void FindCall(HttpContext arg, int max)
     {
+      /* TODO
       try
       {
         var post = arg.PostDataAsString;
@@ -250,10 +244,12 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
         arg.Response.Send(HttpStatusCode.InternalServerError);
       }
+      */
     }
 
     private void Pull(HttpContext arg)
     {
+      /* TODO
       try
       {
         var req = arg.PostData<CowidPlusPullRequest>();
@@ -280,18 +276,14 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
         arg.Response.Send(HttpStatusCode.InternalServerError);
       }
+      */
     }
 
     private void Norm(HttpContext arg)
     {
       try
       {
-        var stb = new StringBuilder();
-        stb.Append("[");
-        for (byte i = 1; i <= _n; i++)
-          stb.Append($"{_dbs[i].Get($">{i}")}}}{(i != _n ? "," : "")}");
-        stb.Append("]");
-        arg.Response.Send(stb.ToString());
+        arg.Response.Send(_normData);
       }
       catch (Exception ex)
       {
@@ -566,56 +558,13 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     {
       ProjectName = "OWIDplusLIVE";
 
-      _dbPath = config.RocksDbPath;
-      _n = config.N;
+      _nMax = config.N;
       _maxPostSize = config.MaxPostSize;
-      _enableLogging = config.EnableLogging;
       _secureUpdateToken = config.SecureUpdateToken;
-
-      if (_enableLogging && !Directory.Exists("log"))
-        Directory.CreateDirectory("log");
     }
 
     protected override void LoadData()
-    {
-      Console.WriteLine();
-      Console.Write("Start ElasticSearch...");
-      _es = CreateClient("http://127.0.0.1:9200", "", "", "entries");
-      Console.WriteLine("OK");
-
-      _dbs = new Dictionary<byte, EasyRocksDb>();
-      for (byte i = 0; i < _n; i++)
-      {
-        try
-        {
-          var lockFile = Path.Combine(_dbPath, $"N{(i + 1):D2}") + "/LOCK";
-          if (File.Exists(lockFile))
-            File.Delete(lockFile);
-
-          Console.Write($"Start RocksDB N{(i + 1):D2}...");
-          _dbs.Add((byte)(i + 1), new EasyRocksDb(Path.Combine(_dbPath, $"N{(i + 1):D2}"), true));
-          Console.WriteLine("OK");
-        }
-        catch (Exception ex)
-        {
-          Console.WriteLine(ex.Message);
-          Console.WriteLine(ex.StackTrace);
-        }
-      }
-    }
-
-    private static ElasticClient CreateClient(string url, string user, string password, string index)
-    {
-      var connection = new StaticConnectionPool(new[] { new Uri(url) });
-      var settings = new ConnectionSettings(connection);
-      if (!string.IsNullOrEmpty(user))
-        settings.BasicAuthentication(user, password);
-      settings.RequestTimeout(TimeSpan.FromSeconds(500));
-
-      var client = new ElasticClient(settings);
-      ((ConnectionSettings)client.ConnectionSettings).DefaultIndex(index);
-
-      return client;
+    {      
     }
 
     private static void WriteLog(Exception ex)

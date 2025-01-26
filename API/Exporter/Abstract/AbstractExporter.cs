@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using CorpusExplorer.Sdk.Db.RocksDb;
 using Tfres;
 
 namespace IDS.Lexik.cOWIDplusViewer.v2.WebService.Exporter.Abstract
