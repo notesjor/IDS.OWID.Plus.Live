@@ -6,6 +6,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService.Exporter.Abstract
   public abstract class AbstractExporter
   {
     public abstract string Id { get; }
-    public abstract void Convert(HttpContext arg, ref EasyRocksDb db, byte n, string[] requests);
+    // TODO: public abstract void Convert(HttpContext arg, ref EasyRocksDb db, byte n, string[] requests);
   }
 }

@@ -16,6 +16,14 @@ using Tfres;
 using HttpContext = Tfres.HttpContext;
 using IDS.Lexik.WebService.Sdk.WaitBehaviour.Abstract;
 using System.ComponentModel;
+using CorpusExplorer.Sdk.Model.Adapter.Corpus;
+using System.Linq;
+using CorpusExplorer.Sdk.Helper;
+using CorpusExplorer.Sdk.Model.Adapter.Corpus.Abstract;
+using CorpusExplorer.Sdk.Utils.DocumentProcessing.Cleanup;
+using CorpusExplorer.Sdk.Utils.DocumentProcessing.Tagger.TreeTagger;
+using CorpusExplorer.Sdk.Utils.CorpusManipulation;
+using IDS.OWIDplusLIVE.API.Model.Json.OwidLiveStorage;
 
 namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 {
@@ -31,10 +39,12 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     private AbstractExporter[] _exporter =
     {
       new ExporterTsv(),
-    };    
+    };
 
     protected override void ConfigureEndpoints(Server server)
     {
+      ReloadData();
+
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/init", Init);
       server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/find", Find);
       server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/pull", Pull);
@@ -45,6 +55,11 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/update", Update);
 
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/heartbeat", Validate);
+    }
+
+    private void ReloadData()
+    {
+      
     }
 
     private void Validate(HttpContext arg)
@@ -114,6 +129,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       {
         var req = arg.PostData<CowidPlusUpdateRequest>();
 
+        /* TODO
         using (var sha = SHA512.Create())
         {
           var dataHash = Convert.ToBase64String(sha.ComputeHash(Encoding.ASCII.GetBytes(req.Data)));
@@ -126,10 +142,37 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
           }
         }
         _lastUpdateToken = Guid.NewGuid().ToString("N");
+        */
 
-        Database.SetupElasticIndex(ref _es);
+        if (!Directory.Exists("cec6"))
+          Directory.CreateDirectory("cec6");
 
-        Database.InsertFromWebRequest(req.Data, new DateTime(req.Year, req.Month, req.Day), _es, _dbs);
+        var fn = Path.Combine("cec6", $"{req.Year:D4}.cec6");
+
+        var oldData = File.Exists(fn) ? CorpusAdapterWriteDirect.Create(fn) : null;
+
+        var date = $"{req.Year:D4}-{req.Month:D2}-{req.Day:D2}";
+        var newTexts = req.Data.Split(new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
+          .Select(x => new Dictionary<string, object> { { "Text", x }, { "D", date } }).ToArray();
+        req.Data = "";
+
+        var clean01 = new StandardCleanup();
+        clean01.Input.Enqueue(newTexts);
+        clean01.Execute();
+        newTexts = Array.Empty<Dictionary<string, object>>();
+
+        var clean02 = new RegexXmlMarkupCleanup { Input = clean01.Output };
+        clean02.Execute();
+
+        var tagger = new SimpleTreeTagger { Input = clean02.Output, LanguageSelected = "Deutsch" };
+        tagger.Execute();
+        var newData = tagger.Output.First();
+
+        UpdateNormData(newData, req.Year, date);
+
+        var merged = oldData == null ? newData : CorpusMerger.Merge(new[] { oldData, newData });
+
+        merged.Save(fn, false);
 
         arg.Response.Send(HttpStatusCode.OK);
       }
@@ -139,6 +182,44 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         Console.WriteLine(ex.StackTrace);
 
         arg.Response.Send(HttpStatusCode.InternalServerError);
+      }
+    }
+
+    private void UpdateNormData(AbstractCorpusAdapter newData, int year, string key)
+    {
+      if (!Directory.Exists("json"))
+        Directory.CreateDirectory("json");
+
+      var fn = Path.Combine("json", $"{year:D4}.json");
+
+      var normData = new Dictionary<string, OwidLiveNormData>();
+      try
+      {
+        normData = JsonConvert.DeserializeObject<Dictionary<string, OwidLiveNormData>>(File.ReadAllText(fn));
+      }
+      catch (Exception ex)
+      {
+        // ignore
+      }
+
+      var nEntry = new OwidLiveNormData
+      {
+        Token = newData.CountToken,
+        Sentences = newData.CountSentences,
+      };
+
+      if (normData.ContainsKey(key))
+        normData[key] = nEntry;
+      else
+        normData.Add(key, nEntry);
+
+      try
+      {
+        File.WriteAllText(fn, JsonConvert.SerializeObject(normData));
+      }
+      catch
+      {
+        // ignore
       }
     }
 
@@ -564,7 +645,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     }
 
     protected override void LoadData()
-    {      
+    {
     }
 
     private static void WriteLog(Exception ex)

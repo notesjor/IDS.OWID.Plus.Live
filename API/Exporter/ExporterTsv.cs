@@ -15,6 +15,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService.Exporter
     private CultureInfo _format = new CultureInfo("en-US");
     public override string Id => "TSV";
 
+    /* TODO
     public override void Convert(HttpContext arg, ref EasyRocksDb db, byte n, string[] requests)
     {
       if (requests.Length > 10000)
@@ -42,5 +43,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService.Exporter
 
       arg.Response.SendFinalChunk();
     }
+    */
   }
 }
