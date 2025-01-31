@@ -2,11 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Security.Cryptography;
-using System.Text;
-using System.Web;
-using IDS.Lexik.cOWIDplusViewer.v2.WebService.Exporter;
-using IDS.Lexik.cOWIDplusViewer.v2.WebService.Exporter.Abstract;
 using IDS.Lexik.cOWIDplusViewer.v2.WebService.Model.Configuration;
 using IDS.Lexik.cOWIDplusViewer.v2.WebService.Model.Request;
 using IDS.Lexik.WebService.Sdk.WebService.Abstract;
@@ -14,8 +9,7 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Tfres;
 using HttpContext = Tfres.HttpContext;
-using IDS.Lexik.WebService.Sdk.WaitBehaviour.Abstract;
-using System.ComponentModel;
+using System.Data;
 using CorpusExplorer.Sdk.Model.Adapter.Corpus;
 using System.Linq;
 using CorpusExplorer.Sdk.Helper;
@@ -24,6 +18,9 @@ using CorpusExplorer.Sdk.Utils.DocumentProcessing.Cleanup;
 using CorpusExplorer.Sdk.Utils.DocumentProcessing.Tagger.TreeTagger;
 using CorpusExplorer.Sdk.Utils.CorpusManipulation;
 using IDS.OWIDplusLIVE.API.Model.Json.OwidLiveStorage;
+using IDS.OWIDplusLIVE.API.Model.Response;
+using CorpusExplorer.Sdk.Utils.DataTableWriter.Abstract;
+using CorpusExplorer.Sdk.Utils.DataTableWriter;
 
 namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 {
@@ -36,30 +33,34 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     private string _secureUpdateToken;
     private string _lastUpdateToken;
 
-    private AbstractExporter[] _exporter =
+    private Dictionary<string, AbstractTableWriter> _exporter = new Dictionary<string, AbstractTableWriter>
     {
-      new ExporterTsv(),
+      {"TSV", new TsvTableWriter() },
+      {"HTML", new HtmlTableSnippetTableWriter() },
+      {"SQL", new SqlTableWriter() },
+      {"CSV", new CsvTableWriter() },
+      {"XML", new XmlTableWriter() }
     };
 
     protected override void ConfigureEndpoints(Server server)
     {
       ReloadData();
 
-      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/init", Init);
+      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/init", Init); // ok
       server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/find", Find);
       server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/pull", Pull);
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/norm", Norm);
-      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/down", Down);
+      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/down", Down); // TODO: Freq. rel berechnen
 
-      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/token", Token);
-      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/update", Update);
+      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/token", Token); // ok
+      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/update", Update); // TODO: token check
 
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/heartbeat", Validate);
     }
 
     private void ReloadData()
     {
-      
+
     }
 
     private void Validate(HttpContext arg)
@@ -240,7 +241,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
     private void Down(HttpContext arg)
     {
-      /* TODO
       try
       {
         if (arg.Request.ContentLength > _maxPostSize)
@@ -249,15 +249,45 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
           return;
         }
 
-        var request = arg.PostData<CowidPlusDownRequest>();
-        foreach (var e in _exporter)
-          if (e.Id == request.Format.ToUpper())
+        var getParams = arg.Request.GetData();
+        if (!getParams.ContainsKey("format"))
+        {
+          arg.Response.Send(HttpStatusCode.BadRequest);
+          return;
+        }
+
+        var format = getParams["format"].ToUpper();
+        if (!_exporter.ContainsKey(format))
+        {
+          arg.Response.Send(HttpStatusCode.MethodNotAllowed);
+          return;
+        }
+
+        using var ms = new MemoryStream();
+        var writer = _exporter[format].Clone(ms);
+
+        var request = arg.PostData<CowidPlusNgramResponse[]>();
+
+        var dt = new DataTable();
+        dt.Columns.Add("Wortform", typeof(string));
+        dt.Columns.Add("Lemma", typeof(string));
+        dt.Columns.Add("POS", typeof(string));
+        dt.Columns.Add("Datum", typeof(DateTime));
+        dt.Columns.Add("Frequenz", typeof(double));
+        dt.Columns.Add("Frequenz (rel.)", typeof(double));
+
+        dt.BeginLoadData();
+        foreach (var x in request)
+        {
+          foreach (var y in x.Dates)
           {
-            var db = _dbs[request.N];
-            e.Convert(arg, ref db, request.N, request.Requests);
-            return;
+            //TODO: dt.Rows.Add(x.Wordform, x.Lemma, x.Pos, y.Key, y.Value, y.FreqRel);
           }
-        arg.Response.Send(HttpStatusCode.NotFound);
+        }
+        dt.EndLoadData();
+
+        writer.WriteTable(dt);
+        arg.Response.Send(ms.ToArray(), writer.MimeType);
       }
       catch (Exception ex)
       {
@@ -266,7 +296,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
         arg.Response.Send(HttpStatusCode.InternalServerError);
       }
-      */
     }
 
     private void Find(HttpContext arg)
