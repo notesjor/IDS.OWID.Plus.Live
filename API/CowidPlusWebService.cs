@@ -50,12 +50,28 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/find", Find);
       server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/pull", Pull);
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/norm", Norm);
-      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/down", Down); // TODO: Freq. rel berechnen
+      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/search", Search);
+      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/convert", Convert); // früher down
 
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/token", Token); // ok
       server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/update", Update); // TODO: token check
 
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/heartbeat", Validate);
+    }
+
+    private void Search(HttpContext arg)
+    {
+      try
+      {
+
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine(ex.Message);
+        Console.WriteLine(ex.StackTrace);
+
+        arg.Response.Send(HttpStatusCode.InternalServerError);
+      }
     }
 
     private void ReloadData()
@@ -239,7 +255,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       }
     }
 
-    private void Down(HttpContext arg)
+    private void Convert(HttpContext arg)
     {
       try
       {
@@ -266,7 +282,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         using var ms = new MemoryStream();
         var writer = _exporter[format].Clone(ms);
 
-        var request = arg.PostData<CowidPlusNgramResponse[]>();
+        var request = arg.PostData<NgramRecordResponse[]>();
 
         var dt = new DataTable();
         dt.Columns.Add("Wortform", typeof(string));
@@ -274,14 +290,13 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         dt.Columns.Add("POS", typeof(string));
         dt.Columns.Add("Datum", typeof(DateTime));
         dt.Columns.Add("Frequenz", typeof(double));
-        dt.Columns.Add("Frequenz (rel.)", typeof(double));
 
         dt.BeginLoadData();
         foreach (var x in request)
         {
           foreach (var y in x.Dates)
           {
-            //TODO: dt.Rows.Add(x.Wordform, x.Lemma, x.Pos, y.Key, y.Value, y.FreqRel);
+            dt.Rows.Add(x.Wordform, x.Lemma, x.Pos, y.Key, y.Value);
           }
         }
         dt.EndLoadData();

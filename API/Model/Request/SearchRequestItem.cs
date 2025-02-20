@@ -1,6 +1,6 @@
 ﻿namespace IDS.Lexik.cOWIDplusViewer.v2.WebService.Model.Request
 {
-  public class CowidPlusFindRequestItem
+  public class SearchRequestItem
   {
     public byte Position { get; set; }
     public byte Layer { get; set; }
