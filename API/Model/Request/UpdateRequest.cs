@@ -1,6 +1,6 @@
 ﻿namespace IDS.Lexik.cOWIDplusViewer.v2.WebService.Model.Request
 {
-  public class CowidPlusUpdateRequest
+  public class UpdateRequest
   {
     public string SessionKey { get; set; }
     public int Year { get; set; }

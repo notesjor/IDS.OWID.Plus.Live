@@ -21,13 +21,18 @@ using IDS.OWIDplusLIVE.API.Model.Json.OwidLiveStorage;
 using IDS.OWIDplusLIVE.API.Model.Response;
 using CorpusExplorer.Sdk.Utils.DataTableWriter.Abstract;
 using CorpusExplorer.Sdk.Utils.DataTableWriter;
+using System.Globalization;
+using System.Text.Json.Serialization;
 
 namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 {
-  public class CowidPlusWebService : AbstractEasyWebService<CowidPlusWebConfiguration>
+  public class CowidPlusWebService : AbstractEasyWebService<ServiceConfiguration>
   {
     private int _nMax = 5;
-    private int _normData; // TODO
+
+    private string _normDataFile = Path.Combine("json", $"normData.json");
+    private object _normDataLock = new object();
+    private Dictionary<string, OwidLiveNormData> _normData;
 
     private long _maxPostSize;
     private string _secureUpdateToken;
@@ -46,14 +51,12 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     {
       ReloadData();
 
-      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/init", Init); // ok
-      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/find", Find);
-      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/pull", Pull);
+      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/init", Init);
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/norm", Norm);
       server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/search", Search);
-      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/convert", Convert); // früher down
+      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/convert", Convert);
 
-      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/token", Token); // ok
+      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/token", Token);
       server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/update", Update); // TODO: token check
 
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/heartbeat", Validate);
@@ -76,7 +79,19 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
     private void ReloadData()
     {
+      try
+      {
+        _normData = JsonConvert.DeserializeObject<Dictionary<string, OwidLiveNormData>>(File.ReadAllText(_normDataFile));
 
+        var settings = JsonConvert.DeserializeObject<ServiceConfiguration>(File.ReadAllText("config.json"));
+        _maxPostSize = settings.MaxPostSize;
+        _secureUpdateToken = settings.SecureUpdateToken;
+        _nMax = settings.N;
+      }
+      catch (Exception ex)
+      {
+        // ignore
+      }
     }
 
     private void Validate(HttpContext arg)
@@ -144,7 +159,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     {
       try
       {
-        var req = arg.PostData<CowidPlusUpdateRequest>();
+        var req = arg.PostData<UpdateRequest>();
 
         /* TODO
         using (var sha = SHA512.Create())
@@ -202,17 +217,15 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       }
     }
 
-    private void UpdateNormData(AbstractCorpusAdapter newData, int year, string key)
+    private void UpdateNormData(AbstractCorpusAdapter newData, string key)
     {
       if (!Directory.Exists("json"))
         Directory.CreateDirectory("json");
 
-      var fn = Path.Combine("json", $"{year:D4}.json");
-
       var normData = new Dictionary<string, OwidLiveNormData>();
       try
       {
-        normData = JsonConvert.DeserializeObject<Dictionary<string, OwidLiveNormData>>(File.ReadAllText(fn));
+        normData = JsonConvert.DeserializeObject<Dictionary<string, OwidLiveNormData>>(File.ReadAllText(_normDataFile));
       }
       catch (Exception ex)
       {
@@ -232,12 +245,15 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
       try
       {
-        File.WriteAllText(fn, JsonConvert.SerializeObject(normData));
+        File.WriteAllText(_normDataFile, JsonConvert.SerializeObject(normData));
       }
       catch
       {
         // ignore
       }
+
+      lock (_normDataLock)
+        _normData = normData;
     }
 
     private void Init(HttpContext arg)
@@ -283,26 +299,37 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         var writer = _exporter[format].Clone(ms);
 
         var request = arg.PostData<NgramRecordResponse[]>();
+        var n = request[0].Wordform.Length - 1.0;
 
         var dt = new DataTable();
         dt.Columns.Add("Wortform", typeof(string));
         dt.Columns.Add("Lemma", typeof(string));
         dt.Columns.Add("POS", typeof(string));
-        dt.Columns.Add("Datum", typeof(DateTime));
+        dt.Columns.Add("Datum", typeof(string));
         dt.Columns.Add("Frequenz", typeof(double));
+        dt.Columns.Add("Frequenz (ppm)", typeof(double));
+
+        Dictionary<string, double> normHelper;
+        lock (_normDataLock)
+          normHelper = _normData.ToDictionary(x => x.Key, x => x.Value.Token - (x.Value.Sentences * n));
 
         dt.BeginLoadData();
         foreach (var x in request)
-        {
           foreach (var y in x.Dates)
-          {
-            dt.Rows.Add(x.Wordform, x.Lemma, x.Pos, y.Key, y.Value);
-          }
-        }
+            try
+            {
+              dt.Rows.Add(x.Wordform, x.Lemma, x.Pos, y.Key, y.Value, (y.Value / normHelper[y.Key]) * 1000000.0);
+            }
+            catch
+            {
+              // ignore
+            }
         dt.EndLoadData();
 
         writer.WriteTable(dt);
-        arg.Response.Send(ms.ToArray(), writer.MimeType);
+
+        ms.Seek(0, SeekOrigin.Begin);
+        arg.Response.Send(ms, writer.MimeType);
       }
       catch (Exception ex)
       {
@@ -311,97 +338,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
         arg.Response.Send(HttpStatusCode.InternalServerError);
       }
-    }
-
-    private void Find(HttpContext arg)
-      => FindCall(arg, 1000);
-
-    private void FindCall(HttpContext arg, int max)
-    {
-      /* TODO
-      try
-      {
-        var post = arg.PostDataAsString;
-        if (_enableLogging && arg.Request.Headers.ContainsKey("sessionKey"))
-        {
-          var dir = $"log/{arg.Request.Headers["sessionKey"]}/";
-          if (!Directory.Exists(dir))
-            Directory.CreateDirectory(dir);
-          File.WriteAllText($"{dir}{Directory.GetFiles(dir).Length:D4}.json", post, Encoding.UTF8);
-        }
-
-        Console.WriteLine(post);
-        var req = JsonConvert.DeserializeObject<CowidPlusFindRequest>(post);
-
-        var subq = new List<QueryContainer>
-        {
-          new TermQuery
-          {
-            Field = "n",
-            Value = req.N
-          }
-        };
-        // ReSharper disable once LoopCanBeConvertedToQuery
-        foreach (var x in req.Items)
-        {
-          subq.Add(new QueryStringQuery
-          {
-            Query = x.Query,
-            Fields = x.Fields
-          });
-        }
-
-        var container = new QueryContainer(new BoolQuery { Must = subq });
-
-        var items = _es.Search<EsEntry>(s => s.Query(q => container).Source(src => src.Includes(i => i.Field("key")))
-                                              .Size(max));
-        Console.WriteLine(items.Hits.Count);
-        arg.Response.Send(new CowidPlusPullRequest
-        {
-          N = req.N,
-          Items = items.Hits.Select(x => x.Source.Key).ToArray()
-        });
-      }
-      catch (Exception ex)
-      {
-        Console.WriteLine(ex.Message);
-        Console.WriteLine(ex.StackTrace);
-
-        arg.Response.Send(HttpStatusCode.InternalServerError);
-      }
-      */
-    }
-
-    private void Pull(HttpContext arg)
-    {
-      /* TODO
-      try
-      {
-        var req = arg.PostData<CowidPlusPullRequest>();
-
-        arg.Response.SendChunk("{");
-
-        var items = _dbs[req.N].GetBatch(req.Items);
-        var last = items.Length - 1;
-
-        for (var i = 0; i < items.Length; i++)
-        {
-          arg.Response
-             .SendChunk($"\"{HttpUtility.JavaScriptStringEncode(items[i].Key)}\":{(string.IsNullOrWhiteSpace(items[i].Value) ? "null" : items[i].Value)}}}");
-          if (i < last)
-            arg.Response.SendChunk(",");
-        }
-
-        arg.Response.SendFinalChunk("}");
-      }
-      catch (Exception ex)
-      {
-        Console.WriteLine(ex.Message);
-        Console.WriteLine(ex.StackTrace);
-
-        arg.Response.Send(HttpStatusCode.InternalServerError);
-      }
-      */
     }
 
     private void Norm(HttpContext arg)
@@ -679,7 +615,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       };
     }
 
-    protected override void LoadAdditionalConfiguration(CowidPlusWebConfiguration config)
+    protected override void LoadAdditionalConfiguration(ServiceConfiguration config)
     {
       ProjectName = "OWIDplusLIVE";
 
