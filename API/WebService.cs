@@ -23,16 +23,19 @@ using CorpusExplorer.Sdk.Utils.DataTableWriter.Abstract;
 using CorpusExplorer.Sdk.Utils.DataTableWriter;
 using System.Globalization;
 using System.Text.Json.Serialization;
+using CorpusExplorer.Sdk.Model.Extension;
+using CorpusExplorer.Sdk.Utils.Filter.Abstract;
+using CorpusExplorer.Sdk.Utils.Filter.Queries;
 
 namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 {
-  public class CowidPlusWebService : AbstractEasyWebService<ServiceConfiguration>
+  public class WebService : AbstractEasyWebService<ServiceConfiguration>
   {
     private int _nMax = 5;
 
     private string _normDataFile = Path.Combine("json", $"normData.json");
     private object _normDataLock = new object();
-    private Dictionary<string, OwidLiveNormData> _normData;
+    private Dictionary<string, NormDataResponseItem> _normData;
 
     private long _maxPostSize;
     private string _secureUpdateToken;
@@ -53,13 +56,14 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/init", Init);
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/norm", Norm);
-      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/search", Search);
+      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/search", Search);  //TODO
       server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/convert", Convert);
 
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/token", Token);
       server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/update", Update); // TODO: token check
 
-      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/heartbeat", Validate);
+      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/heartbeat", Heartbeat); //TODO
+      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/ping", (arg) => arg.Response.Send(200));
     }
 
     private void Search(HttpContext arg)
@@ -81,7 +85,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     {
       try
       {
-        _normData = JsonConvert.DeserializeObject<Dictionary<string, OwidLiveNormData>>(File.ReadAllText(_normDataFile));
+        _normData = JsonConvert.DeserializeObject<Dictionary<string, NormDataResponseItem>>(File.ReadAllText(_normDataFile));
 
         var settings = JsonConvert.DeserializeObject<ServiceConfiguration>(File.ReadAllText("config.json"));
         _maxPostSize = settings.MaxPostSize;
@@ -94,7 +98,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       }
     }
 
-    private void Validate(HttpContext arg)
+    private void Heartbeat(HttpContext arg)
     {
       try
       {
@@ -180,10 +184,10 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
           Directory.CreateDirectory("cec6");
 
         var fn = Path.Combine("cec6", $"{req.Year:D4}.cec6");
-
-        var oldData = File.Exists(fn) ? CorpusAdapterWriteDirect.Create(fn) : null;
-
         var date = $"{req.Year:D4}-{req.Month:D2}-{req.Day:D2}";
+
+        var oldData = ReadCorpus(fn, date);
+
         var newTexts = req.Data.Split(new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
           .Select(x => new Dictionary<string, object> { { "Text", x }, { "D", date } }).ToArray();
         req.Data = "";
@@ -200,7 +204,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         tagger.Execute();
         var newData = tagger.Output.First();
 
-        UpdateNormData(newData, req.Year, date);
+        UpdateNormData(newData, date);
 
         var merged = oldData == null ? newData : CorpusMerger.Merge(new[] { oldData, newData });
 
@@ -217,22 +221,42 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       }
     }
 
+    private AbstractCorpusAdapter ReadCorpus(string fn, string date)
+    {
+      if (!File.Exists(fn))
+        return null; // komplett neues Jahr
+      var corpus = CorpusAdapterWriteDirect.Create(fn);
+
+      var select = corpus.ToSelection();
+      var tmp = select.CreateTemporary(new AbstractFilterQuery[] { new FilterQueryMetaExactMatch { MetaLabel = "D", MetaValues = new[] { date } } });
+      // Überprüfe, ob der Tag bereits existiert
+      if (tmp.CountDocuments == 0)
+        return corpus;
+
+      // Falls ja, aktualisiere den Tag
+      var guids = new HashSet<Guid>(select.DocumentGuids);
+      foreach (var x in tmp.DocumentGuids)
+        guids.Remove(x);
+
+      return select.CreateTemporary(guids).ToCorpus();
+    }
+
     private void UpdateNormData(AbstractCorpusAdapter newData, string key)
     {
       if (!Directory.Exists("json"))
         Directory.CreateDirectory("json");
 
-      var normData = new Dictionary<string, OwidLiveNormData>();
+      var normData = new Dictionary<string, NormDataResponseItem>();
       try
       {
-        normData = JsonConvert.DeserializeObject<Dictionary<string, OwidLiveNormData>>(File.ReadAllText(_normDataFile));
+        normData = JsonConvert.DeserializeObject<Dictionary<string, NormDataResponseItem>>(File.ReadAllText(_normDataFile));
       }
       catch (Exception ex)
       {
         // ignore
       }
 
-      var nEntry = new OwidLiveNormData
+      var nEntry = new NormDataResponseItem
       {
         Token = newData.CountToken,
         Sentences = newData.CountSentences,

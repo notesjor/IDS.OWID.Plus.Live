@@ -19,7 +19,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       if(args.Length == 1 && args[0] == "/WAIT")
         Console.ReadLine();
 
-      var service = new CowidPlusWebService();
+      var service = new WebService();
       service.Start();
     }
   }

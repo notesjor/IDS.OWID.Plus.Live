@@ -2,7 +2,7 @@
 
 namespace IDS.OWIDplusLIVE.API.Model.Json.OwidLiveStorage
 {
-  public class OwidLiveNormData
+  public class NormDataResponseItem
   {
     [JsonProperty("t")]
     public long Token { get; set; }
