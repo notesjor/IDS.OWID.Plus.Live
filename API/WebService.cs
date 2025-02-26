@@ -21,8 +21,6 @@ using IDS.OWIDplusLIVE.API.Model.Json.OwidLiveStorage;
 using IDS.OWIDplusLIVE.API.Model.Response;
 using CorpusExplorer.Sdk.Utils.DataTableWriter.Abstract;
 using CorpusExplorer.Sdk.Utils.DataTableWriter;
-using System.Globalization;
-using System.Text.Json.Serialization;
 using CorpusExplorer.Sdk.Model.Extension;
 using CorpusExplorer.Sdk.Utils.Filter.Abstract;
 using CorpusExplorer.Sdk.Utils.Filter.Queries;
@@ -36,6 +34,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     private string _normDataFile = Path.Combine("json", $"normData.json");
     private object _normDataLock = new object();
     private Dictionary<string, NormDataResponseItem> _normData;
+    private string _normDataStr;
 
     private long _maxPostSize;
     private string _secureUpdateToken;
@@ -85,7 +84,11 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     {
       try
       {
-        _normData = JsonConvert.DeserializeObject<Dictionary<string, NormDataResponseItem>>(File.ReadAllText(_normDataFile));
+        lock(_normDataLock)
+        {
+          _normDataStr = File.ReadAllText(_normDataFile);
+          _normData = JsonConvert.DeserializeObject<Dictionary<string, NormDataResponseItem>>(_normDataStr);
+        }
 
         var settings = JsonConvert.DeserializeObject<ServiceConfiguration>(File.ReadAllText("config.json"));
         _maxPostSize = settings.MaxPostSize;
@@ -102,35 +105,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     {
       try
       {
-        /* TODO
-        #region RocksDB-Check
-        for (byte i = 1; i <= _n; i++)
-          if(string.IsNullOrWhiteSpace(_dbs[i].Get($">{i}")))
-            throw new Exception($"N{i} is empty!");
-        #endregion
-        
-        #region ElasticSearch-Check
-        var subq = new List<QueryContainer>
-        {
-          new TermQuery
-          {
-            Field = "n",
-            Value = 1
-          },
-          new QueryStringQuery
-          {
-            Query = "die",
-            Fields = "l0"
-          }
-        };
-
-        var container = new QueryContainer(new BoolQuery { Must = subq });
-
-        var items = _es.Search<EsEntry>(s => s.Query(q => container).Source(src => src.Includes(i => i.Field("key"))).Size(1));
-        if (items.Hits.Count != 1)
-          throw new Exception("ElasticSearch - Connection Error!");
-        #endregion
-        */
+        /* TODO */
 
         arg.Response.Send(HttpStatusCode.OK);
       }
@@ -276,8 +251,11 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         // ignore
       }
 
-      lock (_normDataLock)
+      lock(_normDataLock)
+      {
         _normData = normData;
+        _normDataStr = JsonConvert.SerializeObject(_normData);
+      }
     }
 
     private void Init(HttpContext arg)
@@ -368,7 +346,8 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     {
       try
       {
-        arg.Response.Send(_normData);
+        lock (_normDataLock)
+          arg.Response.Send(_normDataStr);
       }
       catch (Exception ex)
       {
@@ -381,6 +360,8 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
     protected override OpenApiDocument GetDocumentation()
     {
+      // TODO
+
       return new OpenApiDocument
       {
         Paths = new OpenApiPaths
