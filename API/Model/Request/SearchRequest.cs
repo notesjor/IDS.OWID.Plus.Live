@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Linq;
-using System.Text;
+using System.Globalization;
 
 namespace IDS.Lexik.cOWIDplusViewer.v2.WebService.Model.Request
 {
@@ -11,6 +10,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService.Model.Request
     public string From { get; set; }
     public string To { get; set; }
 
-    public DateTime FromDate => DateTime.ParseExact(From, "yyyy-MM-dd", CurrentCulture.);
+    public DateTime FromDate => DateTime.ParseExact(From, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+    public int Year => FromDate.Year;
   }
 }

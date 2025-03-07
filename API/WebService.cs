@@ -31,12 +31,17 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
   {
     private int _nMax = 5;
 
+    private object _syncLock = new object();
+    private bool _syncPending = false;
+    private Dictionary<int, CorpusAdapterWriteIndirect> _corpora = new Dictionary<int, CorpusAdapterWriteIndirect>();
+
     private string _normDataFile = Path.Combine("json", $"normData.json");
     private object _normDataLock = new object();
     private Dictionary<string, NormDataResponseItem> _normData;
     private string _normDataStr;
 
     private long _maxPostSize;
+    private int _maxItems;
     private string _secureUpdateToken;
     private string _lastUpdateToken;
 
@@ -49,17 +54,19 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       {"XML", new XmlTableWriter() }
     };
 
+    private string _cec6path = "cec6";
+
     protected override void ConfigureEndpoints(Server server)
     {
       ReloadData();
 
-      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/init", Init);
-      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/norm", Norm);
-      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/search", Search);  //TODO
-      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/convert", Convert);
+      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/v2/init", Init);
+      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/v2/norm", Norm);
+      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/v2/search", Search);  //TODO
+      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/v2/convert", Convert);
 
-      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/token", Token);
-      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/update", Update); // TODO: token check
+      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/v2/token", Token);
+      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/v2/update", Update); // TODO: token check
 
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/heartbeat", Heartbeat); //TODO
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/ping", (arg) => arg.Response.Send(200));
@@ -69,6 +76,17 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     {
       try
       {
+        var request = arg.PostData<SearchRequest>();
+        
+        var current = request.FromDate.Year;
+        var 
+
+        while (true)
+        {
+          if(_corpora.ContainsKey(current))
+            break;
+        }
+
 
       }
       catch (Exception ex)
@@ -84,7 +102,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     {
       try
       {
-        lock(_normDataLock)
+        lock (_normDataLock)
         {
           _normDataStr = File.ReadAllText(_normDataFile);
           _normData = JsonConvert.DeserializeObject<Dictionary<string, NormDataResponseItem>>(_normDataStr);
@@ -92,8 +110,31 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
         var settings = JsonConvert.DeserializeObject<ServiceConfiguration>(File.ReadAllText("config.json"));
         _maxPostSize = settings.MaxPostSize;
+        _maxItems = settings.MaxItems;
         _secureUpdateToken = settings.SecureUpdateToken;
         _nMax = settings.N;
+
+        lock (_syncLock)
+        {
+          _syncPending = false;
+          try
+          {
+            foreach(var k in _corpora.Keys)
+              _corpora[k].Dispose();
+            _corpora.Clear();
+
+            foreach (var fn in Directory.GetFiles(_cec6path, "*.cec6"))
+            {
+              var key = int.Parse(Path.GetFileNameWithoutExtension(fn));
+              _corpora.Add(key, CorpusAdapterWriteIndirect.Create(fn));
+            }
+          }
+          catch
+          {
+            // ignore
+          }
+          _syncPending = false;
+        }
       }
       catch (Exception ex)
       {
@@ -105,8 +146,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     {
       try
       {
-        /* TODO */
-
         arg.Response.Send(HttpStatusCode.OK);
       }
       catch (Exception ex)
@@ -155,13 +194,13 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         _lastUpdateToken = Guid.NewGuid().ToString("N");
         */
 
-        if (!Directory.Exists("cec6"))
-          Directory.CreateDirectory("cec6");
+        if (!Directory.Exists(_cec6path))
+          Directory.CreateDirectory(_cec6path);
 
-        var fn = Path.Combine("cec6", $"{req.Year:D4}.cec6");
+        var fn = Path.Combine(_cec6path, $"{req.Year:D4}.cec6");
         var date = $"{req.Year:D4}-{req.Month:D2}-{req.Day:D2}";
 
-        var oldData = ReadCorpus(fn, date);
+        var oldData = Update_OpenCorpus(fn, date);
 
         var newTexts = req.Data.Split(new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
           .Select(x => new Dictionary<string, object> { { "Text", x }, { "D", date } }).ToArray();
@@ -183,7 +222,9 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
         var merged = oldData == null ? newData : CorpusMerger.Merge(new[] { oldData, newData });
 
-        merged.Save(fn, false);
+        SaveCorpus(merged, fn);
+
+        ReloadData();
 
         arg.Response.Send(HttpStatusCode.OK);
       }
@@ -196,14 +237,35 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       }
     }
 
-    private AbstractCorpusAdapter ReadCorpus(string fn, string date)
+    private void SaveCorpus(AbstractCorpusAdapter merged, string fn)
+    {
+      lock (_syncLock)
+      {
+        _syncPending = true;
+        try
+        {
+          var key = int.Parse(Path.GetFileNameWithoutExtension(fn));
+          if (_corpora.ContainsKey(key))
+            _corpora[key].Dispose();
+
+          merged.Save(fn, false);
+        }
+        catch
+        {
+          // ignore
+        }
+        _syncPending = false;
+      }
+    }
+
+    private AbstractCorpusAdapter Update_OpenCorpus(string fn, string excludeDate)
     {
       if (!File.Exists(fn))
         return null; // komplett neues Jahr
       var corpus = CorpusAdapterWriteDirect.Create(fn);
 
       var select = corpus.ToSelection();
-      var tmp = select.CreateTemporary(new AbstractFilterQuery[] { new FilterQueryMetaExactMatch { MetaLabel = "D", MetaValues = new[] { date } } });
+      var tmp = select.CreateTemporary(new AbstractFilterQuery[] { new FilterQueryMetaExactMatch { MetaLabel = "D", MetaValues = new[] { excludeDate } } });
       // Überprüfe, ob der Tag bereits existiert
       if (tmp.CountDocuments == 0)
         return corpus;
@@ -221,7 +283,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       if (!Directory.Exists("json"))
         Directory.CreateDirectory("json");
 
-      var normData = new Dictionary<string, NormDataResponseItem>();
+      Dictionary<string, NormDataResponseItem> normData = null;
       try
       {
         normData = JsonConvert.DeserializeObject<Dictionary<string, NormDataResponseItem>>(File.ReadAllText(_normDataFile));
@@ -230,6 +292,8 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       {
         // ignore
       }
+      if (normData == null)
+        return;
 
       var nEntry = new NormDataResponseItem
       {
@@ -251,7 +315,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         // ignore
       }
 
-      lock(_normDataLock)
+      lock (_normDataLock)
       {
         _normData = normData;
         _normDataStr = JsonConvert.SerializeObject(_normData);
