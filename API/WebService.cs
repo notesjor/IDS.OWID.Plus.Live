@@ -24,12 +24,21 @@ using CorpusExplorer.Sdk.Utils.DataTableWriter;
 using CorpusExplorer.Sdk.Model.Extension;
 using CorpusExplorer.Sdk.Utils.Filter.Abstract;
 using CorpusExplorer.Sdk.Utils.Filter.Queries;
+using System.Security.Cryptography;
+using System.Runtime.Intrinsics.Arm;
+using IDS.OWIDplusLIVE.API.Helper;
+using CorpusExplorer.Sdk.Blocks.SelectionCluster.Generator;
+using CorpusExplorer.Sdk.Blocks;
+using CorpusExplorer.Sdk.Model;
 
 namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 {
   public class WebService : AbstractEasyWebService<ServiceConfiguration>
   {
     private int _nMax = 5;
+
+    private SHA512 _hash = SHA512.Create();
+    private object _hashLock = new object();
 
     private object _syncLock = new object();
     private bool _syncPending = false;
@@ -44,6 +53,11 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     private int _maxItems;
     private string _secureUpdateToken;
     private string _lastUpdateToken;
+    private string _cacheDir;
+
+    private TimeSpan _cacheTime = TimeSpan.FromMinutes(30);
+    private object _cacheLock = new object();
+    private Dictionary<string, DateTime> _cache = new Dictionary<string, DateTime>();
 
     private Dictionary<string, AbstractTableWriter> _exporter = new Dictionary<string, AbstractTableWriter>
     {
@@ -60,7 +74,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     {
       ReloadData();
 
-      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/v2/init", Init);
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/v2/norm", Norm);
       server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/v2/search", Search);  //TODO
       server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/v2/convert", Convert);
@@ -76,18 +89,20 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     {
       try
       {
-        var request = arg.PostData<SearchRequest>();
-        
-        var current = request.FromDate.Year;
-        var 
-
-        while (true)
+        var request = GetSearchRequest(arg);
+        var dir = CachePathHelper.GetDirectory(_cacheDir, request.N, request.Hash);
+        if (Directory.Exists(dir))
         {
-          if(_corpora.ContainsKey(current))
-            break;
+          var file = Path.Combine(dir, $"{request.Year}.json");
+          if (File.Exists(file))
+          {
+            SearchResponseFullCached(arg, file);
+          }
+          else
+            SearchResponseGetAdditionalYear(arg, request, dir);
         }
-
-
+        else
+          SearchResponseInitialSearch(arg, request, dir);
       }
       catch (Exception ex)
       {
@@ -96,6 +111,48 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
         arg.Response.Send(HttpStatusCode.InternalServerError);
       }
+    }
+
+    private void SearchResponseInitialSearch(HttpContext httpContext, SearchRequest request, string dir)
+    {
+      if (!Directory.Exists(dir))
+        Directory.CreateDirectory(dir);
+
+      var corpus = _corpora[request.Year];
+      var cluster = corpus.ToSelection().CreateBlock<SelectionClusterBlock>();
+    }
+
+    private void SearchResponseGetAdditionalYear(HttpContext arg, SearchRequest request, string dir)
+    {
+      if (!Directory.Exists(dir))
+        Directory.CreateDirectory(dir);
+
+      var file = Path.Combine(dir, $"{request.Year}.json");
+      if (_corpora.ContainsKey(request.Year))
+      {
+        arg.Response.Send(HttpStatusCode.NotFound, "year not found");
+        return;
+      }
+
+      var corpus = _corpora[request.Year];
+      var cluster = corpus.ToSelection().CreateBlock<SelectionClusterBlock>();
+      cluster.ClusterGenerator = new SelectionClusterGeneratorStringValue();
+    }
+
+    private void SearchResponseFullCached(HttpContext arg, string file)
+    {
+      lock (_cacheLock)
+        _cache[file] = DateTime.Now.Add(_cacheTime);
+      arg.Response.Send(File.ReadAllText(file));
+    }
+
+    private SearchRequest GetSearchRequest(HttpContext arg)
+    {
+      var post = arg.PostDataAsString;
+      var request = JsonConvert.DeserializeObject<SearchRequest>(post);
+      lock (_hashLock)
+        request.Hash = System.Convert.ToBase64String(_hash.ComputeHash(System.Text.Encoding.UTF8.GetBytes(post)));
+      return request;
     }
 
     private void ReloadData()
@@ -113,13 +170,14 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         _maxItems = settings.MaxItems;
         _secureUpdateToken = settings.SecureUpdateToken;
         _nMax = settings.N;
+        _cacheDir = settings.CacheDir;
 
         lock (_syncLock)
         {
           _syncPending = false;
           try
           {
-            foreach(var k in _corpora.Keys)
+            foreach (var k in _corpora.Keys)
               _corpora[k].Dispose();
             _corpora.Clear();
 
@@ -319,21 +377,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       {
         _normData = normData;
         _normDataStr = JsonConvert.SerializeObject(_normData);
-      }
-    }
-
-    private void Init(HttpContext arg)
-    {
-      try
-      {
-        arg.Response.Send(Guid.NewGuid().ToString("N"));
-      }
-      catch (Exception ex)
-      {
-        Console.WriteLine(ex.Message);
-        Console.WriteLine(ex.StackTrace);
-
-        arg.Response.Send(HttpStatusCode.InternalServerError);
       }
     }
 

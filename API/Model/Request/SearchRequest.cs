@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Globalization;
+using System.Text.Json.Serialization;
 
 namespace IDS.Lexik.cOWIDplusViewer.v2.WebService.Model.Request
 {
@@ -7,10 +7,9 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService.Model.Request
   {
     public byte N { get; set; }
     public SearchRequestItem[] Items { get; set; }
-    public string From { get; set; }
-    public string To { get; set; }
+    public int Year { get; set; }
 
-    public DateTime FromDate => DateTime.ParseExact(From, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-    public int Year => FromDate.Year;
+    [JsonIgnore]
+    public string Hash { get; set; }
   }
 }
