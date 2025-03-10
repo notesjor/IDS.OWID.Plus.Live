@@ -25,11 +25,12 @@ using CorpusExplorer.Sdk.Model.Extension;
 using CorpusExplorer.Sdk.Utils.Filter.Abstract;
 using CorpusExplorer.Sdk.Utils.Filter.Queries;
 using System.Security.Cryptography;
-using System.Runtime.Intrinsics.Arm;
+using System.Text;
 using IDS.OWIDplusLIVE.API.Helper;
 using CorpusExplorer.Sdk.Blocks.SelectionCluster.Generator;
 using CorpusExplorer.Sdk.Blocks;
 using CorpusExplorer.Sdk.Model;
+using System.Threading.Tasks;
 
 namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 {
@@ -43,6 +44,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     private object _syncLock = new object();
     private bool _syncPending = false;
     private Dictionary<int, CorpusAdapterWriteIndirect> _corpora = new Dictionary<int, CorpusAdapterWriteIndirect>();
+    private Dictionary<int, Dictionary<string, Guid[]>> _selections = new Dictionary<int, Dictionary<string, Guid[]>>();
 
     private string _normDataFile = Path.Combine("json", $"normData.json");
     private object _normDataLock = new object();
@@ -74,15 +76,28 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     {
       ReloadData();
 
-      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/v2/norm", Norm);
-      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/v2/search", Search);  //TODO
-      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/v2/convert", Convert);
+      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/v3/norm", Norm);
+      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/v3/years", Years);
+      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/v3/search", Search);
+      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/v3/convert", Convert);
 
-      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/v2/token", Token);
-      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/v2/update", Update); // TODO: token check
+      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/v3/token", Token);
+      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/v3/update", Update); // TODO: token check
 
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/heartbeat", Heartbeat); //TODO
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/ping", (arg) => arg.Response.Send(200));
+    }
+
+    private void Years(HttpContext arg)
+    {
+      try
+      {
+        arg.Response.Send(_corpora.Keys);
+      }
+      catch
+      {
+        arg.Response.Send(HttpStatusCode.InternalServerError);
+      }
     }
 
     private void Search(HttpContext arg)
@@ -113,13 +128,69 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       }
     }
 
-    private void SearchResponseInitialSearch(HttpContext httpContext, SearchRequest request, string dir)
+    private void SearchResponseInitialSearch(HttpContext arg, SearchRequest request, string dir)
     {
       if (!Directory.Exists(dir))
         Directory.CreateDirectory(dir);
 
+      var @lock = new object();
+      var limitter = new Dictionary<string, double>();
+      var res = new Dictionary<string, Dictionary<string, double>>();
+
+      var selections = _selections[request.Year];
       var corpus = _corpora[request.Year];
-      var cluster = corpus.ToSelection().CreateBlock<SelectionClusterBlock>();
+
+      #region Validation 
+      if (request.N < 1)
+      {
+        arg.Response.Send(HttpStatusCode.BadRequest, $"N is smaller 1");
+        return;
+      }
+      if (request.N > _nMax)
+      {
+        arg.Response.Send(HttpStatusCode.BadRequest, $"N is too large (N max={_nMax})");
+        return;
+      }
+      #endregion
+      var layerAndQueries = GetLayerAndQueries(request);
+
+      Parallel.ForEach(selections, selection =>
+      {
+        var block = corpus.ToSelection(selection.Value).CreateBlock<NgramMultiLayerSelectiveBlock>();
+        block.LayerDisplayname = "Wort";
+        block.LayerAndQueries = layerAndQueries;
+        block.Calculate();
+
+        lock (@lock)
+          foreach (var x in block.NGramFrequency)
+          {
+            if (limitter.ContainsKey(x.Key))
+              limitter[x.Key] += x.Value;
+            else
+              limitter.Add(x.Key, x.Value);
+            if (!res.ContainsKey(x.Key))
+              res.Add(x.Key, new Dictionary<string, double>());
+            res[x.Key].Add(selection.Key, x.Value);
+          }
+      });
+
+      var limit = limitter.Count <= _maxItems ? limitter.Keys.ToArray() : limitter.OrderByDescending(x => x.Value).Take(_maxItems).Select(x => x.Key).ToArray();
+      File.WriteAllLines(Path.Combine(dir, "limit.txt"), limit, Encoding.UTF8);
+      limitter.Clear();
+      res = limit.ToDictionary(x => x, x => res[x]);
+      var str = JsonConvert.SerializeObject(res);
+      res.Clear();
+      arg.Response.Send(str);
+      File.WriteAllText(Path.Combine(dir, $"{request.Year}.json"), str, Encoding.UTF8);
+    }
+
+    private static Dictionary<string, string[]> GetLayerAndQueries(SearchRequest request)
+    {
+      var layerNames = new HashSet<string>(request.Items.Select(x => x.LayerDisplayname));
+      var layerAndQueries = layerNames.ToDictionary(x => x, x => new string[request.N]);
+      foreach (var x in request.Items)
+        layerAndQueries[x.LayerDisplayname][x.Position] = x.Token;
+      return layerAndQueries;
     }
 
     private void SearchResponseGetAdditionalYear(HttpContext arg, SearchRequest request, string dir)
@@ -127,16 +198,36 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       if (!Directory.Exists(dir))
         Directory.CreateDirectory(dir);
 
-      var file = Path.Combine(dir, $"{request.Year}.json");
-      if (_corpora.ContainsKey(request.Year))
-      {
-        arg.Response.Send(HttpStatusCode.NotFound, "year not found");
-        return;
-      }
+      var @lock = new object();
+      var res = new Dictionary<string, Dictionary<string, double>>();
+      var limit = File.ReadAllLines(Path.Combine(dir, "limit.txt"), Encoding.UTF8);
 
+      var selections = _selections[request.Year];
       var corpus = _corpora[request.Year];
-      var cluster = corpus.ToSelection().CreateBlock<SelectionClusterBlock>();
-      cluster.ClusterGenerator = new SelectionClusterGeneratorStringValue();
+
+      // no validation nessesary, because it is already done in the initial search
+      var layerAndQueries = GetLayerAndQueries(request);
+
+      Parallel.ForEach(selections, selection =>
+      {
+        var block = corpus.ToSelection(selection.Value).CreateBlock<NgramMultiLayerSelectiveBlock>();
+        block.LayerDisplayname = "Wort";
+        block.LayerAndQueries = layerAndQueries;
+        block.Calculate();
+
+        lock (@lock)
+          foreach (var x in limit)
+          {
+            if (!res.ContainsKey(x))
+              res.Add(x, new Dictionary<string, double>());
+            res[x].Add(selection.Key, block.NGramFrequency.ContainsKey(x) ? block.NGramFrequency[x] : 0.0);
+          }
+      });
+
+      var str = JsonConvert.SerializeObject(res);
+      res.Clear();
+      arg.Response.Send(str);
+      File.WriteAllText(Path.Combine(dir, $"{request.Year}.json"), str, Encoding.UTF8);
     }
 
     private void SearchResponseFullCached(HttpContext arg, string file)
@@ -184,7 +275,18 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
             foreach (var fn in Directory.GetFiles(_cec6path, "*.cec6"))
             {
               var key = int.Parse(Path.GetFileNameWithoutExtension(fn));
-              _corpora.Add(key, CorpusAdapterWriteIndirect.Create(fn));
+              var corpus = CorpusAdapterWriteIndirect.Create(fn);
+              _corpora.Add(key, corpus);
+
+              var cluster = corpus.ToSelection().CreateBlock<SelectionClusterBlock>();
+              cluster.ClusterGenerator = new SelectionClusterGeneratorStringValue();
+              cluster.NoParent = true;
+              cluster.MetadataKey = "D";
+              cluster.Calculate();
+
+              _selections.Add(key, cluster.SelectionClusters.ToDictionary(
+                x => x.Key,
+                x => x.Value.ToArray()));
             }
           }
           catch
