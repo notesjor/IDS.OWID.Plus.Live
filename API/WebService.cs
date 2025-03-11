@@ -78,6 +78,9 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       _cec6path = Path.Combine(AppPath, "cec6");
       _cachePath = Path.Combine(AppPath, "cache");
 
+      Directory.Delete(_cachePath, true);
+      Directory.CreateDirectory(_cachePath);
+
       ReloadData();
 
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/v3/norm", Norm);
@@ -110,9 +113,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       {
         var request = GetSearchRequest(arg);
         var dir = CachePathHelper.GetDirectory(_cachePath, request.N, request.Hash);
-
-        SearchResponseInitialSearch(arg, request, dir);
-        return; // TODO
 
         if (Directory.Exists(dir))
         {
@@ -200,7 +200,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       block.LayerDisplayname = "Wort";
       block.QueriesSimpleRaw = layerAndQueries;
       block.CompileQueries();
-      return  block.QueriesCompiled;
+      return block.QueriesCompiled;
     }
 
     private static Dictionary<string, string[]> GetLayerAndQueries(SearchRequest request)
