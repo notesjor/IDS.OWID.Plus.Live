@@ -1,0 +1,8 @@
+﻿{
+  "IP": "127.0.0.1",
+  "Port": 4455,
+  "N": 5,
+  "MaxItems": 1000,
+  "MaxPostSize": 52428800,
+  "SecureUpdateToken": "token"
+}

@@ -46,7 +46,9 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     private Dictionary<int, CorpusAdapterWriteIndirect> _corpora = new Dictionary<int, CorpusAdapterWriteIndirect>();
     private Dictionary<int, Dictionary<string, Guid[]>> _selections = new Dictionary<int, Dictionary<string, Guid[]>>();
 
-    private string _normDataFile = Path.Combine("json", $"normData.json");
+    private string _cec6path = "";
+    private string _normDataFile = "";
+
     private object _normDataLock = new object();
     private Dictionary<string, NormDataResponseItem> _normData;
     private string _normDataStr;
@@ -55,7 +57,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     private int _maxItems;
     private string _secureUpdateToken;
     private string _lastUpdateToken;
-    private string _cacheDir;
+    private string _cachePath;
 
     private TimeSpan _cacheTime = TimeSpan.FromMinutes(30);
     private object _cacheLock = new object();
@@ -70,10 +72,12 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       {"XML", new XmlTableWriter() }
     };
 
-    private string _cec6path = "cec6";
-
     protected override void ConfigureEndpoints(Server server)
     {
+      _normDataFile = Path.Combine(AppPath, "json", "norm.json");
+      _cec6path = Path.Combine(AppPath, "cec6");
+      _cachePath = Path.Combine(AppPath, "cache");
+
       ReloadData();
 
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/v3/norm", Norm);
@@ -105,7 +109,11 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       try
       {
         var request = GetSearchRequest(arg);
-        var dir = CachePathHelper.GetDirectory(_cacheDir, request.N, request.Hash);
+        var dir = CachePathHelper.GetDirectory(_cachePath, request.N, request.Hash);
+
+        SearchResponseInitialSearch(arg, request, dir);
+        return; // TODO
+
         if (Directory.Exists(dir))
         {
           var file = Path.Combine(dir, $"{request.Year}.json");
@@ -152,13 +160,13 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         return;
       }
       #endregion
-      var layerAndQueries = GetLayerAndQueries(request);
+      var compiledQueries = GetPreCompiledQueries(request, corpus);
 
       Parallel.ForEach(selections, selection =>
       {
         var block = corpus.ToSelection(selection.Value).CreateBlock<NgramMultiLayerSelectiveBlock>();
         block.LayerDisplayname = "Wort";
-        block.LayerAndQueries = layerAndQueries;
+        block.QueriesCompiled = compiledQueries;
         block.Calculate();
 
         lock (@lock)
@@ -184,12 +192,24 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       File.WriteAllText(Path.Combine(dir, $"{request.Year}.json"), str, Encoding.UTF8);
     }
 
+    private static List<Dictionary<string, NgramMultiLayerSelectiveBlock.AbstractValidateCall>> GetPreCompiledQueries(SearchRequest request, CorpusAdapterWriteIndirect corpus)
+    {
+      var layerAndQueries = GetLayerAndQueries(request);
+
+      var block = corpus.ToSelection().CreateBlock<NgramMultiLayerSelectiveBlock>();
+      block.LayerDisplayname = "Wort";
+      block.QueriesSimpleRaw = layerAndQueries;
+      block.CompileQueries();
+      return  block.QueriesCompiled;
+    }
+
     private static Dictionary<string, string[]> GetLayerAndQueries(SearchRequest request)
     {
       var layerNames = new HashSet<string>(request.Items.Select(x => x.LayerDisplayname));
       var layerAndQueries = layerNames.ToDictionary(x => x, x => new string[request.N]);
       foreach (var x in request.Items)
-        layerAndQueries[x.LayerDisplayname][x.Position] = x.Token;
+        if (x.Position < request.N)
+          layerAndQueries[x.LayerDisplayname][x.Position] = x.Token;
       return layerAndQueries;
     }
 
@@ -212,7 +232,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       {
         var block = corpus.ToSelection(selection.Value).CreateBlock<NgramMultiLayerSelectiveBlock>();
         block.LayerDisplayname = "Wort";
-        block.LayerAndQueries = layerAndQueries;
+        block.QueriesSimpleRaw = layerAndQueries;
         block.Calculate();
 
         lock (@lock)
@@ -252,16 +272,15 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       {
         lock (_normDataLock)
         {
-          _normDataStr = File.ReadAllText(_normDataFile);
-          _normData = JsonConvert.DeserializeObject<Dictionary<string, NormDataResponseItem>>(_normDataStr);
+          //TODO: _normDataStr = File.ReadAllText(_normDataFile);
+          //TODO: _normData = JsonConvert.DeserializeObject<Dictionary<string, NormDataResponseItem>>(_normDataStr);
         }
 
-        var settings = JsonConvert.DeserializeObject<ServiceConfiguration>(File.ReadAllText("config.json"));
+        var settings = JsonConvert.DeserializeObject<ServiceConfiguration>(File.ReadAllText(Path.Combine(AppPath, "config.cnf")));
         _maxPostSize = settings.MaxPostSize;
         _maxItems = settings.MaxItems;
         _secureUpdateToken = settings.SecureUpdateToken;
         _nMax = settings.N;
-        _cacheDir = settings.CacheDir;
 
         lock (_syncLock)
         {
