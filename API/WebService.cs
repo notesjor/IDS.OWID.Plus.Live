@@ -80,6 +80,9 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       Directory.CreateDirectory(_cachePath);
       if (!Directory.Exists(_cec6path))
         Directory.CreateDirectory(_cec6path);
+      
+      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/heartbeat", Heartbeat);
+      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/ping", (arg) => arg.Response.Send(200));
 
       ReloadData();
 
@@ -90,9 +93,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/v3/token", Token);
       server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/v3/update", Update); // TODO: token check
-
-      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/heartbeat", Heartbeat); //TODO
-      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/ping", (arg) => arg.Response.Send(200));
     }
 
     private void Years(HttpContext arg)
@@ -320,7 +320,8 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     {
       try
       {
-        arg.Response.Send(HttpStatusCode.OK);
+        lock (_syncLock)
+          arg.Response.Send(string.IsNullOrEmpty(_normDataStr) ? HttpStatusCode.Processing : HttpStatusCode.OK);
       }
       catch (Exception ex)
       {
