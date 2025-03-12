@@ -31,6 +31,7 @@ using CorpusExplorer.Sdk.Blocks.SelectionCluster.Generator;
 using CorpusExplorer.Sdk.Blocks;
 using CorpusExplorer.Sdk.Model;
 using System.Threading.Tasks;
+using CorpusExplorer.Sdk.Blocks.NgramMultiLayerSelectiveQuery.ValidateCall.Abstract;
 
 namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 {
@@ -192,7 +193,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       File.WriteAllText(Path.Combine(dir, $"{request.Year}.json"), str, Encoding.UTF8);
     }
 
-    private static List<Dictionary<string, NgramMultiLayerSelectiveBlock.AbstractValidateCall>> GetPreCompiledQueries(SearchRequest request, CorpusAdapterWriteIndirect corpus)
+    private static List<Dictionary<string, AbstractValidateCall>> GetPreCompiledQueries(SearchRequest request, CorpusAdapterWriteIndirect corpus)
     {
       var layerAndQueries = GetLayerAndQueries(request);
 
