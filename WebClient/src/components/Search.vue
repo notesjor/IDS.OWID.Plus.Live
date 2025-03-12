@@ -614,7 +614,6 @@ async function sendSearchRequest(data, store, n, queryItems) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        sessionKey: store.state.sessionKey,
       },
       body: JSON.stringify({ N: n, Items: queryItems }),
     });
@@ -695,7 +694,6 @@ async function sendSearchRequest(data, store, n, queryItems) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        sessionKey: store.state.sessionKey,
       },
       body: JSON.stringify({ N: n, Items: queryItems }),
     });

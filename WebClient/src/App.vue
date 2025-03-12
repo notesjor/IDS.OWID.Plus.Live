@@ -24,12 +24,12 @@
         </v-row>
         <v-row class="text-center">
           <v-col>
-            <VizPanel id="vizPanel" v-show="this.$store.state.vizData != null"/>
+            <VizPanel id="vizPanel" v-show="this.$store.state.vizData != null" />
           </v-col>
         </v-row>
         <v-row class="text-center">
           <v-col>
-            <VizOptions v-show="this.$store.state.vizData != null"/>          
+            <VizOptions v-show="this.$store.state.vizData != null" />
           </v-col>
         </v-row>
         <v-row class="text-center">
@@ -64,24 +64,12 @@
                     {{ new Date().getFullYear() }} — <strong>{{ this.$config.appName }}</strong>
                   </div>
                   <div style="display:inline-block">
-                    <a
-                      :href="footerContact"
-                      style="margin-left:15px"
-                      v-if="footerContact != null && footerContact.length > 1"
-                      >{{ $t("footer_Contact") }}</a
-                    >
-                    <a
-                      :href="footerImpressum"
-                      style="margin-left:15px"
-                      v-if="footerImpressum != null && footerImpressum.length > 1"
-                      >{{ $t("footer_Impressum") }}</a
-                    >
-                    <a
-                      :href="footerDsgvo"
-                      style="margin-left:15px"
-                      v-if="footerDsgvo != null && footerDsgvo.length > 1"
-                      >{{ $t("footer_Dsgvo") }}</a
-                    >
+                    <a :href="footerContact" style="margin-left:15px"
+                      v-if="footerContact != null && footerContact.length > 1">{{ $t("footer_Contact") }}</a>
+                    <a :href="footerImpressum" style="margin-left:15px"
+                      v-if="footerImpressum != null && footerImpressum.length > 1">{{ $t("footer_Impressum") }}</a>
+                    <a :href="footerDsgvo" style="margin-left:15px"
+                      v-if="footerDsgvo != null && footerDsgvo.length > 1">{{ $t("footer_Dsgvo") }}</a>
                   </div>
                 </v-card-text>
               </v-card>
@@ -123,20 +111,15 @@
           <div class="d-none d-sm-flex">
             <span style="font-size:14px; line-height:1; font-weight:200; margin-top:10px;">
               <p>
-                <strong>{{ $t("main_menu_language") }}</strong
-                ><br />
-                <a @click="setLocale('de')"
-                  ><img src="./locales/de.svg" alt="Deutsch" style="height:24px; margin:10px 10px 5px 0px"
-                /></a>
-                <a @click="setLocale('en')"
-                  ><img src="./locales/gb.svg" alt="Englisch" style="height:24px; margin:10px 10px 5px 0px"
-                /></a>
-                <a @click="setLocale('th')"
-                  ><img src="./locales/th.svg" alt="Thai" style="height:24px; margin:10px 10px 5px 0px"
-                /></a>
-                <a @click="setLocale('cmn')"
-                  ><img src="./locales/cn.svg" alt="Mandarin" style="height:24px; margin:10px 10px 5px 0px"
-                /></a>
+                <strong>{{ $t("main_menu_language") }}</strong><br />
+                <a @click="setLocale('de')"><img src="./locales/de.svg" alt="Deutsch"
+                    style="height:24px; margin:10px 10px 5px 0px" /></a>
+                <a @click="setLocale('en')"><img src="./locales/gb.svg" alt="Englisch"
+                    style="height:24px; margin:10px 10px 5px 0px" /></a>
+                <a @click="setLocale('th')"><img src="./locales/th.svg" alt="Thai"
+                    style="height:24px; margin:10px 10px 5px 0px" /></a>
+                <a @click="setLocale('cmn')"><img src="./locales/cn.svg" alt="Mandarin"
+                    style="height:24px; margin:10px 10px 5px 0px" /></a>
               </p>
             </span>
           </div>
@@ -150,11 +133,8 @@
           <v-card-title class="headline">
             {{ $t("app_dialog_welcome_message") }} {{ this.$config.appName }}
           </v-card-title>
-          <iframe
-            :src="tutorial_iframe_src"
-            title="Video-Tutorial"
-            style="width:600px; max-width:600px; height:414px; max-height:414px;"
-          ></iframe>
+          <iframe :src="tutorial_iframe_src" title="Video-Tutorial"
+            style="width:600px; max-width:600px; height:414px; max-height:414px;"></iframe>
           <v-card-text>
             {{ $t("app_dialog_welcome_message_info") }}
           </v-card-text>
@@ -196,23 +176,29 @@
   text-align: center;
   line-height: 50px;
 }
+
 .blink span {
   color: white;
   animation: blink 3s linear infinite;
 }
+
 @keyframes blink {
   0% {
     opacity: 0.3;
   }
+
   25% {
     opacity: 0.7;
   }
+
   50% {
     opacity: 1;
   }
+
   75% {
     opacity: 0.7;
   }
+
   100% {
     opacity: 0.3;
   }
@@ -274,10 +260,10 @@ export default {
   }),
 
   methods: {
-    newProject: function() {
+    newProject: function () {
       location.reload();
     },
-    showTutorial: function() {
+    showTutorial: function () {
       this.tutorial = false;
     },
     blink(event) {
@@ -292,9 +278,9 @@ export default {
     },
     setLocale(locale) {
       localStorage.setItem("locale", locale);
-      this.$vuetify.lang.current = this.$i18n.locale = locale;      
+      this.$vuetify.lang.current = this.$i18n.locale = locale;
     },
-    closeTutorial(){
+    closeTutorial() {
       this.tutorial = true;
       localStorage.setItem("tutorial", true);
     }
@@ -304,7 +290,7 @@ export default {
     var locale = localStorage.getItem("locale", locale);
     if (locale != null)
       this.setLocale(locale);
-    
+
     this.tutorial = localStorage.getItem("tutorial") ?? false;
   },
 
@@ -321,18 +307,20 @@ export default {
     this.footerImpressum = config.footerImpressum;
     this.footerDsgvo = config.footerDsgvo;
 
+    var baseUrl = "http://localhost:4455/v3"; // TODO: config.baseUrl
+
     // Der Aufruf INIT sowie NORM lädt notwendige Normdaten herunter.
     // INIT kann serverseitig zur Flood-Detection und Loging verwendet werden.
-    fetch(config.baseUrl + "/init")
-      .then((response) => response.text())
+    fetch(baseUrl + "/years") // TODO: v3/years
+      .then((response) => response.json()) // TODO: JSON
       .then((response) => {
-        store.commit("id", response);
+        store.commit("years", response);
 
-        fetch(config.baseUrl + "/norm", {
+        fetch(baseUrl + "/norm", { // TODO: v3/norm
           method: "GET",
         })
           .then((resp) => {
-            if(resp.status != 200)
+            if (resp.status != 200)
               throw new Error("Server Error");
             return resp;
           })
@@ -342,6 +330,7 @@ export default {
           .then((obj) => {
             if (obj === null)
               throw new Error("No Data");
+            
             store.commit("init", obj);
 
             store.commit("vizOption", { r: true, s: 16, g: 1 });
@@ -355,7 +344,7 @@ export default {
             if (queries.has("locale")) {
               var locale = queries.get("locale");
               // vermeidet reload
-              if (this.$cookie.get("locale") != locale)                
+              if (this.$cookie.get("locale") != locale)
                 self.setLocale(locale);
             }
 
@@ -378,16 +367,16 @@ export default {
     let trackingScript = document.createElement("script");
     trackingScript.setAttribute("src", "./tracking.js");
     document.head.appendChild(trackingScript);
-    
+
     // Als Tutorial lassen sich MP4-Video-Dateien (inkl. PNG-Poster => myvideo.mp4.png) oder
     // eine externe HTML-Datei mit Video-Player laden.
-    if (config.tutorialUrl.length < 1) 
+    if (config.tutorialUrl.length < 1)
       this.tutorial = true;
-    else 
+    else
       this.$data.tutorial_iframe_src = config.tutorialUrl;
   },
   computed: {
-    totalLabel: function() {
+    totalLabel: function () {
       if (this.$store.state.owid === null) return "";
 
       var totals = this.$store.state.owid.Total;

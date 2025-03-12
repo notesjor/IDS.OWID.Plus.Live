@@ -9,6 +9,7 @@ export class OwidLiveStorage {
   #Total;
   #NormTotal;
   #N;
+  #NMax = 5;
   #Granulation;
   #AvailableYears;
 
@@ -41,6 +42,8 @@ export class OwidLiveStorage {
    * @param  {array} norm array from GET: owidAPI/norm
    */
   constructor(norm) {
+    norm = this.v3decompile(norm);
+
     this.#Norm = norm;
     this.#OwidLiveSearches = {};
     this.#N = 1;
@@ -50,12 +53,12 @@ export class OwidLiveStorage {
     var notal = [];
     for (var n = 0; n < norm.length; n++) {
       if (n === 0)
-        Object.keys(norm[0]).forEach(function(key) {
+        Object.keys(norm[0]).forEach(function (key) {
           dates.push(key.substring(0, 10));
         });
 
       var sum = 0.0;
-      Object.keys(norm[n]).forEach(function(key) {
+      Object.keys(norm[n]).forEach(function (key) {
         sum += norm[n][key];
       });
       total.push(sum);
@@ -68,9 +71,24 @@ export class OwidLiveStorage {
     this.#NormTotal = notal;
 
     var years = new Set();
-    Object.keys(norm[0]).forEach(k=> years.add(k.substring(0,4)));
+    Object.keys(norm[0]).forEach((k) => years.add(k.substring(0, 4)));
     this.#AvailableYears = Array.from(years);
     this.#AvailableYears.sort();
+  }
+
+  v3decompile(norm) {
+    var keys = Object.keys(norm);
+    var res = [];
+    for (var i = 0; i < this.#NMax; i++) {
+      var n = {};
+      for (var j = 0; j < keys.length; j++) {
+        var date = keys[j];
+        var info = norm[date];
+        n[date] = info.t - (info.s * i);
+      }
+      res.push(n);
+    }
+    return res;
   }
 
   /**
@@ -115,14 +133,14 @@ export class OwidLiveStorage {
   /**
    * Delete all searches
    */
-  clearAll(){
+  clearAll() {
     this.#OwidLiveSearches = {};
   }
 
   /**
    * An array of all available years
    */
-  get AvailableYears(){
+  get AvailableYears() {
     return this.#AvailableYears;
   }
 
@@ -191,18 +209,19 @@ export class OwidLiveStorage {
 
     Object.keys(this.#OwidLiveSearches).forEach((key) => {
       var current = this.#OwidLiveSearches[key];
-      if (current.N === this.#N) tmp.push({key: key, date: current.TimeStamp});
+      if (current.N === this.#N)
+        tmp.push({ key: key, date: current.TimeStamp });
     });
 
-    tmp.sort(function(a,b){
+    tmp.sort(function (a, b) {
       return b.date - a.date;
     });
 
     var res = [];
-    tmp.forEach(x=>{
+    tmp.forEach((x) => {
       res.push(x.key);
     });
-  
+
     return res;
   }
 
@@ -248,7 +267,7 @@ export class OwidLiveStorage {
     }
 
     var res = [];
-    data.OwidLiveStorageTimeItems.forEach(function(item) {
+    data.OwidLiveStorageTimeItems.forEach(function (item) {
       var tokens = item.Key.split("µ");
 
       var d = Object.keys(item.Date).length;
@@ -259,9 +278,9 @@ export class OwidLiveStorage {
 
       var sparkNorm = [];
       for (var i in normd) {
-        var v = i in item.Date ? item.Date[i].value : 0;  
-        sparkNorm.push(Math.round((v / normd[i] * 1000000.0), 0));
-      }      
+        var v = i in item.Date ? item.Date[i].value : 0;
+        sparkNorm.push(Math.round((v / normd[i]) * 1000000.0, 0));
+      }
 
       var wS = tokens[0].split(" ");
       var pS = tokens[2].split(" ");
@@ -293,7 +312,7 @@ export class OwidLiveStorage {
     return res;
   }
 
-  #funcDate = function(x) {
+  #funcDate = function (x) {
     return (
       x.getFullYear() +
       "-" +
@@ -303,19 +322,19 @@ export class OwidLiveStorage {
     );
   };
 
-  #funcWeek = function(x) {
+  #funcWeek = function (x) {
     return x.getYearWeek();
   };
 
-  #funcMonth = function(x) {
+  #funcMonth = function (x) {
     return x.getFullYear() + "-" + x.getMonth().pad(2);
   };
 
-  #funcQuarter = function(x) {
+  #funcQuarter = function (x) {
     return x.getYearQuarter();
   };
 
-  #funcYear = function(x) {
+  #funcYear = function (x) {
     return x.getFullYear();
   };
 
@@ -410,7 +429,7 @@ export class OwidLiveStorage {
    */
   calculateDateGranulation(func) {
     var res = [];
-    Object.keys(this.#Dates).forEach((d) => {      
+    Object.keys(this.#Dates).forEach((d) => {
       res.push(func(new Date(this.#Dates[d])));
     });
     return res;

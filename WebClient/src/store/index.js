@@ -7,7 +7,10 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    sessionKey: null,
+    years: [],
+    yearMin: 0,
+    yearMax: 0,
+    yearInc: 0,
 
     owid: null,
     version: 0,
@@ -21,8 +24,11 @@ export default new Vuex.Store({
     vizData: null,
   },
   mutations: {
-    id(state, id) {
-      state.sessionKey = id;
+    years(state, years) {
+      state.years = years;
+      state.yearMin = Math.min(...years);
+      state.yearMax = Math.max(...years);
+      state.yearInc = -1;
     },
 
     init(state, payload) {
