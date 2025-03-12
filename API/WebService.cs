@@ -32,6 +32,7 @@ using CorpusExplorer.Sdk.Blocks;
 using CorpusExplorer.Sdk.Model;
 using System.Threading.Tasks;
 using CorpusExplorer.Sdk.Blocks.NgramMultiLayerSelectiveQuery.ValidateCall.Abstract;
+using CorpusExplorer.Sdk.Blocks.NgramMultiLayerSelectiveQuery;
 
 namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 {
@@ -79,8 +80,11 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       _cec6path = Path.Combine(AppPath, "cec6");
       _cachePath = Path.Combine(AppPath, "cache");
 
-      Directory.Delete(_cachePath, true);
+      if (Directory.Exists(_cachePath))
+        Directory.Delete(_cachePath, true);
       Directory.CreateDirectory(_cachePath);
+      if (!Directory.Exists(_cec6path))
+        Directory.CreateDirectory(_cec6path);
 
       ReloadData();
 
@@ -161,13 +165,13 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         return;
       }
       #endregion
-      var compiledQueries = GetPreCompiledQueries(request, corpus);
+      var compiledQueries = QueryCompiler.Compile(corpus.ToSelection(), GetLayerAndQueries(request));
 
       Parallel.ForEach(selections, selection =>
       {
         var block = corpus.ToSelection(selection.Value).CreateBlock<NgramMultiLayerSelectiveBlock>();
         block.LayerDisplayname = "Wort";
-        block.QueriesCompiled = compiledQueries;
+        block.LayerQueriesPreCompiled = compiledQueries;
         block.Calculate();
 
         lock (@lock)
@@ -193,17 +197,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       File.WriteAllText(Path.Combine(dir, $"{request.Year}.json"), str, Encoding.UTF8);
     }
 
-    private static List<Dictionary<string, AbstractValidateCall>> GetPreCompiledQueries(SearchRequest request, CorpusAdapterWriteIndirect corpus)
-    {
-      var layerAndQueries = GetLayerAndQueries(request);
-
-      var block = corpus.ToSelection().CreateBlock<NgramMultiLayerSelectiveBlock>();
-      block.LayerDisplayname = "Wort";
-      block.QueriesSimpleRaw = layerAndQueries;
-      block.CompileQueries();
-      return block.QueriesCompiled;
-    }
-
     private static Dictionary<string, string[]> GetLayerAndQueries(SearchRequest request)
     {
       var layerNames = new HashSet<string>(request.Items.Select(x => x.LayerDisplayname));
@@ -227,13 +220,11 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       var corpus = _corpora[request.Year];
 
       // no validation nessesary, because it is already done in the initial search
-      var layerAndQueries = GetLayerAndQueries(request);
-
       Parallel.ForEach(selections, selection =>
       {
-        var block = corpus.ToSelection(selection.Value).CreateBlock<NgramMultiLayerSelectiveBlock>();
+        var block = corpus.ToSelection(selection.Value).CreateBlock<Ngram1LayerSelectiveQuickLookupBlock>();
         block.LayerDisplayname = "Wort";
-        block.QueriesSimpleRaw = layerAndQueries;
+        block.LayerQueries = limit;
         block.Calculate();
 
         lock (@lock)
@@ -263,7 +254,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       var post = arg.PostDataAsString;
       var request = JsonConvert.DeserializeObject<SearchRequest>(post);
       lock (_hashLock)
-        request.Hash = System.Convert.ToBase64String(_hash.ComputeHash(System.Text.Encoding.UTF8.GetBytes(post)));
+        request.Hash = System.Convert.ToBase64String(_hash.ComputeHash(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(request.Items)))).Replace("/", "_");
       return request;
     }
 
