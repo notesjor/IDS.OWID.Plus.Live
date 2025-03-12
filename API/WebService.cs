@@ -29,9 +29,7 @@ using System.Text;
 using IDS.OWIDplusLIVE.API.Helper;
 using CorpusExplorer.Sdk.Blocks.SelectionCluster.Generator;
 using CorpusExplorer.Sdk.Blocks;
-using CorpusExplorer.Sdk.Model;
 using System.Threading.Tasks;
-using CorpusExplorer.Sdk.Blocks.NgramMultiLayerSelectiveQuery.ValidateCall.Abstract;
 using CorpusExplorer.Sdk.Blocks.NgramMultiLayerSelectiveQuery;
 
 namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
@@ -49,11 +47,9 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     private Dictionary<int, Dictionary<string, Guid[]>> _selections = new Dictionary<int, Dictionary<string, Guid[]>>();
 
     private string _cec6path = "";
-    private string _normDataFile = "";
 
-    private object _normDataLock = new object();
-    private Dictionary<string, NormDataResponseItem> _normData;
-    private string _normDataStr;
+    private Dictionary<string, NormDataResponseItem> _normData = new Dictionary<string, NormDataResponseItem>();
+    private string _normDataStr = "";
 
     private long _maxPostSize;
     private int _maxItems;
@@ -76,7 +72,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
     protected override void ConfigureEndpoints(Server server)
     {
-      _normDataFile = Path.Combine(AppPath, "json", "norm.json");
       _cec6path = Path.Combine(AppPath, "cec6");
       _cachePath = Path.Combine(AppPath, "cache");
 
@@ -262,12 +257,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     {
       try
       {
-        lock (_normDataLock)
-        {
-          //TODO: _normDataStr = File.ReadAllText(_normDataFile);
-          //TODO: _normData = JsonConvert.DeserializeObject<Dictionary<string, NormDataResponseItem>>(_normDataStr);
-        }
-
         var settings = JsonConvert.DeserializeObject<ServiceConfiguration>(File.ReadAllText(Path.Combine(AppPath, "config.cnf")));
         _maxPostSize = settings.MaxPostSize;
         _maxItems = settings.MaxItems;
@@ -285,9 +274,9 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
             foreach (var fn in Directory.GetFiles(_cec6path, "*.cec6"))
             {
-              var key = int.Parse(Path.GetFileNameWithoutExtension(fn));
+              var year = int.Parse(Path.GetFileNameWithoutExtension(fn));
               var corpus = CorpusAdapterWriteIndirect.Create(fn);
-              _corpora.Add(key, corpus);
+              _corpora.Add(year, corpus);
 
               var cluster = corpus.ToSelection().CreateBlock<SelectionClusterBlock>();
               cluster.ClusterGenerator = new SelectionClusterGeneratorStringValue();
@@ -295,10 +284,24 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
               cluster.MetadataKey = "D";
               cluster.Calculate();
 
-              _selections.Add(key, cluster.SelectionClusters.ToDictionary(
+              var days = cluster.SelectionClusters.ToDictionary(
                 x => x.Key,
-                x => x.Value.ToArray()));
+                x => x.Value.ToArray());
+
+              _selections.Add(year, days);
+
+              foreach (var d in days)
+              {
+                var sel = corpus.ToSelection(d.Value);
+                var item = new NormDataResponseItem { Token = sel.CountToken, Sentences = sel.CountSentences };
+                if (_normData.ContainsKey(d.Key))
+                  _normData[d.Key] = item;
+                else
+                  _normData.Add(d.Key, item);
+              }
             }
+
+            _normDataStr = JsonConvert.SerializeObject(_normData);
           }
           catch
           {
@@ -388,9 +391,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         var tagger = new SimpleTreeTagger { Input = clean02.Output, LanguageSelected = "Deutsch" };
         tagger.Execute();
         var newData = tagger.Output.First();
-
-        UpdateNormData(newData, date);
-
         var merged = oldData == null ? newData : CorpusMerger.Merge(new[] { oldData, newData });
 
         SaveCorpus(merged, fn);
@@ -449,50 +449,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       return select.CreateTemporary(guids).ToCorpus();
     }
 
-    private void UpdateNormData(AbstractCorpusAdapter newData, string key)
-    {
-      if (!Directory.Exists("json"))
-        Directory.CreateDirectory("json");
-
-      Dictionary<string, NormDataResponseItem> normData = null;
-      try
-      {
-        normData = JsonConvert.DeserializeObject<Dictionary<string, NormDataResponseItem>>(File.ReadAllText(_normDataFile));
-      }
-      catch (Exception ex)
-      {
-        // ignore
-      }
-      if (normData == null)
-        return;
-
-      var nEntry = new NormDataResponseItem
-      {
-        Token = newData.CountToken,
-        Sentences = newData.CountSentences,
-      };
-
-      if (normData.ContainsKey(key))
-        normData[key] = nEntry;
-      else
-        normData.Add(key, nEntry);
-
-      try
-      {
-        File.WriteAllText(_normDataFile, JsonConvert.SerializeObject(normData));
-      }
-      catch
-      {
-        // ignore
-      }
-
-      lock (_normDataLock)
-      {
-        _normData = normData;
-        _normDataStr = JsonConvert.SerializeObject(_normData);
-      }
-    }
-
     private void Convert(HttpContext arg)
     {
       try
@@ -532,7 +488,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         dt.Columns.Add("Frequenz (ppm)", typeof(double));
 
         Dictionary<string, double> normHelper;
-        lock (_normDataLock)
+        lock (_syncLock)
           normHelper = _normData.ToDictionary(x => x.Key, x => x.Value.Token - (x.Value.Sentences * n));
 
         dt.BeginLoadData();
@@ -566,7 +522,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     {
       try
       {
-        lock (_normDataLock)
+        lock (_syncLock)
           arg.Response.Send(_normDataStr);
       }
       catch (Exception ex)
