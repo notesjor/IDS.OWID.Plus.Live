@@ -615,7 +615,11 @@ async function sendSearchRequest(data, store, n, queryItems) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ N: n, Items: queryItems }),
+      body: JSON.stringify({ 
+        N: n, 
+        Items: queryItems,
+        Year: 2025 // TODO
+      }),
     });
 
     if (!response.ok) {
