@@ -1,6 +1,64 @@
-<template>
+<template> 
   <v-container>
     <v-expansion-panels :value="expensionPanelOpen">
+      <v-expansion-panel>
+        <v-expansion-panel-header class="justify-self-start">
+          <v-dialog v-model="dialog_helpSearchSimple" width="600" scrollable>
+            <template v-slot:activator="{ on, attrs }">
+              <div v-bind="attrs" v-on="on" style="float:right; display:block;" @click="stopClickSimple">
+                <div style="display:block; float:left" @click="stopClickSimple">
+                  <v-icon @click="stopClickSimple" left>mdi-magnify</v-icon>
+                  <span @click="stopClickSimple">{{ $t("search_settings") }}</span>
+                  <a @click="dialog_helpSearchSimple = true">
+                    <sup>
+                      <v-icon left small style="margin-left:5px">
+                        mdi-information-outline
+                      </v-icon>
+                    </sup>
+                  </a>
+                </div>
+              </div>
+            </template>
+            <v-card>
+              <v-card-title class="headline grey lighten-2">
+                {{ $t("search_settings_head") }} 
+              </v-card-title>
+              <v-divider></v-divider>
+              <v-card-text>
+                <span v-html="$t('search_settings_info')"> </span>
+              </v-card-text>
+              <v-divider></v-divider>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="primary" text @click="dialog_helpSearchSimple = false">
+                  {{ $t("lbl_closeWindow") }}
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <v-row>
+            <v-col cols="3">
+              <h5>{{ $t("search_lbl_focusYear") }}:</h5>
+                <v-select outlined v-model="focusYear" :items="years" style="max-width: 150px;margin:10px 0px 0px 0px"></v-select>
+            </v-col>
+            <v-col>
+              <h5 style="margin:0px 0px 0px -10px">{{ $t("search_lbl_focusYearRange") }}:</h5>
+              <v-range-slider 
+              v-model="searchRange" 
+              :max="years[years.length - 1]" 
+              :min="years[0]" 
+              step="1" 
+              thumb-label="always" 
+              ticks="always" 
+              tick-size="5" 
+              tick-labels
+              style="margin:40px 0px 0px 0px"></v-range-slider>
+            </v-col>
+          </v-row>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
       <v-expansion-panel>
         <v-expansion-panel-header class="justify-self-start">
           <v-dialog v-model="dialog_helpSearchSimple" width="600" scrollable>
@@ -604,40 +662,72 @@ class queryItem {
 }
 
 async function sendSearchRequest(data, store, n, queryItems) {
-  data.progressWait = true;
+  data.progressWait = true; 
   data.progressMsg = globalT.$t("search_progress_msg01");
 
   var baseUrl = "http://localhost:4455/v3"; // TODO: config.baseUrl
   console.log(config.baseUrl);
 
+  var years = data.focusYears.sort((a, b) => b - a);  
+  var max = years[0];
+  years = years.filter((x) => x !== data.focusYear);
+  years = [data.focusYear].concat(years);
+
+  var results = {};
+
+  for (let i = 0; i < years.length; i++) {
+    const year = years[i];
+
+    try {
+      data.progressMsg = globalT.$t("search_progress_msg02", { current: year, max: max });
+      const response = await fetch(baseUrl + "/search", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          N: n,
+          Items: queryItems,
+          Year: year
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(globalT.$t("search_progress_err01"));
+      }
+
+      const currentPage = await response.json();
+
+      if (!currentPage || Object.keys(currentPage).length < 1) {
+        throw new Error(globalT.$t("search_progress_err01"));
+      }
+
+      Object.keys(currentPage).forEach((key) => {
+        if (results[key] === undefined) {
+          results[key] = currentPage[key];
+        } else {
+          Object.keys(currentPage[key]).forEach((key2) => {
+            if (results[key][key2] === undefined) {
+              results[key][key2] = currentPage[key][key2];
+            } else {
+              results[key][key2] = results[key][key2].concat(currentPage[key][key2]);
+            }
+          });
+        }
+      });
+
+    } catch (error) {
+      data.snackbar = true;
+      data.progressError = error.message;
+    }
+  }  
+
   try {
-    const response = await fetch(baseUrl + "/search", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        N: n,
-        Items: queryItems,
-        Year: 2022 // TODO
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(globalT.$t("search_progress_err01"));
-    }
-
-    const searchResult = await response.json();
-
-    if (!searchResult || Object.keys(searchResult).length < 1) {
-      throw new Error(globalT.$t("search_progress_err01"));
-    }
-
     data.progressMsg = globalT.$t("search_progress_msg03");
     store.commit("search", {
       n: n,
       queryItems: queryItems,
-      items: searchResult,
+      items: results,
     });
     store.state.vizNoCommit = 1;
     store.commit("calculate");
@@ -659,7 +749,7 @@ export default {
     return {
       dialog_helpSearchSimple: false,
       dialog_helpSearchComplex: false,
-      expensionPanelOpen: 0,
+      expensionPanelOpen: 1,
 
       layer: null,
       search_simple_1_layer: "",
@@ -688,6 +778,12 @@ export default {
       search_complex_3_3_l: "",
       search_complex_3_3_p: "",
 
+      years: [],
+      focusYears: [],
+      focusYear: 2020,
+      searchRange: [],
+      yearWatcher: null,
+
       search_simple_n: 1,
       search_complex_n: 1,
       name: "world",
@@ -714,6 +810,24 @@ export default {
       ],
     };
   },
+  created: function () {
+    var self = this;
+    this.yearWatcher = this.$store.watch(
+      (state) => state.years,
+      (newValue) => {
+        console.log("years changed");
+        self.years = newValue;
+        self.focusYears = newValue;
+        self.searchRange = [newValue[0], newValue[newValue.length - 1]];
+      }
+    );
+  },
+  watch: {
+    searchRange: function (newVal) {
+      this.focusYears = this.years.filter((x) => x >= newVal[0] && x <= newVal[1]);
+      this.focusYear = this.focusYears.length > 2 ? this.focusYears[this.focusYears.length - 2] : this.focusYears[this.focusYears.length - 1];
+    },
+  },
   mounted: function () {
     config = this.$config;
 
@@ -724,7 +838,7 @@ export default {
     global_layers = [this.$t("layer_wordform"), this.$t("layer_lemma"), this.$t("layer_pos")];
     this.layer = global_layers;
 
-    globalT = this;
+    globalT = this;    
   },
   computed: {
     search_simple_1_layer_show_pos: function () {

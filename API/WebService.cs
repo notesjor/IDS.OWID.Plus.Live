@@ -59,10 +59,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     private string _lastUpdateToken;
     private string _cachePath;
 
-    private TimeSpan _cacheTime = TimeSpan.FromMinutes(30);
-    private object _cacheLock = new object();
-    private Dictionary<string, DateTime> _cache = new Dictionary<string, DateTime>();
-
     private Dictionary<string, AbstractTableWriter> _exporter = new Dictionary<string, AbstractTableWriter>
     {
       {"TSV", new TsvTableWriter() },
@@ -76,13 +72,10 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     {
       _cec6path = Path.Combine(AppPath, "cec6");
       _cachePath = Path.Combine(AppPath, "cache");
-
-      if (Directory.Exists(_cachePath))
-        Directory.Delete(_cachePath, true);
-      Directory.CreateDirectory(_cachePath);
+      
       if (!Directory.Exists(_cec6path))
         Directory.CreateDirectory(_cec6path);
-      
+
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/heartbeat", Heartbeat);
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/ping", (arg) => arg.Response.Send(200));
 
@@ -95,38 +88,20 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/v3/token", Token);
       server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/v3/update", Update); // TODO: token check
+    }
 
-      var task = new Thread(() =>
+    private void ClearCache()
+    {
+      try
       {
-        while (true)
-        {
-          try
-          {
-            Thread.Sleep(600000);
-            lock (_cacheLock)
-            {
-              var now = DateTime.Now;
-              var keys = _cache.Where(x => x.Value < now).Select(x => x.Key).ToArray();
-              foreach (var x in keys)
-              {
-                try
-                {
-                  File.Delete(x);
-                  _cache.Remove(x.);
-                }
-                catch
-                {
-                  // ignore
-                }
-              }
-            }
-          }
-          catch
-          {
-            // ignore
-          }
-        }
-      });
+        if (Directory.Exists(_cachePath))
+          Directory.Delete(_cachePath, true);
+        Directory.CreateDirectory(_cachePath);
+      }
+      catch
+      {
+        // ignore
+      }
     }
 
     private void Years(HttpContext arg)
@@ -150,7 +125,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         var year = request.Year == 0 ? _defaultYear : request.Year;
 
         if (Directory.Exists(dir))
-        {          
+        {
           var file = Path.Combine(dir, $"{year}.json");
           if (File.Exists(file))
             SearchResponseFullCached(arg, file);
@@ -271,11 +246,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     }
 
     private void SearchResponseFullCached(HttpContext arg, string file)
-    {
-      lock (_cacheLock)
-        _cache[file] = DateTime.Now.Add(_cacheTime);
-      arg.Response.Send(File.ReadAllText(file));
-    }
+      => arg.Response.Send(File.ReadAllText(file));
 
     private SearchRequest GetSearchRequest(HttpContext arg)
     {
@@ -308,7 +279,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
             foreach (var fn in Directory.GetFiles(_cec6path, "*.cec6"))
             {
               var year = int.Parse(Path.GetFileNameWithoutExtension(fn));
-              if(year > _defaultYear)
+              if (year > _defaultYear)
                 _defaultYear = year;
               var corpus = CorpusAdapterWriteIndirect.Create(fn);
               _corpora.Add(year, corpus);
@@ -342,6 +313,9 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
           {
             // ignore
           }
+
+          ClearCache();
+
           _syncPending = false;
         }
       }
