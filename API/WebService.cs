@@ -50,6 +50,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
     private Dictionary<string, NormDataResponseItem> _normData = new Dictionary<string, NormDataResponseItem>();
     private string _normDataStr = "";
+    private int _defaultYear = 0;
 
     private long _maxPostSize;
     private int _maxItems;
@@ -113,19 +114,18 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       {
         var request = GetSearchRequest(arg);
         var dir = CachePathHelper.GetDirectory(_cachePath, request.N, request.Hash);
+        var year = request.Year == 0 ? _defaultYear : request.Year;
 
         if (Directory.Exists(dir))
-        {
-          var file = Path.Combine(dir, $"{request.Year}.json");
+        {          
+          var file = Path.Combine(dir, $"{year}.json");
           if (File.Exists(file))
-          {
             SearchResponseFullCached(arg, file);
-          }
           else
-            SearchResponseGetAdditionalYear(arg, request, dir);
+            SearchResponseGetAdditionalYear(arg, request, dir, year);
         }
         else
-          SearchResponseInitialSearch(arg, request, dir);
+          SearchResponseInitialSearch(arg, request, dir, year);
       }
       catch (Exception ex)
       {
@@ -136,7 +136,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       }
     }
 
-    private void SearchResponseInitialSearch(HttpContext arg, SearchRequest request, string dir)
+    private void SearchResponseInitialSearch(HttpContext arg, SearchRequest request, string dir, int year)
     {
       if (!Directory.Exists(dir))
         Directory.CreateDirectory(dir);
@@ -145,8 +145,8 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       var limitter = new Dictionary<string, double>();
       var res = new Dictionary<string, Dictionary<string, double>>();
 
-      var selections = _selections[request.Year];
-      var corpus = _corpora[request.Year];
+      var selections = _selections[year];
+      var corpus = _corpora[year];
 
       #region Validation 
       if (request.N < 1)
@@ -189,7 +189,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       var str = JsonConvert.SerializeObject(res);
       res.Clear();
       arg.Response.Send(str);
-      File.WriteAllText(Path.Combine(dir, $"{request.Year}.json"), str, Encoding.UTF8);
+      File.WriteAllText(Path.Combine(dir, $"{year}.json"), str, Encoding.UTF8);
     }
 
     private static Dictionary<string, string[]> GetLayerAndQueries(SearchRequest request)
@@ -202,7 +202,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       return layerAndQueries;
     }
 
-    private void SearchResponseGetAdditionalYear(HttpContext arg, SearchRequest request, string dir)
+    private void SearchResponseGetAdditionalYear(HttpContext arg, SearchRequest request, string dir, int year)
     {
       if (!Directory.Exists(dir))
         Directory.CreateDirectory(dir);
@@ -211,8 +211,8 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       var res = new Dictionary<string, Dictionary<string, double>>();
       var limit = File.ReadAllLines(Path.Combine(dir, "limit.txt"), Encoding.UTF8);
 
-      var selections = _selections[request.Year];
-      var corpus = _corpora[request.Year];
+      var selections = _selections[year];
+      var corpus = _corpora[year];
 
       // no validation nessesary, because it is already done in the initial search
       Parallel.ForEach(selections, selection =>
@@ -234,7 +234,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       var str = JsonConvert.SerializeObject(res);
       res.Clear();
       arg.Response.Send(str);
-      File.WriteAllText(Path.Combine(dir, $"{request.Year}.json"), str, Encoding.UTF8);
+      File.WriteAllText(Path.Combine(dir, $"{year}.json"), str, Encoding.UTF8);
     }
 
     private void SearchResponseFullCached(HttpContext arg, string file)
@@ -275,6 +275,8 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
             foreach (var fn in Directory.GetFiles(_cec6path, "*.cec6"))
             {
               var year = int.Parse(Path.GetFileNameWithoutExtension(fn));
+              if(year > _defaultYear)
+                _defaultYear = year;
               var corpus = CorpusAdapterWriteIndirect.Create(fn);
               _corpora.Add(year, corpus);
 

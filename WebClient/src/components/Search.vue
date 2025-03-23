@@ -595,7 +595,7 @@ class queryItem {
   constructor(layer, position, element, upperCase) {
     this.layer = layer;
     this.position = position;
-    this.token = (upperCase ? element.toUpperCase() : element.toLowerCase()).trim();
+    this.token = (upperCase ? element.toUpperCase() : element).trim();
   }
 
   toString() {
@@ -607,18 +607,19 @@ async function sendSearchRequest(data, store, n, queryItems) {
   data.progressWait = true;
   data.progressMsg = globalT.$t("search_progress_msg01");
 
-  console.log(queryItems)
+  var baseUrl = "http://localhost:4455/v3"; // TODO: config.baseUrl
+  console.log(config.baseUrl);
 
   try {
-    const response = await fetch(config.baseUrl + "/find", {
+    const response = await fetch(baseUrl + "/search", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ 
-        N: n, 
+      body: JSON.stringify({
+        N: n,
         Items: queryItems,
-        Year: 2025 // TODO
+        Year: 2022 // TODO
       }),
     });
 
@@ -628,128 +629,24 @@ async function sendSearchRequest(data, store, n, queryItems) {
 
     const searchResult = await response.json();
 
-    if (!searchResult || !searchResult.Items || searchResult.Items.length === 0) {
+    if (!searchResult || Object.keys(searchResult).length < 1) {
       throw new Error(globalT.$t("search_progress_err01"));
     }
 
-    searchResult.Items = searchResult.Items.slice(0, 1000);
-
-    const packageSize = 250;
-    let result = {};
-    let done = 0;
-
-    for (let i = 0; i < searchResult.Items.length; i += packageSize) {
-      const request = searchResult.Items.slice(i, i + packageSize);
-
-      const pullResponse = await fetch(config.baseUrl + "/pull", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ N: n, Items: request }),
-      });
-
-      const page = await pullResponse.json();
-      result = { ...result, ...page };
-      done += Object.keys(page).length;
-      data.progressMsg = globalT.$t("search_progress_msg02", { current: done, max: searchResult.Items.length });
-
-      if (done === searchResult.Items.length) {
-        data.progressMsg = globalT.$t("search_progress_msg03");
-        store.commit("search", {
-          n: n,
-          queryItems: queryItems,
-          items: result,
-        });
-        store.state.vizNoCommit = 1;
-        store.commit("calculate");
-        data.progressWait = false;
-      }
-    }
-  } catch (error) {
-    data.snackbar = true;
-    data.progressError = error.message;
-    data.progressWait = false;
-  }
-
-  const fetchWithTimeout = async (url, options, timeout = 60000) => {
-    return Promise.race([
-      fetch(url, options),
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error(globalT.$t("search_progress_msg01"))), timeout)
-      ),
-    ]);
-  };
-
-  const retryFetch = async (url, options, retries = 3) => {
-    for (let i = 0; i < retries; i++) {
-      try {
-        return await fetchWithTimeout(url, options);
-      } catch (error) {
-        if (i < retries - 1) {
-          data.progressError = `${globalT.$t("search_progress_msg01")} (${i + 1})`;
-        } else {
-          throw error;
-        }
-      }
-    }
-  };
-
-  try {
-    const response = await retryFetch(config.baseUrl + "/find", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ N: n, Items: queryItems }),
+    data.progressMsg = globalT.$t("search_progress_msg03");
+    store.commit("search", {
+      n: n,
+      queryItems: queryItems,
+      items: searchResult,
     });
-
-    if (!response.ok) {
-      throw new Error(globalT.$t("search_progress_err01"));
-    }
-
-    const searchResult = await response.json();
-
-    if (!searchResult || !searchResult.Items || searchResult.Items.length === 0) {
-      throw new Error(globalT.$t("search_progress_err01"));
-    }
-
-    searchResult.Items = searchResult.Items.slice(0, 1000);
-
-    const packageSize = 250;
-    let result = {};
-    let done = 0;
-
-    for (let i = 0; i < searchResult.Items.length; i += packageSize) {
-      const request = searchResult.Items.slice(i, i + packageSize);
-
-      const pullResponse = await retryFetch(config.baseUrl + "/pull", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ N: n, Items: request }),
-      });
-
-      const page = await pullResponse.json();
-
-      result = { ...result, ...page };
-      done += Object.keys(page).length;
-      data.progressMsg = globalT.$t("search_progress_msg02", { current: done, max: searchResult.Items.length });
-
-      if (done === searchResult.Items.length) {
-        data.progressMsg = globalT.$t("search_progress_msg03");
-        store.commit("search", {
-          n: n,
-          queryItems: queryItems,
-          items: result,
-        });
-        store.state.vizNoCommit = 1;
-        store.commit("calculate");
-        data.progressWait = false;
-      }
-    }
+    store.state.vizNoCommit = 1;
+    store.commit("calculate");
   } catch (error) {
     data.snackbar = true;
     data.progressError = error.message;
-    data.progressWait = false;
   }
+
+  data.progressWait = false;
 }
 
 var globalT;

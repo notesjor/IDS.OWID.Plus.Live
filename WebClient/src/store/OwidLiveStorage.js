@@ -283,19 +283,18 @@ export class OwidLiveStorage {
       }
 
       var wS = tokens[0].split(" ");
-      var pS = tokens[2].split(" ");
 
       var korap = "";
       for (let i = 0; i < wS.length; i++) {
-        korap += `[orth=${wS[i]}/i & pos=${pS[i]}] `;
+        korap += `[orth=${wS[i]}/i] `;
       }
 
       res.push({
         key: item.Key,
 
         w: tokens[0],
-        l: tokens[1],
-        p: tokens[2],
+        l: tokens.length > 1 ? tokens[1] : null,
+        p: tokens.length > 2 ? tokens[2] : null,
 
         d: d,
         dRel: ((d / dates.length) * 100.0).toFixed(5),
