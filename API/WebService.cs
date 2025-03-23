@@ -31,6 +31,7 @@ using CorpusExplorer.Sdk.Blocks.SelectionCluster.Generator;
 using CorpusExplorer.Sdk.Blocks;
 using System.Threading.Tasks;
 using CorpusExplorer.Sdk.Blocks.NgramMultiLayerSelectiveQuery;
+using System.Threading;
 
 namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 {
@@ -94,6 +95,38 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/v3/token", Token);
       server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/v3/update", Update); // TODO: token check
+
+      var task = new Thread(() =>
+      {
+        while (true)
+        {
+          try
+          {
+            Thread.Sleep(600000);
+            lock (_cacheLock)
+            {
+              var now = DateTime.Now;
+              var keys = _cache.Where(x => x.Value < now).Select(x => x.Key).ToArray();
+              foreach (var x in keys)
+              {
+                try
+                {
+                  File.Delete(x);
+                  _cache.Remove(x.);
+                }
+                catch
+                {
+                  // ignore
+                }
+              }
+            }
+          }
+          catch
+          {
+            // ignore
+          }
+        }
+      });
     }
 
     private void Years(HttpContext arg)
