@@ -88,7 +88,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/v3/lookup", Lookup);
 
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/v3/token", Token);
-      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/v3/update", Update); // TODO: token check
+      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/v3/update", Update);
     }
 
     private void ClearCache()
@@ -392,20 +392,18 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       {
         var req = arg.PostData<UpdateRequest>();
 
-        /* TODO
         using (var sha = SHA512.Create())
         {
-          var dataHash = Convert.ToBase64String(sha.ComputeHash(Encoding.ASCII.GetBytes(req.Data)));
+          var dataHash = System.Convert.ToBase64String(sha.ComputeHash(Encoding.ASCII.GetBytes(req.Data)));
 
           var token = $"{dataHash}-{_lastUpdateToken}-{_secureUpdateToken}";
-          if (req.SessionKey != Convert.ToBase64String(sha.ComputeHash(Encoding.ASCII.GetBytes(token))))
+          if (req.SessionKey != System.Convert.ToBase64String(sha.ComputeHash(Encoding.ASCII.GetBytes(token))))
           {
             arg.Response.Send(HttpStatusCode.Forbidden);
             return;
           }
         }
         _lastUpdateToken = Guid.NewGuid().ToString("N");
-        */
 
         if (!Directory.Exists(_cec6path))
           Directory.CreateDirectory(_cec6path);
@@ -575,8 +573,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
     protected override OpenApiDocument GetDocumentation()
     {
-      // TODO
-
       return new OpenApiDocument
       {
         Paths = new OpenApiPaths
