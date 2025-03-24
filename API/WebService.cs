@@ -515,13 +515,13 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         using var ms = new MemoryStream();
         var writer = _exporter[format].Clone(ms);
 
-        var request = arg.PostData<NgramRecordResponse[]>();
-        var n = request[0].Wordform.Length - 1.0;
+        var request = arg.PostData<Dictionary<string, Dictionary<string, double>>>();
+        var n = request.First().Key.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries).Length - 1.0;
 
         var dt = new DataTable();
-        dt.Columns.Add("Wortform", typeof(string));
-        dt.Columns.Add("Lemma", typeof(string));
-        dt.Columns.Add("POS", typeof(string));
+        dt.Columns.Add("N-Gramm", typeof(string));
+        //dt.Columns.Add("Lemma", typeof(string));
+        //dt.Columns.Add("POS", typeof(string));
         dt.Columns.Add("Datum", typeof(string));
         dt.Columns.Add("Frequenz", typeof(double));
         dt.Columns.Add("Frequenz (ppm)", typeof(double));
@@ -532,10 +532,10 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
         dt.BeginLoadData();
         foreach (var x in request)
-          foreach (var y in x.Dates)
+          foreach (var y in x.Value)
             try
             {
-              dt.Rows.Add(x.Wordform, x.Lemma, x.Pos, y.Key, y.Value, (y.Value / normHelper[y.Key]) * 1000000.0);
+              dt.Rows.Add(x.Key, y.Key, y.Value, (y.Value / normHelper[y.Key]) * 1000000.0);
             }
             catch
             {
@@ -582,17 +582,17 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         Paths = new OpenApiPaths
         {
           {
-            "/init", new OpenApiPathItem
+            "/v3/years", new OpenApiPathItem
             {
               Operations = new Dictionary<OperationType, OpenApiOperation>
               {
                 {
                   OperationType.Get, new OpenApiOperation
                   {
-                    Description = "Sollte als erstes aufgerufen werden. Gibt eine zufällige SessionID zurück. Zukünftige Versionen können ggf. Authentifizierungen über SessionId erfordern.",
+                    Description = "Gibt die verfügbaren Jahre zurück.",
                     Responses = new OpenApiResponses
                     {
-                      {"200", new OpenApiResponse {Description = "SessionID"}}
+                      {"200", new OpenApiResponse {Description = "Verfügbare Jahre als Array"}}
                     }
                   }
                 }
@@ -600,17 +600,17 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
             }
           },
           {
-            "/norm", new OpenApiPathItem
+            "/v3/norm", new OpenApiPathItem
             {
               Operations = new Dictionary<OperationType, OpenApiOperation>
               {
                 {
                   OperationType.Get, new OpenApiOperation
                   {
-                    Description = "Sollte als zweites aufgerufen werden. Gibt die Norm-Daten (Tages-Summe für unterschiedliche N-Gramme) zurück.",
+                    Description = "Gibt die Norm-Daten (Tages-Summe) zurück.",
                     Responses = new OpenApiResponses
                     {
-                      {"200", new OpenApiResponse {Description = "Ein Array (Array-Position + 1 = N-Gramm-Länge) von Dictionarys (Tag : Summe)"}}
+                      {"200", new OpenApiResponse {Description = "Ein Dictionary (Tag : t/s) - t = Basiswert für N=1 / zur Berchnung von N=2 (t - s) / zur Berechnung von N=3 (t - s*2) / usw."}}
                     }
                   }
                 }
@@ -618,14 +618,14 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
             }
           },
           {
-            "/find", new OpenApiPathItem
+            "/v3/search", new OpenApiPathItem
             {
               Operations = new Dictionary<OperationType, OpenApiOperation>
               {
                 {
                   OperationType.Post, new OpenApiOperation
                   {
-                    Description = "Sucht nach verfügbaren N-Grammen und gibt deren Schlüssel zurück.",
+                    Description = "Sucht nach verfügbaren N-Grammen.",
                     Parameters = new List<OpenApiParameter>
                     {
                       new OpenApiParameter
@@ -638,6 +638,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
                           Properties = new Dictionary<string, OpenApiSchema>
                           {
                             {"N", new OpenApiSchema {Type = "integer", Description = "Legt die Größe des N-Gramms fest."}},
+                            {"Year", new OpenApiSchema {Type = "integer", Description = "Jahr das abgefragt wird (siehe GET /v3/years). Das erste Jahr pro Abfrage ist das Fokus-Jahr (zusätzliche Berechnung der 1000 häufigsten N-Gramme)."}},
                             {"Items", new OpenApiSchema
                               {
                                 Type = "array",
@@ -660,7 +661,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
                     },
                     Responses = new OpenApiResponses
                     {
-                      {"200", new OpenApiResponse {Description = "Auflistung von bis zu 10K bekannten Zeitreihen."}}
+                      {"200", new OpenApiResponse {Description = "Bis zu 1000 der häufigsten N-Gramme für die Abfrage."}}
                     }
                   }
                 }
@@ -668,43 +669,35 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
             }
           },
           {
-            "/pull", new OpenApiPathItem
+            "/v3/lookup", new OpenApiPathItem
             {
               Operations = new Dictionary<OperationType, OpenApiOperation>
               {
                 {
                   OperationType.Post, new OpenApiOperation
                   {
-                    Description = "Ruft bekannte Zeitreihen ab. Schlüssel bekannter Zeitreihen können mittels /find gefunden werden.",
+                    Description = "Löst ein N-Gramm in korrespondierende Layer-Werte auf.",
                     Parameters = new List<OpenApiParameter>
                     {
                       new OpenApiParameter
                       {
                         Name = "request", In = ParameterLocation.Query, Required = true,
-                        Description = "Suchanfrage",
+                        Description = "Lookup-Anfrage",
                         Schema = new OpenApiSchema
                         {
                           Type = "object",
                           Properties = new Dictionary<string, OpenApiSchema>
                           {
-                            {"N", new OpenApiSchema {Type = "integer", Description = "Legt die Größe des N-Gramms fest. Schlüssel (Items) müssen diese Länge haben."}},
-                            {"Items", new OpenApiSchema
-                              {
-                                Type = "array",
-                                Description = "Bekannte Zeitreihen (Schlüssel)",
-                                Items = new OpenApiSchema
-                                {
-                                  Type = "string",
-                                }
-                              }
-                            }
+                            {"Year", new OpenApiSchema {Type = "integer", Description = "Jahr das abgefragt wird (siehe GET /v3/years)."}},
+                            {"Layer", new OpenApiSchema {Type = "integer", Description = "Wortform = 0 / Lemma = 1 / POS = 2"}},
+                            {"Query", new OpenApiSchema {Type = "string", Description = "N-Gramme als string (Leerzeichen getrennt)"}}
                           }
                         }
                       }
                     },
                     Responses = new OpenApiResponses
                     {
-                      {"200", new OpenApiResponse {Description = ""}}
+                      {"200", new OpenApiResponse {Description = "Ergebnis in Lookup - zusammengesetztr String"}}
                     }
                   }
                 }
@@ -712,44 +705,34 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
             }
           },
           {
-            "/down", new OpenApiPathItem
+            "/v3/convert", new OpenApiPathItem
             {
               Operations = new Dictionary<OperationType, OpenApiOperation>
               {
                 {
                   OperationType.Post, new OpenApiOperation
                   {
-                    Description = "Ruft bekannte Zeitreihen ab und exportiert die Daten in ein gewähltes Format.",
+                    Description = "Konvertiert die Ausgabe von POST /v3/search in ein gewünschtes Format.",
                     Parameters = new List<OpenApiParameter>
                     {
                       new OpenApiParameter
                       {
+                        Name = "format", In = ParameterLocation.Path, Required = true,
+                        Description = "Gewünschtes Export-Format. Gültige Werte: CSV, TSV, HTML, SQL, XML",
+                      },
+                      new OpenApiParameter
+                      {
                         Name = "request", In = ParameterLocation.Query, Required = true,
-                        Description = "Suchanfrage",
+                        Description = "Ausgabe von POST /v3/search",
                         Schema = new OpenApiSchema
                         {
                           Type = "object",
-                          Properties = new Dictionary<string, OpenApiSchema>
-                          {
-                            {"N", new OpenApiSchema {Type = "integer", Description = "Legt die Größe des N-Gramms fest. Schlüssel (Items) müssen diese Länge haben."}},
-                            {"Requests", new OpenApiSchema
-                              {
-                                Type = "array",
-                                Description = "Bekannte Zeitreihen (Schlüssel)",
-                                Items = new OpenApiSchema
-                                {
-                                  Type = "string",
-                                }
-                              }
-                            },
-                            {"Format", new OpenApiSchema{Type="string", Description = "Key für das gewünschte Export-Format. Zulässige Werte (aktuell nur): TSV"} }
-                          }
                         }
                       }
                     },
                     Responses = new OpenApiResponses
                     {
-                      {"200", new OpenApiResponse {Description = ""}}
+                      {"200", new OpenApiResponse {Description = "Daten im gewünschten Format."}}
                     }
                   }
                 }
@@ -757,7 +740,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
             }
           },
           {
-            "/token", new OpenApiPathItem
+            "/v3/token", new OpenApiPathItem
             {
               Operations = new Dictionary<OperationType, OpenApiOperation>
               {
@@ -775,7 +758,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
             }
           },
           {
-            "/update", new OpenApiPathItem
+            "/v3/update", new OpenApiPathItem
             {
               Operations = new Dictionary<OperationType, OpenApiOperation>
               {
@@ -797,7 +780,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
                             {"Year", new OpenApiSchema {Type = "integer", Description = "Jahreszahl (vierstellig)"}},
                             {"Month", new OpenApiSchema {Type = "integer", Description = "Monat (zweistellig)"}},
                             {"Day", new OpenApiSchema {Type = "integer", Description = "Tag (zweistellig)"}},
-                            {"Data", new OpenApiSchema {Type = "string", Description = "Die Daten TSV-Format müssen mittels GZip komprimiert und als Base64-String übermittelt werden."}},
+                            {"Data", new OpenApiSchema {Type = "string", Description = "Alle Dokumente als ein String. Keine Umbrüche im Dokument. Neue Zeile (\\n) = Neues Dokument."}},
                             {"SessionKey", new OpenApiSchema {Type = "string", Description = "Der SessionKey muss clientseitig berechnet werden. Berechnung: SHA512-Hash folgender Zeichenfolge: 'SHA512(Data)-TOKEN-SECRET'. SHA512(Data) ist der SHA512-Hash des GZip komprimierten Base64-Strings. Einmal TOKEN kann über /token abgerufen werden (nur einmalig gültig). SECRET muss bekannt sein und ist geheim."}},
                           }
                         }
