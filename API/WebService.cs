@@ -72,7 +72,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     {
       _cec6path = Path.Combine(AppPath, "cec6");
       _cachePath = Path.Combine(AppPath, "cache");
-      
+
       if (!Directory.Exists(_cec6path))
         Directory.CreateDirectory(_cec6path);
 
@@ -85,6 +85,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/v3/years", Years);
       server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/v3/search", Search);
       server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/v3/convert", Convert);
+      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/v3/lookup", Lookup);
 
       server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/v3/token", Token);
       server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/v3/update", Update); // TODO: token check
@@ -101,6 +102,34 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       catch
       {
         // ignore
+      }
+    }
+
+    private void Lookup(HttpContext arg)
+    {
+      try
+      {
+        var request = arg.PostData<LookupRequest>();
+        var year = request.Year == 0 ? _defaultYear : request.Year;
+
+        var keys = request.Query.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+
+        var select = _corpora[year].ToSelection();
+        var block = select.CreateBlock<CorrespondingLayerValueSelectedBlock>();
+        block.Layer1Displayname = "Wort";
+        block.Layer2Displayname = request.LayerDisplayname;
+        block.LayerValues = keys;
+        block.Calculate();
+
+        var stb = new StringBuilder();
+        foreach (var x in keys)
+          stb.Append(block.CorrespondingLayerValues.TryGetValue(x, out var value) ? $"{string.Join("|", value)} " : "? ");
+
+        arg.Response.Send(new LookupResponse { Lookup = stb.ToString().Trim() });
+      }
+      catch
+      {
+        arg.Response.Send(HttpStatusCode.InternalServerError);
       }
     }
 
