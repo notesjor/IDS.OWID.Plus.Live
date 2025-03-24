@@ -31,7 +31,6 @@ using CorpusExplorer.Sdk.Blocks.SelectionCluster.Generator;
 using CorpusExplorer.Sdk.Blocks;
 using System.Threading.Tasks;
 using CorpusExplorer.Sdk.Blocks.NgramMultiLayerSelectiveQuery;
-using System.Threading;
 
 namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 {
