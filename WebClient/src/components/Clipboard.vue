@@ -96,14 +96,34 @@
                     <v-list-item-title><v-icon style="margin-right:10px">mdi-link-variant</v-icon>{{
                       $t("clipboard_export_link") }}</v-list-item-title>
                   </v-list-item>
+                  <v-list-item @click="exportCsv(i)">
+                    <v-list-item-title><v-icon style="margin-right:10px">mdi-export</v-icon>{{
+                      $t("clipboard_export_csv")
+                      }}</v-list-item-title>
+                  </v-list-item>
                   <v-list-item @click="exportTsv(i)">
                     <v-list-item-title><v-icon style="margin-right:10px">mdi-export</v-icon>{{
                       $t("clipboard_export_tsv")
                       }}</v-list-item-title>
                   </v-list-item>
+                  <v-list-item @click="exportHtml(i)">
+                    <v-list-item-title><v-icon style="margin-right:10px">mdi-export</v-icon>{{
+                      $t("clipboard_export_html")
+                      }}</v-list-item-title>
+                  </v-list-item>
+                  <v-list-item @click="exportXml(i)">
+                    <v-list-item-title><v-icon style="margin-right:10px">mdi-export</v-icon>{{
+                      $t("clipboard_export_xml")
+                      }}</v-list-item-title>
+                  </v-list-item>
                   <v-list-item @click="exportJson(i)">
                     <v-list-item-title><v-icon style="margin-right:10px">mdi-export</v-icon>{{
                       $t("clipboard_export_json")
+                      }}</v-list-item-title>
+                  </v-list-item>
+                  <v-list-item @click="exportSql(i)">
+                    <v-list-item-title><v-icon style="margin-right:10px">mdi-export</v-icon>{{
+                      $t("clipboard_export_sql")
                       }}</v-list-item-title>
                   </v-list-item>
                 </v-list>
@@ -278,7 +298,7 @@ export default {
         }),
       }).then((response) => {
         if (!response.ok) {
-          throw new Error(globalT.$t("search_progress_err01"));
+          throw new Error(this.$t("search_progress_err01"));
         }
         return response.json();
       }).then((lookup) => {
@@ -318,28 +338,38 @@ export default {
       this.$data.snackbarQrcode = encodeURIComponent(this.$data.snackbarLink.replace("https://www.owid.de/"));
       this.$data.snackbar = true;
     },
-    exportTsv(i) {
-      var raw = this.$store.state.owid.GetSearchHistoryItem4export(i.label);
-      var keys = [];
-      raw.OwidLiveStorageTimeItems.forEach((x) => {
-        if (x.IsSelected) keys.push(x.Key);
-      });
+    export(i, format, mime, fn){
+      var exp = this.$store.state.owid.GetSearchHistoryItem4export(i.label);
+      var baseUrl = "http://localhost:4455/v3"; //TODO: this.$config.baseUrl;
 
-      var config = this.$config;
-
-      fetch(config.baseUrl + "/down", {
+      fetch(`${baseUrl}/convert?N=${exp.N}&format=${format}`, {
         method: "post",
-        body: JSON.stringify({ Format: "TSV", N: raw.N, Requests: keys }),
+        body: JSON.stringify(exp.Request),
       })
         .then(function (r) {
           return r.arrayBuffer();
         })
         .then(function (buffer) {
-          saveBlob(buffer, "text/tab-separated-value", "data.tsv");
+          saveBlob(buffer, mime, fn);
         })
         .catch(function (error) {
           console.log("Request failed", error);
         });
+    },
+    exportTsv(i) {
+      this.export(i, "TSV", "text/tab-separated-value", "data.tsv");
+    },
+    exportCsv(i) {
+      this.export(i, "CSV", "text/csv", "data.csv");
+    },
+    exportHtml(i) {
+      this.export(i, "HTML", "text/html", "data.html");
+    },
+    exportXml(i) {
+      this.export(i, "XML", "text/xml", "data.xml");
+    },
+    exportSql(i) {
+      this.export(i, "SQL", "text/sql", "data.sql");
     },
     exportJson(i) {
       var enc = new TextEncoder();

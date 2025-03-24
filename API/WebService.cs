@@ -68,7 +68,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       {"SQL", new SqlTableWriter() },
       {"CSV", new CsvTableWriter() },
       {"XML", new XmlTableWriter() }
-    };    
+    };
 
     protected override void ConfigureEndpoints(Server server)
     {
@@ -564,6 +564,13 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         }
 
         var getParams = arg.Request.GetData();
+        if (!getParams.ContainsKey("n"))
+        {
+          arg.Response.Send(HttpStatusCode.BadRequest);
+          return;
+        }
+        var n = int.Parse(getParams["n"]);
+
         if (!getParams.ContainsKey("format"))
         {
           arg.Response.Send(HttpStatusCode.BadRequest);
@@ -577,26 +584,56 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
           return;
         }
 
+        string hash;
+        var post = JsonConvert.DeserializeObject<SearchRequestItem[]>(arg.PostDataAsString);
+
+        lock (_hashLock)
+          hash = System.Convert.ToBase64String(_hash.ComputeHash(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(post)))).Replace("/", "_");
+        var dir = CachePathHelper.GetDirectory(_cachePath, n, hash);
+
+        if (!Directory.Exists(dir))
+        {
+          arg.Response.Send(HttpStatusCode.NotFound);
+          return;
+        }
+
+        var years = Directory.GetFiles(dir, "*.json").Select(x => int.Parse(Path.GetFileNameWithoutExtension(x))).ToArray();
+        if (years.Length == 0)
+        {
+          arg.Response.Send(HttpStatusCode.NotFound);
+          return;
+        }
+
+        var data = new Dictionary<string, Dictionary<string, double>>();
+        foreach (var year in years)
+        {
+          var file = Path.Combine(dir, $"{year}.json");
+          var tmp = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, double>>>(File.ReadAllText(file));
+          foreach (var x in tmp)
+          {
+            if (!data.ContainsKey(x.Key))
+              data.Add(x.Key, new Dictionary<string, double>());
+            foreach (var y in x.Value)
+              data[x.Key].Add(y.Key, y.Value);
+          }
+        }
+
         using var ms = new MemoryStream();
         var writer = _exporter[format].Clone(ms);
 
-        var request = arg.PostData<Dictionary<string, Dictionary<string, double>>>();
-        var n = request.First().Key.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries).Length - 1.0;
-
         var dt = new DataTable();
         dt.Columns.Add("N-Gramm", typeof(string));
-        //dt.Columns.Add("Lemma", typeof(string));
-        //dt.Columns.Add("POS", typeof(string));
         dt.Columns.Add("Datum", typeof(string));
         dt.Columns.Add("Frequenz", typeof(double));
-        dt.Columns.Add("Frequenz (ppm)", typeof(double));
+        dt.Columns.Add(format == "XML" ? "Frequenz_ppm" : "Frequenz (ppm)", typeof(double));
 
+        var nD = (double)n;
         Dictionary<string, double> normHelper;
         lock (_syncLock)
-          normHelper = _normData.ToDictionary(x => x.Key, x => x.Value.Token - (x.Value.Sentences * n));
+          normHelper = _normData.ToDictionary(x => x.Key, x => x.Value.Token - (x.Value.Sentences * nD));
 
         dt.BeginLoadData();
-        foreach (var x in request)
+        foreach (var x in data)
           foreach (var y in x.Value)
             try
             {
