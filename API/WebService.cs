@@ -53,6 +53,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     private Dictionary<string, NormDataResponseItem> _normData = new Dictionary<string, NormDataResponseItem>();
     private string _normDataStr = "";
     private int _defaultYear = 0;
+    private int[] _years;
 
     private long _maxPostSize;
     private int _maxItems;
@@ -67,7 +68,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       {"SQL", new SqlTableWriter() },
       {"CSV", new CsvTableWriter() },
       {"XML", new XmlTableWriter() }
-    };
+    };    
 
     protected override void ConfigureEndpoints(Server server)
     {
@@ -138,7 +139,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     {
       try
       {
-        arg.Response.Send(_year2corpusIndex.Keys);
+        arg.Response.Send(_years);
       }
       catch
       {
@@ -326,7 +327,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
                 x => x.Value.First());
 
               var years = days.Keys.Select(x => int.Parse(x.Substring(0, 4))).Distinct().ToArray();
-              foreach(var year in years)
+              foreach (var year in years)
               {
                 var sdays = days.Where(x => x.Key.StartsWith($"{year}-")).ToDictionary(x => x.Key, x => x.Value);
                 _selections.Add(year, sdays);
@@ -363,7 +364,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
               var days = cluster.SelectionClusters.ToDictionary(
                 x => x.Key,
                 x => x.Value.First());
-              
+
               _selections.Add(year, days);
 
               foreach (var d in days)
@@ -378,6 +379,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
             }
 
             _corpora = corpora.ToArray();
+            _years = _year2corpusIndex.Keys.OrderBy(x => x).ToArray();
             _normDataStr = JsonConvert.SerializeObject(_normData);
           }
           catch
