@@ -3,13 +3,13 @@
     <v-expansion-panels :value="expensionPanelOpen">
       <v-expansion-panel>
         <v-expansion-panel-header class="justify-self-start">
-          <v-dialog v-model="dialog_helpSearchSimple" width="600" scrollable>
+          <v-dialog v-model="dialog_helpSearchSetting" width="600" scrollable>
             <template v-slot:activator="{ on, attrs }">
               <div v-bind="attrs" v-on="on" style="float:right; display:block;" @click="stopClickSimple">
                 <div style="display:block; float:left" @click="stopClickSimple">
                   <v-icon @click="stopClickSimple" left>mdi-magnify</v-icon>
                   <span @click="stopClickSimple">{{ $t("search_settings") }}</span>
-                  <a @click="dialog_helpSearchSimple = true">
+                  <a @click="dialog_helpSearchSetting = true">
                     <sup>
                       <v-icon left small style="margin-left:5px">
                         mdi-information-outline
@@ -21,7 +21,7 @@
             </template>
             <v-card>
               <v-card-title class="headline grey lighten-2">
-                {{ $t("search_settings_head") }} 
+                {{ $t("search_settings_head") }}
               </v-card-title>
               <v-divider></v-divider>
               <v-card-text>
@@ -30,7 +30,7 @@
               <v-divider></v-divider>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary" text @click="dialog_helpSearchSimple = false">
+                <v-btn color="primary" text @click="dialog_helpSearchSetting = false">
                   {{ $t("lbl_closeWindow") }}
                 </v-btn>
               </v-card-actions>
@@ -749,6 +749,7 @@ export default {
     return {
       dialog_helpSearchSimple: false,
       dialog_helpSearchComplex: false,
+      dialog_helpSearchSetting: false,
       expensionPanelOpen: 1,
 
       layer: null,
