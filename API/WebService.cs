@@ -45,7 +45,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     private object _syncLock = new object();
     private bool _syncPending = false;
     private Dictionary<int, CorpusAdapterWriteIndirect> _corpora = new Dictionary<int, CorpusAdapterWriteIndirect>();
-    private Dictionary<int, Dictionary<string, Guid[]>> _selections = new Dictionary<int, Dictionary<string, Guid[]>>();
+    private Dictionary<int, Dictionary<string, Guid>> _selections = new Dictionary<int, Dictionary<string, Guid>>();
 
     private string _cec6path = "";
 
@@ -201,7 +201,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
       Parallel.ForEach(selections, selection =>
       {
-        var block = corpus.ToSelection(selection.Value).CreateBlock<NgramMultiLayerSelectiveBlock>();
+        var block = corpus.ToSelection(new[] { selection.Value }).CreateBlock<NgramMultiLayerSelectiveBlock>();
         block.LayerDisplayname = "Wort";
         block.LayerQueriesPreCompiled = compiledQueries;
         block.Calculate();
@@ -254,7 +254,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       // no validation nessesary, because it is already done in the initial search
       Parallel.ForEach(selections, selection =>
       {
-        var block = corpus.ToSelection(selection.Value).CreateBlock<Ngram1LayerSelectiveQuickLookupBlock>();
+        var block = corpus.ToSelection(new[] { selection.Value }).CreateBlock<Ngram1LayerSelectiveQuickLookupBlock>();
         block.LayerDisplayname = "Wort";
         block.LayerQueries = limit;
         block.Calculate();
@@ -321,13 +321,13 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
               var days = cluster.SelectionClusters.ToDictionary(
                 x => x.Key,
-                x => x.Value.ToArray());
+                x => x.Value.First());
 
               _selections.Add(year, days);
 
               foreach (var d in days)
               {
-                var sel = corpus.ToSelection(d.Value);
+                var sel = corpus.ToSelection(new[] { d.Value });
                 var item = new NormDataResponseItem { Token = sel.CountToken, Sentences = sel.CountSentences };
                 if (_normData.ContainsKey(d.Key))
                   _normData[d.Key] = item;
