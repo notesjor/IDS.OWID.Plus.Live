@@ -42,7 +42,7 @@ namespace IDS.Lexik.OWIDplusLIVE.Upload
       string data;
       using(var ms = new MemoryStream())
       { 
-        using(var gz = new GZipStream(ms, CompressionLevel.Fastest))
+        using(var gz = new GZipStream(ms, CompressionLevel.Optimal))
           gz.Write(raw, 0, raw.Length);
         data = Convert.ToBase64String(ms.ToArray());
       }
@@ -56,7 +56,7 @@ namespace IDS.Lexik.OWIDplusLIVE.Upload
 
       var client = new RestClient($"{url}update");
       var request = new RestRequest();
-      request.AddJsonBody(new CowidPlusUpdateRequest
+      request.AddJsonBody(new UpdateRequest
       {
         Data = data,
         Day = date.Day,
@@ -64,7 +64,7 @@ namespace IDS.Lexik.OWIDplusLIVE.Upload
         SessionKey = sessionKey,
         Year = date.Year
       });
-      request.Timeout = -1;
+      request.Timeout = new TimeSpan(12, 0, 0);
 
       var response = client.PostAsync(request);
       response.Wait();

@@ -6,12 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\..\API\Model\Request\CowidPlusUpdateRequest.cs" Link="CowidPlusUpdateRequest.cs" />
+    <Compile Include="..\..\API\Model\Request\UpdateRequest.cs" Link="UpdateRequest.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="RestSharp" Version="109.0.1" />
+    <PackageReference Include="RestSharp" Version="112.1.0" />
   </ItemGroup>
 
 </Project>
