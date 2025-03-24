@@ -97,26 +97,51 @@
                       $t("clipboard_export_link") }}</v-list-item-title>
                   </v-list-item>
                   <v-list-item @click="exportTsv(i)">
-                    <v-list-item-title><v-icon style="margin-right:10px">mdi-export</v-icon>{{ $t("clipboard_export_tsv")
-                    }}</v-list-item-title>
+                    <v-list-item-title><v-icon style="margin-right:10px">mdi-export</v-icon>{{
+                      $t("clipboard_export_tsv")
+                      }}</v-list-item-title>
                   </v-list-item>
                   <v-list-item @click="exportJson(i)">
-                    <v-list-item-title><v-icon style="margin-right:10px">mdi-export</v-icon>{{ $t("clipboard_export_json")
-                    }}</v-list-item-title>
+                    <v-list-item-title><v-icon style="margin-right:10px">mdi-export</v-icon>{{
+                      $t("clipboard_export_json")
+                      }}</v-list-item-title>
                   </v-list-item>
                 </v-list>
               </v-menu>
             </div>
           </div>
         </v-expansion-panel-header>
+
         <v-expansion-panel-content>
           <v-data-table :headers="headers" :items="i.grid" :search="search" :single-select="false"
             :footer-props="{ itemsPerPageOptions: [3, 5, 10, 25, 50, 100, 250, -1], options: { itemsPerPage: 5 } }"
-            @input="selectionChanged" v-model="selected" item-key="key" mutli-sort :sort-by="['dRel']" :sort-desc="[true]"
-            show-select>
+            @input="selectionChanged" v-model="selected" item-key="key" mutli-sort :sort-by="['dRel']"
+            :sort-desc="[true]" show-select>
             <!-- eslint-disable -->
             <template v-slot:item.korap="x">
               <kwicBtnSearch :query="x.item.korap" />
+            </template>
+            <template v-slot:item.l="x">
+              <p v-if="x.item.l != null" style="text-align: center; margin-top: 5px;">{{ x.item.l }}</p>
+              <v-btn style="text-transform: none; margin-left: 10%;" small v-else-if="x.item.l === undefined">
+                <v-progress-circular indeterminate color="black" :size="10"></v-progress-circular>
+              </v-btn>
+              <v-btn style="text-transform: none; margin-left: 10%;" small @click="lookup(idx, x.item.key, x.item.w, 1)"
+                v-else>
+                <v-icon>mdi-card-search-outline</v-icon>
+                Anzeigen
+              </v-btn>
+            </template>
+            <template v-slot:item.p="x">
+              <p v-if="x.item.p != null" style="text-align: center; margin-top: 5px;">{{ x.item.p }}</p>
+              <v-btn style="text-transform: none; margin-left: 10%;" small v-else-if="x.item.p === undefined">
+                <v-progress-circular indeterminate color="black" :size="10"></v-progress-circular>
+              </v-btn>
+              <v-btn style="text-transform: none; margin-left: 10%;" small @click="lookup(idx, x.item.key, x.item.w, 2)"
+                v-else>
+                <v-icon>mdi-card-search-outline</v-icon>
+                Anzeigen
+              </v-btn>
             </template>
             <!-- eslint-enable -->
           </v-data-table>
@@ -229,6 +254,44 @@ export default {
   },
 
   methods: {
+    lookup(idx, key, w, layer) {
+      var baseUrl = "http://localhost:4455/v3"; //TODO: this.$config.baseUrl;
+      var year = this.$store.state.yearFocus;
+      var data = this.$data;
+
+      data.entries[idx].grid.forEach((x) => {
+        if (x.key === key) {
+          if (layer === 1) x.l = undefined;
+          else x.p = undefined;
+        }
+      });
+
+      fetch(baseUrl + "/lookup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          Layer: layer,
+          Query: w,
+          Year: year
+        }),
+      }).then((response) => {
+        if (!response.ok) {
+          throw new Error(globalT.$t("search_progress_err01"));
+        }
+        return response.json();
+      }).then((lookup) => {
+        data.entries[idx].grid.forEach((x) => {
+          if (x.key === key) {
+            if (layer === 1) x.l = lookup.Lookup;
+            else x.p = lookup.Lookup;
+          }
+        });
+      }).catch((error) => {
+        console.error("Error:", error);
+      });
+    },
     changeSumSelection: function () {
       if (this.$data.syncLock) return;
 
@@ -329,38 +392,38 @@ export default {
       storeGlobal.commit("calculate");
       this.refreshData();
     },
-    refreshData(){
+    refreshData() {
       if (this.$store.state.owid === null) return;
 
-        var selected = new Set();
-        var selectedSums = [];
-        var res = [];
+      var selected = new Set();
+      var selectedSums = [];
+      var res = [];
 
-        this.$store.state.owid.GetSearchHistory().forEach((key) => {
-          var grid = this.$store.state.owid.GetSearchHistoryItem(key, this.$store.state.vizOptionGranulation);
+      this.$store.state.owid.GetSearchHistory().forEach((key) => {
+        var grid = this.$store.state.owid.GetSearchHistoryItem(key, this.$store.state.vizOptionGranulation);
 
-          for (var row in grid) if (grid[row].checked) selected.add(grid[row]);
+        for (var row in grid) if (grid[row].checked) selected.add(grid[row]);
 
-          res.push({
-            label: key,
-            checked: this.$store.state.owid.OwidLiveSearches[key].IsSelected,
-            grid: grid,
-          });
-
-          if (this.$store.state.owid.OwidLiveSearches[key].IsSelected) selectedSums.push(key);
+        res.push({
+          label: key,
+          checked: this.$store.state.owid.OwidLiveSearches[key].IsSelected,
+          grid: grid,
         });
 
-        this.$data.syncLock = true;
-        this.$data.selected = Array.from(selected);
-        this.$data.syncSumSelection = selectedSums;
-        this.$data.entries = res;
+        if (this.$store.state.owid.OwidLiveSearches[key].IsSelected) selectedSums.push(key);
+      });
 
-        var exp = [];
-        var max = res.length > 3 ? 3 : res.length;
-        for (var ei = 0; ei < max; ei++) exp.push(ei);
-        this.$data.expanded = exp;
+      this.$data.syncLock = true;
+      this.$data.selected = Array.from(selected);
+      this.$data.syncSumSelection = selectedSums;
+      this.$data.entries = res;
 
-        this.$data.syncLock = false;
+      var exp = [];
+      var max = res.length > 3 ? 3 : res.length;
+      for (var ei = 0; ei < max; ei++) exp.push(ei);
+      this.$data.expanded = exp;
+
+      this.$data.syncLock = false;
     }
   },
 

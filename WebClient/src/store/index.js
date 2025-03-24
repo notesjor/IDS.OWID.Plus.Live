@@ -11,6 +11,7 @@ export default new Vuex.Store({
     yearMin: 0,
     yearMax: 0,
     yearInc: 0,
+    yearFocus: 2024,
 
     owid: null,
     version: 0,
@@ -31,6 +32,10 @@ export default new Vuex.Store({
       state.yearInc = -1;
     },
 
+    focusYear(state, year) {
+      state.yearFocus = year;
+    },
+
     init(state, payload) {
       state.owid = new OwidLiveStorage(payload);
     },
@@ -44,8 +49,6 @@ export default new Vuex.Store({
     },
 
     search(state, { n, queryItems, items }) {
-      console.log("search", n, queryItems, items);
-
       state.owid.addOwidLiveSearchItem(n, queryItems, items);
       state.searches = Object.keys(state.owid.OwidLiveSearches).length;
     },

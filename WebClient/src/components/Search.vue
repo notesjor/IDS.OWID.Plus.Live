@@ -827,6 +827,9 @@ export default {
       this.focusYears = this.years.filter((x) => x >= newVal[0] && x <= newVal[1]);
       this.focusYear = this.focusYears.length > 2 ? this.focusYears[this.focusYears.length - 2] : this.focusYears[this.focusYears.length - 1];
     },
+    focusYear: function (newVal) {
+      this.$store.commit("focusYear", newVal);
+    },
   },
   mounted: function () {
     config = this.$config;
