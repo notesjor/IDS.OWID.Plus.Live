@@ -44,7 +44,8 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
     private object _syncLock = new object();
     private bool _syncPending = false;
-    private Dictionary<int, CorpusAdapterWriteIndirect> _corpora = new Dictionary<int, CorpusAdapterWriteIndirect>();
+    private CorpusAdapterWriteIndirect[] _corpora = Array.Empty<CorpusAdapterWriteIndirect>();
+    private Dictionary<int, int> _year2corpusIndex = new Dictionary<int, int>();
     private Dictionary<int, Dictionary<string, Guid>> _selections = new Dictionary<int, Dictionary<string, Guid>>();
 
     private string _cec6path = "";
@@ -114,7 +115,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
         var keys = request.Query.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
 
-        var select = _corpora[year].ToSelection();
+        var select = _corpora[_year2corpusIndex[year]].ToSelection();
         var block = select.CreateBlock<CorrespondingLayerValueSelectedBlock>();
         block.Layer1Displayname = "Wort";
         block.Layer2Displayname = request.LayerDisplayname;
@@ -137,7 +138,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     {
       try
       {
-        arg.Response.Send(_corpora.Keys);
+        arg.Response.Send(_year2corpusIndex.Keys);
       }
       catch
       {
@@ -183,7 +184,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       var res = new Dictionary<string, Dictionary<string, double>>();
 
       var selections = _selections[year];
-      var corpus = _corpora[year];
+      var corpus = _corpora[_year2corpusIndex[year]];
 
       #region Validation 
       if (request.N < 1)
@@ -249,7 +250,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       var limit = File.ReadAllLines(Path.Combine(dir, "limit.txt"), Encoding.UTF8);
 
       var selections = _selections[year];
-      var corpus = _corpora[year];
+      var corpus = _corpora[_year2corpusIndex[year]];
 
       // no validation nessesary, because it is already done in the initial search
       Parallel.ForEach(selections, selection =>
@@ -301,17 +302,18 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
           _syncPending = false;
           try
           {
-            foreach (var k in _corpora.Keys)
-              _corpora[k].Dispose();
-            _corpora.Clear();
+            foreach (var c in _corpora)
+              c.Dispose();
 
-            foreach (var fn in Directory.GetFiles(_cec6path, "*.cec6"))
+            var corpora = new List<CorpusAdapterWriteIndirect>();
+            GetCorpusFiles(out var corporaFilesByYear, out var corporaFilesExtra);
+
+            // Korpora die nicht jahrbasiert sind (z. B.: STATIC.cec6)
+            foreach (var fn in corporaFilesExtra)
             {
-              var year = int.Parse(Path.GetFileNameWithoutExtension(fn));
-              if (year > _defaultYear)
-                _defaultYear = year;
               var corpus = CorpusAdapterWriteIndirect.Create(fn);
-              _corpora.Add(year, corpus);
+              var idx = corpora.Count;
+              corpora.Add(corpus);
 
               var cluster = corpus.ToSelection().CreateBlock<SelectionClusterBlock>();
               cluster.ClusterGenerator = new SelectionClusterGeneratorStringValue();
@@ -323,6 +325,45 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
                 x => x.Key,
                 x => x.Value.First());
 
+              var years = days.Keys.Select(x => int.Parse(x.Substring(0, 4))).Distinct().ToArray();
+              foreach(var year in years)
+              {
+                var sdays = days.Where(x => x.Key.StartsWith($"{year}-")).ToDictionary(x => x.Key, x => x.Value);
+                _selections.Add(year, sdays);
+                _year2corpusIndex.Add(year, idx);
+              }
+
+              foreach (var d in days)
+              {
+                var sel = corpus.ToSelection(new[] { d.Value });
+                var item = new NormDataResponseItem { Token = sel.CountToken, Sentences = sel.CountSentences };
+                if (_normData.ContainsKey(d.Key))
+                  _normData[d.Key] = item;
+                else
+                  _normData.Add(d.Key, item);
+              }
+            }
+            // Korpora die jahrbasiert (Dateiname: 2025.cec6) sind
+            foreach (var fn in corporaFilesByYear)
+            {
+              var year = int.Parse(Path.GetFileNameWithoutExtension(fn));
+              if (year > _defaultYear)
+                _defaultYear = year;
+              var corpus = CorpusAdapterWriteIndirect.Create(fn);
+
+              _year2corpusIndex.Add(year, corpora.Count);
+              corpora.Add(corpus);
+
+              var cluster = corpus.ToSelection().CreateBlock<SelectionClusterBlock>();
+              cluster.ClusterGenerator = new SelectionClusterGeneratorStringValue();
+              cluster.NoParent = true;
+              cluster.MetadataKey = "D";
+              cluster.Calculate();
+
+              var days = cluster.SelectionClusters.ToDictionary(
+                x => x.Key,
+                x => x.Value.First());
+              
               _selections.Add(year, days);
 
               foreach (var d in days)
@@ -336,6 +377,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
               }
             }
 
+            _corpora = corpora.ToArray();
             _normDataStr = JsonConvert.SerializeObject(_normData);
           }
           catch
@@ -352,6 +394,29 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       {
         // ignore
       }
+    }
+
+    private void GetCorpusFiles(out string[] corporaFilesByYear, out string[] corporaFilesExtra)
+    {
+      var files = Directory.GetFiles(_cec6path, "*.cec6");
+      var rByYear = new List<string>();
+      var rExtra = new List<string>();
+
+      foreach (var fn in files)
+      {
+        var valid = int.TryParse(Path.GetFileNameWithoutExtension(fn), out var year);
+        if (valid)
+        {
+          if (year > _defaultYear)
+            _defaultYear = year;
+          rByYear.Add(fn);
+        }
+        else
+          rExtra.Add(fn);
+      }
+
+      corporaFilesByYear = rByYear.ToArray();
+      corporaFilesExtra = rExtra.ToArray();
     }
 
     private void Heartbeat(HttpContext arg)
@@ -453,8 +518,8 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         try
         {
           var key = int.Parse(Path.GetFileNameWithoutExtension(fn));
-          if (_corpora.ContainsKey(key))
-            _corpora[key].Dispose();
+          if (_year2corpusIndex.TryGetValue(key, out var idx))
+            _corpora[idx].Dispose();
 
           merged.Save(fn, false);
         }
