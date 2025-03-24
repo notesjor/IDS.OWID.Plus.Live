@@ -311,12 +311,12 @@ export default {
 
     // Der Aufruf INIT sowie NORM lädt notwendige Normdaten herunter.
     // INIT kann serverseitig zur Flood-Detection und Loging verwendet werden.
-    fetch(baseUrl + "/years") // TODO: v3/years
-      .then((response) => response.json()) // TODO: JSON
+    fetch(baseUrl + "/years")
+      .then((response) => response.json())
       .then((response) => {
         store.commit("years", response);
 
-        fetch(baseUrl + "/norm", { // TODO: v3/norm
+        fetch(baseUrl + "/norm", {
           method: "GET",
         })
           .then((resp) => {

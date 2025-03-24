@@ -9,7 +9,7 @@ export class OwidLiveStorage {
   #Total;
   #NormTotal;
   #N;
-  #NMax = 5;
+  #NMax = 3;
   #Granulation;
   #AvailableYears;
 
