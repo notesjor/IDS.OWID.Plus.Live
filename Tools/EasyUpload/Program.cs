@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
+using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using IDS.Lexik.cOWIDplusViewer.v2.WebService.Model.Request;
@@ -14,10 +15,17 @@ namespace IDS.Lexik.OWIDplusLIVE.Upload
   {
     static void Main(string[] args)
     {
-      if (args.Length != 3)
+      if (args.Length < 3)
       {
         Help();
         return;
+      }
+
+      if (args[0] == "/WAIT")
+      {
+        Console.WriteLine("Waiting for DEBUG-Session...");
+        Console.ReadLine();
+        args = args[1..];
       }
 
       if (!args[0].EndsWith("/"))
@@ -40,9 +48,9 @@ namespace IDS.Lexik.OWIDplusLIVE.Upload
     {
       var raw = File.ReadAllBytes(path);
       string data;
-      using(var ms = new MemoryStream())
-      { 
-        using(var gz = new GZipStream(ms, CompressionLevel.Optimal))
+      using (var ms = new MemoryStream())
+      {
+        using (var gz = new GZipStream(ms, CompressionLevel.Optimal))
           gz.Write(raw, 0, raw.Length);
         data = Convert.ToBase64String(ms.ToArray());
       }
@@ -54,8 +62,25 @@ namespace IDS.Lexik.OWIDplusLIVE.Upload
         sessionKey = Convert.ToBase64String(sha.ComputeHash(Encoding.ASCII.GetBytes($"{dataHash}-{token}-{secret}")));
       }
 
-      var client = new RestClient($"{url}update");
-      var request = new RestRequest();
+      var handler = new SocketsHttpHandler
+      {
+        // Optional: explizit nur HTTP erlauben
+        ConnectCallback = async (context, cancellationToken) =>
+        {
+          if (context.DnsEndPoint.Port == 443)
+          {
+            throw new InvalidOperationException("HTTPS-Verbindungen sind nicht erlaubt.");
+          }
+
+          var socket = new System.Net.Sockets.TcpClient();
+          await socket.ConnectAsync(context.DnsEndPoint.Host, context.DnsEndPoint.Port, cancellationToken);
+          return socket.GetStream();
+        }
+      };
+      var options = new RestClientOptions { ConfigureMessageHandler = _ => handler };
+
+      var client = new RestClient(options);
+      var request = new RestRequest($"{url}update");
       request.AddJsonBody(new UpdateRequest
       {
         Data = data,
@@ -79,7 +104,7 @@ namespace IDS.Lexik.OWIDplusLIVE.Upload
 
       var response = client.GetAsync(request);
       response.Wait();
-      
+
       return response.Result.Content;
     }
 
