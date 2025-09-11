@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="CorpusExplorer.Core">
+      <HintPath>..\..\..\..\..\..\Users\Jan\AppData\Roaming\CorpusExplorer\App\CorpusExplorer.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="CorpusExplorer.Sdk">
+      <HintPath>..\..\..\..\..\..\Users\Jan\AppData\Roaming\CorpusExplorer\App\CorpusExplorer.Sdk.dll</HintPath>
+    </Reference>
+    <Reference Include="CorpusExplorer.Sdk.Diagnostic">
+      <HintPath>..\..\..\..\..\..\Users\Jan\AppData\Roaming\CorpusExplorer\App\CorpusExplorer.Sdk.Diagnostic.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
