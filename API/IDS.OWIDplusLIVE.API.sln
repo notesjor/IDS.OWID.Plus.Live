@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CorpusExplorer.Sdk.Diagnost
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IDS.Lexik.WebService.Sdk.DotNet", "..\..\IDS.Lexik.WebService\IDS.Lexik.WebService.Sdk.DotNet\IDS.Lexik.WebService.Sdk.DotNet.csproj", "{FFBF45D2-3AF6-DEDE-3DF5-63D0F74DD531}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IDS.Lexik.OWIDplusLIVE.Upload", "..\Tools\EasyUpload\IDS.Lexik.OWIDplusLIVE.Upload.csproj", "{DF550FA7-92D1-7B0A-A589-FC695216BF21}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{FFBF45D2-3AF6-DEDE-3DF5-63D0F74DD531}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FFBF45D2-3AF6-DEDE-3DF5-63D0F74DD531}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FFBF45D2-3AF6-DEDE-3DF5-63D0F74DD531}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF550FA7-92D1-7B0A-A589-FC695216BF21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF550FA7-92D1-7B0A-A589-FC695216BF21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF550FA7-92D1-7B0A-A589-FC695216BF21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF550FA7-92D1-7B0A-A589-FC695216BF21}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -31,6 +31,8 @@ using CorpusExplorer.Sdk.Blocks.SelectionCluster.Generator;
 using CorpusExplorer.Sdk.Blocks;
 using System.Threading.Tasks;
 using CorpusExplorer.Sdk.Blocks.NgramMultiLayerSelectiveQuery;
+using CorpusExplorer.Sdk.Utils.CorpusManipulation.CorpusMergerTransformation;
+using CorpusExplorer.Sdk.Utils.CorpusManipulation.CorpusMergerTransformation.Abstract;
 
 namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 {
@@ -494,7 +496,23 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         var tagger = new SimpleTreeTagger { Input = clean02.Output, LanguageSelected = "Deutsch" };
         tagger.Execute();
         var newData = tagger.Output.First();
-        var merged = oldData == null ? newData : CorpusMerger.Merge(new[] { oldData, newData });
+
+        var merger = new CorpusMerger();
+        if (oldData != null)
+          merger.Input(oldData, new AbstractCorpusMergerTransformation[]
+          {
+            new CorpusMergerTransformationLowercase{ LayerDisplayname = "Wort"},
+            new CorpusMergerTransformationLowercase{ LayerDisplayname = "Lemma"}
+          });
+        if (newData != null)
+          merger.Input(newData, new AbstractCorpusMergerTransformation[]
+          {
+          new CorpusMergerTransformationLowercase{ LayerDisplayname = "Wort"},
+          new CorpusMergerTransformationLowercase{ LayerDisplayname = "Lemma"}
+          });
+        merger.Execute();
+
+        var merged = merger.Output.First();
 
         SaveCorpus(merged, fn);
 
