@@ -8,15 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="CorpusExplorer.Core">
-      <HintPath>..\..\..\..\..\..\Users\Jan\AppData\Roaming\CorpusExplorer\App\CorpusExplorer.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="CorpusExplorer.Sdk">
-      <HintPath>..\..\..\..\..\..\Users\Jan\AppData\Roaming\CorpusExplorer\App\CorpusExplorer.Sdk.dll</HintPath>
-    </Reference>
-    <Reference Include="CorpusExplorer.Sdk.Diagnostic">
-      <HintPath>..\..\..\..\..\..\Users\Jan\AppData\Roaming\CorpusExplorer\App\CorpusExplorer.Sdk.Diagnostic.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\..\..\..\..\CorpusExplorerV2\CorpusExplorer\BitCutStudios.CorpusExplorer\BitCutStudios.CorpusExplorer.csproj" />
+    <ProjectReference Include="..\..\..\..\..\CorpusExplorerV2\CorpusExplorer\CorpusExplorer.Sdk.Diagnostic\CorpusExplorer.Sdk.Diagnostic.csproj" />
+    <ProjectReference Include="..\..\..\..\..\CorpusExplorerV2\CorpusExplorer\CorpusExplorer.Sdk\CorpusExplorer.Sdk.csproj" />
   </ItemGroup>
 
 </Project>

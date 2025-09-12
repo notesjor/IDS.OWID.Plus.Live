@@ -1,8 +1,11 @@
 ﻿using CorpusExplorer.Sdk.Ecosystem;
 using CorpusExplorer.Sdk.Helper;
+using CorpusExplorer.Sdk.Utils.CorpusManipulation;
+using CorpusExplorer.Sdk.Utils.CorpusManipulation.CorpusMergerTransformation;
+using CorpusExplorer.Sdk.Utils.CorpusManipulation.CorpusMergerTransformation.Abstract;
 using CorpusExplorer.Sdk.Utils.DocumentProcessing.Cleanup;
-using System.Text;
 using CorpusExplorer.Sdk.Utils.DocumentProcessing.Tagger.TreeTagger;
+using System.Text;
 
 namespace IDS.OWIDplusLIVE.Convert
 {
@@ -26,7 +29,7 @@ namespace IDS.OWIDplusLIVE.Convert
         .Select(f =>
           new Dictionary<string, object> {
             { "D", Path.GetFileNameWithoutExtension(f) },
-            { "Text", File.ReadAllText(f, Encoding.UTF8) } 
+            { "Text", File.ReadAllText(f, Encoding.UTF8) }
           }
         ));
       clean01.Execute();
@@ -36,7 +39,16 @@ namespace IDS.OWIDplusLIVE.Convert
 
       var tagger = new SimpleTreeTagger { Input = clean02.Output, LanguageSelected = "Deutsch" };
       tagger.Execute();
-      tagger.Output.First().Save(output, false);
+
+      var merger = new CorpusMerger();
+      merger.Input(tagger.Output.First(), new AbstractCorpusMergerTransformation[]
+      {
+        new CorpusMergerTransformationLowercase{ LayerDisplayname = "Wort"},
+        new CorpusMergerTransformationLowercase{ LayerDisplayname = "Lemma"}
+      });
+      merger.Execute();
+
+      merger.Output.First().Save(output, false);
     }
   }
 }
