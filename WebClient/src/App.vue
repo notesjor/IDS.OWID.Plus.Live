@@ -307,8 +307,8 @@ export default {
     this.footerImpressum = config.footerImpressum;
     this.footerDsgvo = config.footerDsgvo;
 
-    var baseUrl = "http://localhost:4455/v3"; // TODO: config.baseUrl
-
+    var baseUrl = "https://www.owid.de/plus/live-2021/api/v3";
+    
     // Der Aufruf INIT sowie NORM lädt notwendige Normdaten herunter.
     // INIT kann serverseitig zur Flood-Detection und Loging verwendet werden.
     fetch(baseUrl + "/years")

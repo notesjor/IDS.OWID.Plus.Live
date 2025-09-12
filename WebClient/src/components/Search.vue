@@ -665,7 +665,7 @@ async function sendSearchRequest(data, store, n, queryItems) {
   data.progressWait = true; 
   data.progressMsg = globalT.$t("search_progress_msg01");
 
-  var baseUrl = "http://localhost:4455/v3"; // TODO: config.baseUrl
+  var baseUrl = "https://www.owid.de/plus/live-2021/api/v3";
   console.log(config.baseUrl);
 
   var years = data.focusYears.sort((a, b) => b - a);  

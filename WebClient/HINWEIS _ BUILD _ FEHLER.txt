@@ -1,0 +1,4 @@
+In PowerShell
+
+$env:NODE_OPTIONS="--openssl-legacy-provider"
+bun run build

@@ -275,7 +275,7 @@ export default {
 
   methods: {
     lookup(idx, key, w, layer) {
-      var baseUrl = "http://localhost:4455/v3"; //TODO: this.$config.baseUrl;
+      var baseUrl = "https://www.owid.de/plus/live-2021/api/v3";
       var year = this.$store.state.yearFocus;
       var data = this.$data;
 
@@ -340,7 +340,7 @@ export default {
     },
     export(i, format, mime, fn){
       var exp = this.$store.state.owid.GetSearchHistoryItem4export(i.label);
-      var baseUrl = "http://localhost:4455/v3"; //TODO: this.$config.baseUrl;
+      var baseUrl = "https://www.owid.de/plus/live-2021/api/v3";
 
       fetch(`${baseUrl}/convert?N=${exp.N}&format=${format}`, {
         method: "post",
