@@ -42,53 +42,38 @@ export class OwidLiveStorage {
    * @param  {array} norm array from GET: owidAPI/norm
    */
   constructor(norm) {
-    norm = this.v3decompile(norm);
-
     this.#Norm = norm;
     this.#OwidLiveSearches = {};
     this.#N = 1;
+
+    console.log(norm);
 
     var dates = [];
     var total = [];
     var notal = [];
     for (var n = 0; n < norm.length; n++) {
+      console.log(n);
       if (n === 0)
-        Object.keys(norm[0]).forEach(function (key) {
+        Object.keys(norm[0]).forEach(function(key) {
           dates.push(key.substring(0, 10));
         });
 
       var sum = 0.0;
-      Object.keys(norm[n]).forEach(function (key) {
+      Object.keys(norm[n]).forEach(function(key) {
         sum += norm[n][key];
       });
       total.push(sum);
       notal.push(sum / 1000000.0);
     }
 
+    console.log(dates);
+    console.log(total);
+    console.log(notal);
+
     this.#Dates = dates.sort();
     this.#LastDate = this.#Dates[this.#Dates.length - 1];
     this.#Total = total;
     this.#NormTotal = notal;
-
-    var years = new Set();
-    Object.keys(norm[0]).forEach((k) => years.add(k.substring(0, 4)));
-    this.#AvailableYears = Array.from(years);
-    this.#AvailableYears.sort();
-  }
-
-  v3decompile(norm) {
-    var keys = Object.keys(norm);
-    var res = [];
-    for (var i = 0; i < this.#NMax; i++) {
-      var n = {};
-      for (var j = 0; j < keys.length; j++) {
-        var date = keys[j];
-        var info = norm[date];
-        n[date] = info.t - (info.s * i);
-      }
-      res.push(n);
-    }
-    return res;
   }
 
   /**
@@ -135,13 +120,6 @@ export class OwidLiveStorage {
    */
   clearAll() {
     this.#OwidLiveSearches = {};
-  }
-
-  /**
-   * An array of all available years
-   */
-  get AvailableYears() {
-    return this.#AvailableYears;
   }
 
   /**

@@ -653,7 +653,7 @@ class queryItem {
   constructor(layer, position, element, upperCase) {
     this.layer = layer;
     this.position = position;
-    this.token = (upperCase ? element.toUpperCase() : element).trim();
+    this.token = (upperCase ? element.toUpperCase() : element.toLowerCase()).trim();
   }
 
   toString() {
@@ -665,7 +665,7 @@ async function sendSearchRequest(data, store, n, queryItems) {
   data.progressWait = true; 
   data.progressMsg = globalT.$t("search_progress_msg01");
 
-  var baseUrl = "https://www.owid.de/plus/live-2021/api/v3";
+  var baseUrl = "http://127.0.0.1:4455/v3"; // TODO
   console.log(config.baseUrl);
 
   var years = data.focusYears.sort((a, b) => b - a);  

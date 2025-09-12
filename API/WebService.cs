@@ -17,7 +17,6 @@ using CorpusExplorer.Sdk.Model.Adapter.Corpus.Abstract;
 using CorpusExplorer.Sdk.Utils.DocumentProcessing.Cleanup;
 using CorpusExplorer.Sdk.Utils.DocumentProcessing.Tagger.TreeTagger;
 using CorpusExplorer.Sdk.Utils.CorpusManipulation;
-using IDS.OWIDplusLIVE.API.Model.Json.OwidLiveStorage;
 using IDS.OWIDplusLIVE.API.Model.Response;
 using CorpusExplorer.Sdk.Utils.DataTableWriter.Abstract;
 using CorpusExplorer.Sdk.Utils.DataTableWriter;
@@ -51,7 +50,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
     private string _cec6path = "";
 
-    private Dictionary<string, NormDataResponseItem> _normData = new Dictionary<string, NormDataResponseItem>();
+    private List<Dictionary<string, uint>> _normData = new List<Dictionary<string, uint>>();
     private string _normDataStr = "";
     private int _defaultYear = 0;
     private int[] _years;
@@ -284,6 +283,12 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     {
       var post = arg.PostDataAsString;
       var request = JsonConvert.DeserializeObject<SearchRequest>(post);
+
+      if(request.Items != null)
+        foreach (var t in request.Items)
+          if(!string.IsNullOrEmpty(t.Token))
+            t.Token = t.Layer < 2 ? t.Token.ToLower() : t.Token.ToUpper();
+
       lock (_hashLock)
         request.Hash = System.Convert.ToBase64String(_hash.ComputeHash(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(request.Items)))).Replace("/", "_");
       return request;
@@ -298,6 +303,10 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         _maxItems = settings.MaxItems;
         _secureUpdateToken = settings.SecureUpdateToken;
         _nMax = settings.N;
+
+        var range = Enumerable.Range(1, _nMax).Select(x => x).ToArray();
+        for (var n = 0; n < _nMax; n++)
+          _normData.Add(new Dictionary<string, uint>());
 
         lock (_syncLock)
         {
@@ -338,11 +347,12 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
               foreach (var d in days)
               {
                 var sel = corpus.ToSelection(new[] { d.Value });
-                var item = new NormDataResponseItem { Token = sel.CountToken, Sentences = sel.CountSentences };
-                if (_normData.ContainsKey(d.Key))
-                  _normData[d.Key] = item;
-                else
-                  _normData.Add(d.Key, item);
+                var sizes = sel.CountNGramNormalization(range);
+                foreach (var s in sizes)
+                  if (_normData[s.Key - 1].ContainsKey(d.Key))
+                    _normData[s.Key - 1][d.Key] += (uint)s.Value;
+                  else
+                    _normData[s.Key - 1].Add(d.Key, (uint)s.Value);
               }
             }
             // Korpora die jahrbasiert (Dateiname: 2025.cec6) sind
@@ -371,11 +381,12 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
               foreach (var d in days)
               {
                 var sel = corpus.ToSelection(new[] { d.Value });
-                var item = new NormDataResponseItem { Token = sel.CountToken, Sentences = sel.CountSentences };
-                if (_normData.ContainsKey(d.Key))
-                  _normData[d.Key] = item;
-                else
-                  _normData.Add(d.Key, item);
+                var sizes = sel.CountNGramNormalization(range);
+                foreach (var s in sizes)
+                  if (_normData[s.Key - 1].ContainsKey(d.Key))
+                    _normData[s.Key - 1][d.Key] += (uint)s.Value;
+                  else
+                    _normData[s.Key - 1].Add(d.Key, (uint)s.Value);
               }
             }
 
@@ -647,7 +658,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         var nD = (double)n;
         Dictionary<string, double> normHelper;
         lock (_syncLock)
-          normHelper = _normData.ToDictionary(x => x.Key, x => x.Value.Token - (x.Value.Sentences * nD));
+          normHelper = _normData[n].ToDictionary(x => x.Key, x => (double)x.Value);
 
         dt.BeginLoadData();
         foreach (var x in data)
