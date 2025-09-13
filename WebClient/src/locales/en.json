@@ -49,7 +49,7 @@
   "search_progress_err01": "No results - query too specific.",
   "search_progress_msg02": "Load time serie(s): {current} / {max}",
   "search_progress_msg03": "Data visualization in progress",
-  "search_settings": "SEARCH: Settings",
+  "search_settings": "SEARCH: Performance-Settings",
   "search_settings_head": "HELP: Settings",
   "search_settings_info": "You can influence the following parameters via the search settings:<br/><ul><li><strong>Focus year</strong><br/>Searches for N-grams in this year first. Queries with a large result set (greater than 1000) are limited to the 1000 most frequent N-grams in this year.</li><li><strong>Search range (years)</strong><br/>Searches the specified range. If queries run for too long, you can limit the search range to save time and resources.</li></ul>",
   "search_lbl_focusYear": "Focus year",

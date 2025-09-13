@@ -46,13 +46,10 @@ export class OwidLiveStorage {
     this.#OwidLiveSearches = {};
     this.#N = 1;
 
-    console.log(norm);
-
     var dates = [];
     var total = [];
     var notal = [];
     for (var n = 0; n < norm.length; n++) {
-      console.log(n);
       if (n === 0)
         Object.keys(norm[0]).forEach(function(key) {
           dates.push(key.substring(0, 10));
@@ -65,10 +62,6 @@ export class OwidLiveStorage {
       total.push(sum);
       notal.push(sum / 1000000.0);
     }
-
-    console.log(dates);
-    console.log(total);
-    console.log(notal);
 
     this.#Dates = dates.sort();
     this.#LastDate = this.#Dates[this.#Dates.length - 1];

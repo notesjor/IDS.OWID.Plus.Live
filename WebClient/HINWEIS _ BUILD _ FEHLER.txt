@@ -1,4 +1,5 @@
 In PowerShell
 
+cd C:\Projekte\IDS\IDS.OWID.Plus.Live\WebClient
 $env:NODE_OPTIONS="--openssl-legacy-provider"
 bun run build

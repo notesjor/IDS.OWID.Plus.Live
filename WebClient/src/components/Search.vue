@@ -816,10 +816,9 @@ export default {
     this.yearWatcher = this.$store.watch(
       (state) => state.years,
       (newValue) => {
-        console.log("years changed");
         self.years = newValue;
         self.focusYears = newValue;
-        self.searchRange = [newValue[0], newValue[newValue.length - 1]];
+        self.searchRange = [newValue[newValue.length - 2], newValue[newValue.length - 1]];
       }
     );
   },
