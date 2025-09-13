@@ -143,7 +143,7 @@ export default {
 
       var calendars = [];
       var top = 35;
-      this.$store.state.owid.AvailableYears.forEach((year) => {
+      this.$store.state.years.forEach((year) => {
         calendars.push({
           range: year,
           cellSize: ["auto", 20],
