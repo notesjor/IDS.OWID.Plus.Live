@@ -194,18 +194,22 @@ export class OwidLiveSearch {
    * @param  {function} func the functions describes how-to sum up the selected sub items (see OwidLiveStorageItems)
    */
   Sum(func) {
-    var res = {};
+    const res = new Map();
     this.#OwidLiveStorageTimeItems.forEach((x) => {
-      var items = func(x);
-      if (items != null)
+      const items = func(x);
+      if (items != null) {
         Object.keys(items).forEach((key) => {
-          if (key in res) {
-            res[key].value += items[key].value;
-            res[key].dates = new Set([...res[key].dates, ...items[key].dates]);
-          } else res[key] = items[key];
+          if (res.has(key)) {
+            const existing = res.get(key);
+            existing.value += items[key].value;
+            existing.dates = new Set([...existing.dates, ...items[key].dates]);
+          } else {
+            res.set(key, items[key]);
+          }
         });
+      }
     });
-    return res;
+    return Object.fromEntries(res);
   }
 
   /**

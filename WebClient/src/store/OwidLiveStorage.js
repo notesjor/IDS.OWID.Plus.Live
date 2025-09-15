@@ -46,24 +46,21 @@ export class OwidLiveStorage {
     this.#OwidLiveSearches = {};
     this.#N = 1;
 
-    var dates = [];
-    var total = [];
-    var notal = [];
-    for (var n = 0; n < norm.length; n++) {
-      if (n === 0)
-        Object.keys(norm[0]).forEach(function(key) {
-          dates.push(key.substring(0, 10));
-        });
+    const dates = new Set();
+    const total = [];
+    const notal = [];
 
-      var sum = 0.0;
-      Object.keys(norm[n]).forEach(function(key) {
-        sum += norm[n][key];
+    norm.forEach((entry, index) => {
+      let sum = 0;
+      Object.entries(entry).forEach(([key, value]) => {
+        if (index === 0) dates.add(key.substring(0, 10));
+        sum += value;
       });
       total.push(sum);
       notal.push(sum / 1000000.0);
-    }
+    });
 
-    this.#Dates = dates.sort();
+    this.#Dates = Array.from(dates).sort();
     this.#LastDate = this.#Dates[this.#Dates.length - 1];
     this.#Total = total;
     this.#NormTotal = notal;
@@ -175,25 +172,12 @@ export class OwidLiveStorage {
    * Get the search history for N(-Gram). Used by components/Clipboard
    */
   GetSearchHistory() {
-    var tmp = [];
-    if (Object.keys(this.#OwidLiveSearches).length == 0) return res;
+    if (Object.keys(this.#OwidLiveSearches).length === 0) return [];
 
-    Object.keys(this.#OwidLiveSearches).forEach((key) => {
-      var current = this.#OwidLiveSearches[key];
-      if (current.N === this.#N)
-        tmp.push({ key: key, date: current.TimeStamp });
-    });
-
-    tmp.sort(function (a, b) {
-      return b.date - a.date;
-    });
-
-    var res = [];
-    tmp.forEach((x) => {
-      res.push(x.key);
-    });
-
-    return res;
+    return Object.entries(this.#OwidLiveSearches)
+      .filter(([, search]) => search.N === this.#N)
+      .sort(([, a], [, b]) => b.TimeStamp - a.TimeStamp)
+      .map(([key]) => key);
   }
 
   /**
@@ -383,14 +367,12 @@ export class OwidLiveStorage {
    * @param  {function} func the functions needs to describe how-to find the dateTime-Key
    */
   calculateGranulation(func) {
-    var dates = this.#Norm[this.#N - 1];
-    var res = {};
-    Object.keys(dates).forEach((d) => {
-      var key = func(new Date(d));
-      if (key in res) res[key] += dates[d];
-      else res[key] = dates[d];
-    });
-    return res;
+    const dates = this.#Norm[this.#N - 1];
+    return Object.entries(dates).reduce((res, [date, value]) => {
+      const key = func(new Date(date));
+      res[key] = (res[key] || 0) + value;
+      return res;
+    }, {});
   }
 
   /**
@@ -398,10 +380,6 @@ export class OwidLiveStorage {
    * @param  {function} func the functions needs to describe how-to find the dateTime-Key
    */
   calculateDateGranulation(func) {
-    var res = [];
-    Object.keys(this.#Dates).forEach((d) => {
-      res.push(func(new Date(this.#Dates[d])));
-    });
-    return res;
+    return this.#Dates.map((date) => func(new Date(date)));
   }
 }
