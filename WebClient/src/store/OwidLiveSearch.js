@@ -79,19 +79,14 @@ export class OwidLiveSearch {
    * Name based in Key and information about selected sub items
    */
   get Name() {
-    var cnt = 0;
+    let cnt = 0;
+    const total = this.#OwidLiveStorageTimeItems.length;
+
     this.#OwidLiveStorageTimeItems.forEach((i) => {
       if (i.IsSelected) cnt++;
     });
 
-    return (
-      this.#Key +
-      " [" +
-      cnt +
-      " / " +
-      this.#OwidLiveStorageTimeItems.length +
-      "]"
-    );
+    return `${this.#Key} [${cnt} / ${total}]`;
   }
 
   /**
@@ -194,18 +189,23 @@ export class OwidLiveSearch {
    * @param  {function} func the functions describes how-to sum up the selected sub items (see OwidLiveStorageItems)
    */
   Sum(func) {
-    var res = {};
+    const res = new Map();
     this.#OwidLiveStorageTimeItems.forEach((x) => {
-      var items = func(x);
-      if (items != null)
+      const items = func(x);
+      if (items != null) {
         Object.keys(items).forEach((key) => {
-          if (key in res) {
-            res[key].value += items[key].value;
-            res[key].dates = new Set([...res[key].dates, ...items[key].dates]);
-          } else res[key] = items[key];
+          if (res.has(key)) {
+            const existing = res.get(key);
+            existing.value += items[key].value;
+            existing.dates = new Set([...existing.dates, ...items[key].dates]);
+          } else {
+            res.set(key, items[key]);
+          }
         });
+      }
     });
-    return res;
+    // Convert Map back to an object if necessary
+    return Object.fromEntries(res);
   }
 
   /**

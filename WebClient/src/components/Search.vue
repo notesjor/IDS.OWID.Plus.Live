@@ -818,7 +818,7 @@ export default {
       (newValue) => {
         self.years = newValue;
         self.focusYears = newValue;
-        self.searchRange = [newValue[newValue.length - 2], newValue[newValue.length - 1]];
+        self.searchRange = [newValue[0], newValue[newValue.length - 1]];
       }
     );
   },

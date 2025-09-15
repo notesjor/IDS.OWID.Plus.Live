@@ -16,14 +16,15 @@ export class OwidLiveStorageTimeItem {
     }
   }
 
-  static load(obj){
-    var res = new OwidLiveStorageTimeItem("?µ?µ?", null);
+  static load(obj) {
+    const res = new OwidLiveStorageTimeItem(obj.Key, null);
+    const tokens = obj.Key.split("µ");
     res.#Key = obj.Key;
-    res.#Token = obj.Token;
-    res.#Name = obj.Name;
-    res.#Label = obj.Key.split("µ").join(" | ");
+    res.#Token = tokens;
+    res.#Name = tokens[0];
+    res.#Label = tokens.join(" | ");
     res.#Dates = obj.Dates;
-    res.#IsSelected = obj.IsSelected; 
+    res.#IsSelected = obj.IsSelected;
     return res;
   }
 
@@ -32,10 +33,11 @@ export class OwidLiveStorageTimeItem {
    * @param  {array} dates all matched dates
    */
   constructor(key, dates) {
+    const tokens = key.split("µ");
     this.#Key = key;
-    this.#Token = key.split("µ");
-    this.#Name = key.split("µ")[0];
-    this.#Label = key.split("µ").join(" | ");
+    this.#Token = tokens;
+    this.#Name = tokens[0];
+    this.#Label = tokens.join(" | ");
     this.#Dates = dates;
     this.#IsSelected = true;
   }
@@ -72,17 +74,15 @@ export class OwidLiveStorageTimeItem {
    * All matched dates
    */
   get Date() {
-    return this.#IsSelected
-      ? this.calculateGranulation(function(x) {
-          return (
-            x.getFullYear() +
-            "-" +
-            (x.getMonth() + 1).pad(2) +
-            "-" +
-            x.getDate().pad(2)
-          );
-        })
-      : null;
+    if (!this.#IsSelected) return null;
+
+    const formatter = new Intl.DateTimeFormat('de-DE', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+
+    return this.calculateGranulation((x) => formatter.format(x));
   }
 
   /**
@@ -148,20 +148,16 @@ export class OwidLiveStorageTimeItem {
    * @param  {function} func the function describes how-to group the dates
    */
   calculateGranulation(func) {
-    var res = {};
-    Object.keys(this.#Dates).forEach((k) => {
-      var d = new Date(k);
-      var key = func(d);
-      if (key in res) {
+    return Object.keys(this.#Dates).reduce((res, k) => {
+      const d = new Date(k);
+      const key = func(d);
+      if (res[key]) {
         res[key].value += this.#Dates[k];
         res[key].dates.add(k);
       } else {
-        var nset = new Set();
-        nset.add(k);
-
-        res[key] = { dates: nset, value: this.#Dates[k] };
+        res[key] = { dates: new Set([k]), value: this.#Dates[k] };
       }
-    });
-    return res;
+      return res;
+    }, {});
   }
 }

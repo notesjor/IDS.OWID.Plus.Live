@@ -46,24 +46,21 @@ export class OwidLiveStorage {
     this.#OwidLiveSearches = {};
     this.#N = 1;
 
-    var dates = [];
-    var total = [];
-    var notal = [];
-    for (var n = 0; n < norm.length; n++) {
-      if (n === 0)
-        Object.keys(norm[0]).forEach(function(key) {
-          dates.push(key.substring(0, 10));
-        });
+    const dates = new Set();
+    const total = [];
+    const notal = [];
 
-      var sum = 0.0;
-      Object.keys(norm[n]).forEach(function(key) {
-        sum += norm[n][key];
+    norm.forEach((entry, index) => {
+      let sum = 0;
+      Object.entries(entry).forEach(([key, value]) => {
+        if (index === 0) dates.add(key.substring(0, 10));
+        sum += value;
       });
       total.push(sum);
       notal.push(sum / 1000000.0);
-    }
+    });
 
-    this.#Dates = dates.sort();
+    this.#Dates = Array.from(dates).sort();
     this.#LastDate = this.#Dates[this.#Dates.length - 1];
     this.#Total = total;
     this.#NormTotal = notal;
@@ -175,25 +172,12 @@ export class OwidLiveStorage {
    * Get the search history for N(-Gram). Used by components/Clipboard
    */
   GetSearchHistory() {
-    var tmp = [];
-    if (Object.keys(this.#OwidLiveSearches).length == 0) return res;
+    if (Object.keys(this.#OwidLiveSearches).length === 0) return [];
 
-    Object.keys(this.#OwidLiveSearches).forEach((key) => {
-      var current = this.#OwidLiveSearches[key];
-      if (current.N === this.#N)
-        tmp.push({ key: key, date: current.TimeStamp });
-    });
-
-    tmp.sort(function (a, b) {
-      return b.date - a.date;
-    });
-
-    var res = [];
-    tmp.forEach((x) => {
-      res.push(x.key);
-    });
-
-    return res;
+    return Object.entries(this.#OwidLiveSearches)
+      .filter(([, search]) => search.N === this.#N)
+      .sort(([, a], [, b]) => b.TimeStamp - a.TimeStamp)
+      .map(([key]) => key);
   }
 
   /**
@@ -215,71 +199,54 @@ export class OwidLiveStorage {
    * @param  {number} granulation Set the granulation for calculation (0=day, 1=week, 2=month, 3=quarter, 4=year)
    */
   GetSearchHistoryItem(key, granulation) {
-    var data = this.#OwidLiveSearches[key];
-    var dates = this.#Dates;
-    var total = this.#Total[this.#N - 1];
-    var normd = null;
+    const data = this.#OwidLiveSearches[key];
+    const normd = this.getNormByGranulation(granulation);
+    const total = this.#Total[this.#N - 1];
+
+    return data.OwidLiveStorageTimeItems.map((item) => {
+      const tokens = item.Key.split("µ");
+      const d = Object.keys(item.Date).length;
+      const s = Object.values(item.Date).reduce((sum, { value }) => sum + value, 0);
+
+      const sparkNorm = normd.map((norm, i) => {
+        const v = item.Date[i]?.value || 0;
+        return Math.round((v / norm) * 1000000.0);
+      });
+
+      const korap = tokens[0]
+        .split(" ")
+        .map((word) => `[orth=${word}/i]`)
+        .join(" ");
+
+      return {
+        key: item.Key,
+        w: tokens[0],
+        l: tokens[1] || null,
+        p: tokens[2] || null,
+        d,
+        dRel: ((d / this.#Dates.length) * 100.0).toFixed(5),
+        s,
+        sRel: ((s / total) * 1000000.0).toFixed(5),
+        sparkNorm,
+        korap,
+        checked: item.IsSelected,
+      };
+    });
+  }
+
+  getNormByGranulation(granulation) {
     switch (granulation) {
       case 1:
-        normd = this.NormWeek;
-        break;
+        return this.NormWeek;
       case 2:
-        normd = this.NormMonth;
-        break;
+        return this.NormMonth;
       case 3:
-        normd = this.NormQuarter;
-        break;
+        return this.NormQuarter;
       case 4:
-        normd = this.NormYear;
-        break;
+        return this.NormYear;
       default:
-        normd = this.NormDate;
-        break;
+        return this.NormDate;
     }
-
-    var res = [];
-    data.OwidLiveStorageTimeItems.forEach(function (item) {
-      var tokens = item.Key.split("µ");
-
-      var d = Object.keys(item.Date).length;
-      var s = 0;
-      Object.keys(item.Date).forEach((key) => {
-        s += item.Date[key].value;
-      });
-
-      var sparkNorm = [];
-      for (var i in normd) {
-        var v = i in item.Date ? item.Date[i].value : 0;
-        sparkNorm.push(Math.round((v / normd[i]) * 1000000.0, 0));
-      }
-
-      var wS = tokens[0].split(" ");
-
-      var korap = "";
-      for (let i = 0; i < wS.length; i++) {
-        korap += `[orth=${wS[i]}/i] `;
-      }
-
-      res.push({
-        key: item.Key,
-
-        w: tokens[0],
-        l: tokens.length > 1 ? tokens[1] : null,
-        p: tokens.length > 2 ? tokens[2] : null,
-
-        d: d,
-        dRel: ((d / dates.length) * 100.0).toFixed(5),
-        s: s,
-        sRel: ((s / total) * 1000000.0).toFixed(5),
-        sparkNorm: sparkNorm,
-
-        korap: korap.trim(),
-
-        checked: item.IsSelected,
-      });
-    });
-
-    return res;
   }
 
   #funcDate = function (x) {
@@ -383,14 +350,12 @@ export class OwidLiveStorage {
    * @param  {function} func the functions needs to describe how-to find the dateTime-Key
    */
   calculateGranulation(func) {
-    var dates = this.#Norm[this.#N - 1];
-    var res = {};
-    Object.keys(dates).forEach((d) => {
-      var key = func(new Date(d));
-      if (key in res) res[key] += dates[d];
-      else res[key] = dates[d];
-    });
-    return res;
+    const dates = this.#Norm[this.#N - 1];
+    return Object.entries(dates).reduce((res, [date, value]) => {
+      const key = func(new Date(date));
+      res[key] = (res[key] || 0) + value;
+      return res;
+    }, {});
   }
 
   /**
@@ -398,10 +363,6 @@ export class OwidLiveStorage {
    * @param  {function} func the functions needs to describe how-to find the dateTime-Key
    */
   calculateDateGranulation(func) {
-    var res = [];
-    Object.keys(this.#Dates).forEach((d) => {
-      res.push(func(new Date(this.#Dates[d])));
-    });
-    return res;
+    return this.#Dates.map((date) => func(new Date(date)));
   }
 }
