@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Tfres;
 using HttpContext = Tfres.HttpContext;
 using System.Data;
+using System.IO.Compression;
 using CorpusExplorer.Sdk.Model.Adapter.Corpus;
 using System.Linq;
 using CorpusExplorer.Sdk.Helper;
@@ -284,9 +285,9 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       var post = arg.PostDataAsString;
       var request = JsonConvert.DeserializeObject<SearchRequest>(post);
 
-      if(request.Items != null)
+      if (request.Items != null)
         foreach (var t in request.Items)
-          if(!string.IsNullOrEmpty(t.Token))
+          if (!string.IsNullOrEmpty(t.Token))
             t.Token = t.Layer < 2 ? t.Token.ToLower() : t.Token.ToUpper();
 
       lock (_hashLock)
@@ -490,10 +491,20 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         var fn = Path.Combine(_cec6path, $"{req.Year:D4}.cec6");
         var date = $"{req.Year:D4}-{req.Month:D2}-{req.Day:D2}";
 
-        var oldData = Update_OpenCorpus(fn, date);
+        var oldDataTask = new Task<AbstractCorpusAdapter>(() => Update_OpenCorpus(fn, date));
 
-        var newTexts = req.Data.Split(new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
-          .Select(x => new Dictionary<string, object> { { "Text", x }, { "D", date } }).ToArray();
+        byte[] raw;
+        using (var ms = new MemoryStream(System.Convert.FromBase64String(req.Data)))
+        {
+          using (var gz = new GZipStream(ms, CompressionMode.Decompress))
+          using (var outMs = new MemoryStream())
+          {
+            gz.CopyTo(outMs);
+            raw = outMs.ToArray();
+          }
+        }
+
+        var newTexts = new[] { new Dictionary<string, object> { { "Text", Encoding.UTF8.GetString(raw) }, { "D", date } } };
         req.Data = "";
 
         var clean01 = new StandardCleanup();
@@ -507,6 +518,9 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         var tagger = new SimpleTreeTagger { Input = clean02.Output, LanguageSelected = "Deutsch" };
         tagger.Execute();
         var newData = tagger.Output.First();
+
+        oldDataTask.Wait();
+        var oldData = oldDataTask.Result;
 
         var merger = new CorpusMerger();
         if (oldData != null)
