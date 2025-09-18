@@ -6,24 +6,24 @@ export class OwidLiveStorageTimeItem {
   #Dates;
   #IsSelected;
 
-  toJSON(){
+  toJSON() {
     return {
       Key: this.#Key,
       Token: this.#Token,
       Name: this.#Name,
       Dates: this.#Dates,
-      IsSelected: this.#IsSelected
-    }
+      IsSelected: this.#IsSelected,
+    };
   }
 
-  static load(obj){
+  static load(obj) {
     var res = new OwidLiveStorageTimeItem("?µ?µ?", null);
     res.#Key = obj.Key;
     res.#Token = obj.Token;
     res.#Name = obj.Name;
     res.#Label = obj.Key.split("µ").join(" | ");
     res.#Dates = obj.Dates;
-    res.#IsSelected = obj.IsSelected; 
+    res.#IsSelected = obj.IsSelected;
     return res;
   }
 
@@ -73,7 +73,7 @@ export class OwidLiveStorageTimeItem {
    */
   get Date() {
     return this.#IsSelected
-      ? this.calculateGranulation(function(x) {
+      ? this.calculateGranulation(function (x) {
           return (
             x.getFullYear() +
             "-" +
@@ -104,7 +104,7 @@ export class OwidLiveStorageTimeItem {
    */
   get Week() {
     return this.#IsSelected
-      ? this.calculateGranulation(function(x) {
+      ? this.calculateGranulation(function (x) {
           return x.getYearWeek();
         })
       : null;
@@ -115,7 +115,7 @@ export class OwidLiveStorageTimeItem {
    */
   get Month() {
     return this.#IsSelected
-      ? this.calculateGranulation(function(x) {
+      ? this.calculateGranulation(function (x) {
           return x.getFullYear() + "-" + x.getMonth().pad(2);
         })
       : null;
@@ -126,7 +126,7 @@ export class OwidLiveStorageTimeItem {
    */
   get Quarter() {
     return this.#IsSelected
-      ? this.calculateGranulation(function(x) {
+      ? this.calculateGranulation(function (x) {
           return x.getYearQuarter();
         })
       : null;
@@ -137,7 +137,7 @@ export class OwidLiveStorageTimeItem {
    */
   get Year() {
     return this.#IsSelected
-      ? this.calculateGranulation(function(x) {
+      ? this.calculateGranulation(function (x) {
           return x.getFullYear();
         })
       : null;
@@ -148,20 +148,16 @@ export class OwidLiveStorageTimeItem {
    * @param  {function} func the function describes how-to group the dates
    */
   calculateGranulation(func) {
-    var res = {};
-    Object.keys(this.#Dates).forEach((k) => {
-      var d = new Date(k);
-      var key = func(d);
-      if (key in res) {
-        res[key].value += this.#Dates[k];
-        res[key].dates.add(k);
-      } else {
-        var nset = new Set();
-        nset.add(k);
-
-        res[key] = { dates: nset, value: this.#Dates[k] };
+    const res = {};
+    for (const [key, value] of Object.entries(this.#Dates)) {
+      const date = new Date(key);
+      const granulatedKey = func(date);
+      if (!res[granulatedKey]) {
+        res[granulatedKey] = { dates: new Set(), value: 0 };
       }
-    });
+      res[granulatedKey].value += value;
+      res[granulatedKey].dates.add(key);
+    }
     return res;
   }
 }

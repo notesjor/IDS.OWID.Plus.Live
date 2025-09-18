@@ -109,7 +109,7 @@ export class OwidLiveStorage {
    * Delete all searches
    */
   clearAll() {
-    this.#OwidLiveSearches = {};
+    this.#OwidLiveSearches.clear();
   }
 
   /**
@@ -221,49 +221,48 @@ export class OwidLiveStorage {
         break;
     }
 
-    var res = [];
-    data.OwidLiveStorageTimeItems.forEach(function (item) {
-      var tokens = item.Key.split("µ");
+    return data.OwidLiveStorageTimeItems.map((item) => {
+      const tokens = item.Key.split("µ");
+      const w = tokens[0];
+      const l = tokens[1] || null;
+      const p = tokens[2] || null;
 
-      var d = Object.keys(item.Date).length;
-      var s = 0;
-      Object.keys(item.Date).forEach((key) => {
-        s += item.Date[key].value;
-      });
-
-      var sparkNorm = [];
-      for (var i in normd) {
-        var v = i in item.Date ? item.Date[i].value : 0;
-        sparkNorm.push(Math.round((v / normd[i]) * 1000000.0, 0));
+      // Precompute keys and values for item.Date
+      const dateKeys = Object.keys(item.Date);
+      const d = dateKeys.length;
+      let s = 0;
+      for (let i = 0; i < dateKeys.length; i++) {
+        s += item.Date[dateKeys[i]].value;
       }
 
-      var wS = tokens[0].split(" ");
-
-      var korap = "";
-      for (let i = 0; i < wS.length; i++) {
-        korap += `[orth=${wS[i]}/i] `;
+      // Precompute sparkNorm array
+      const sparkNorm = [];
+      for (const i in normd) {
+        const v = item.Date[i]?.value || 0;
+        // Only push if normd[i] is not zero to avoid division by zero
+        sparkNorm.push(normd[i] ? Math.round((v / normd[i]) * 1000000.0) : 0);
       }
 
-      res.push({
+      // Build korap string efficiently
+      const korap = w
+        .split(" ")
+        .map((ws) => `[orth=${ws}/i]`)
+        .join(" ");
+
+      return {
         key: item.Key,
-
-        w: tokens[0],
-        l: tokens.length > 1 ? tokens[1] : null,
-        p: tokens.length > 2 ? tokens[2] : null,
-
-        d: d,
+        w,
+        l,
+        p,
+        d,
         dRel: ((d / dates.length) * 100.0).toFixed(5),
-        s: s,
+        s,
         sRel: ((s / total) * 1000000.0).toFixed(5),
-        sparkNorm: sparkNorm,
-
-        korap: korap.trim(),
-
+        sparkNorm,
+        korap,
         checked: item.IsSelected,
-      });
+      };
     });
-
-    return res;
   }
 
   #funcDate = function (x) {
@@ -367,12 +366,12 @@ export class OwidLiveStorage {
    * @param  {function} func the functions needs to describe how-to find the dateTime-Key
    */
   calculateGranulation(func) {
-    const dates = this.#Norm[this.#N - 1];
-    return Object.entries(dates).reduce((res, [date, value]) => {
+    const res = new Map();
+    for (const [date, value] of Object.entries(this.#Norm[this.#N - 1])) {
       const key = func(new Date(date));
-      res[key] = (res[key] || 0) + value;
-      return res;
-    }, {});
+      res.set(key, (res.get(key) || 0) + value);
+    }
+    return Object.fromEntries(res);
   }
 
   /**

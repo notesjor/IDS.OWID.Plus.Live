@@ -15,7 +15,7 @@ export class OwidLiveSearch {
       Request: this.#Request,
       OwidLiveStorageTimeItems: this.#OwidLiveStorageTimeItems,
       IsSelected: this.#IsSelected,
-      TimeStamp: this.#TimeStamp,      
+      TimeStamp: this.#TimeStamp,
     };
   }
 
@@ -97,7 +97,7 @@ export class OwidLiveSearch {
   /**
    * Get the TimeStamp
    */
-  get TimeStamp(){
+  get TimeStamp() {
     return this.#TimeStamp;
   }
 
@@ -139,7 +139,7 @@ export class OwidLiveSearch {
    */
   get Date() {
     return this.#IsSelected
-      ? this.Sum(function(x) {
+      ? this.Sum(function (x) {
           return x.Date;
         })
       : null;
@@ -150,7 +150,7 @@ export class OwidLiveSearch {
    */
   get Week() {
     return this.#IsSelected
-      ? this.Sum(function(x) {
+      ? this.Sum(function (x) {
           return x.Week;
         })
       : null;
@@ -161,7 +161,7 @@ export class OwidLiveSearch {
    */
   get Month() {
     return this.#IsSelected
-      ? this.Sum(function(x) {
+      ? this.Sum(function (x) {
           return x.Month;
         })
       : null;
@@ -172,7 +172,7 @@ export class OwidLiveSearch {
    */
   get Quarter() {
     return this.#IsSelected
-      ? this.Sum(function(x) {
+      ? this.Sum(function (x) {
           return x.Quarter;
         })
       : null;
@@ -183,7 +183,7 @@ export class OwidLiveSearch {
    */
   get Year() {
     return this.#IsSelected
-      ? this.Sum(function(x) {
+      ? this.Sum(function (x) {
           return x.Year;
         })
       : null;
@@ -194,22 +194,21 @@ export class OwidLiveSearch {
    * @param  {function} func the functions describes how-to sum up the selected sub items (see OwidLiveStorageItems)
    */
   Sum(func) {
-    const res = new Map();
-    this.#OwidLiveStorageTimeItems.forEach((x) => {
-      const items = func(x);
-      if (items != null) {
-        Object.keys(items).forEach((key) => {
-          if (res.has(key)) {
-            const existing = res.get(key);
-            existing.value += items[key].value;
-            existing.dates = new Set([...existing.dates, ...items[key].dates]);
-          } else {
-            res.set(key, items[key]);
-          }
-        });
+    const res = {};
+    this.#OwidLiveStorageTimeItems.forEach((item) => {
+      const data = func(item);
+      if (data) {
+        for (const [key, value] of Object.entries(data)) {
+            if (res[key]) {
+              res[key].value += value.value;
+              res[key].dates = new Set([...res[key].dates, ...value.dates]);
+            } else {
+              res[key] = { ...value };
+            }
+        }
       }
     });
-    return Object.fromEntries(res);
+    return res;
   }
 
   /**
@@ -217,7 +216,7 @@ export class OwidLiveSearch {
    * @param  {arry} selection all listed items will be selected - other: unselected
    */
   SelectOwidLiveStorageTimeItems(selection) {
-    var set = new Set(selection);
+    const set = new Set(selection);
     this.#OwidLiveStorageTimeItems.forEach((i) => {
       i.IsSelected = set.has(i.Key);
     });

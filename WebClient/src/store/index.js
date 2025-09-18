@@ -236,23 +236,26 @@ export default new Vuex.Store({
 
         var warnings = new Set();
         Object.keys(res).forEach((key) => {
-          var item = res[key].data;
-          var keys = state.owid.Dates;
-          var nval = {};
-          for (var i = carret; i < keys.length - carret; i++) {
-            var dates = new Set();
-            var sum = 0.0;
-            for (var j = 0 - carret; j <= carret; j++) {
-              try {
-                item[keys[i + j]].dates.forEach((d) => dates.add(d));
+          const item = res[key].data;
+          const keys = state.owid.Dates;
+          const nval = {};
+          const keysLength = keys.length; 
 
-                if (!(keys[i + j] in item)) continue;
+          for (let i = carret; i < keysLength - carret; i++) {
+            const dates = new Set();
+            let sum = 0.0;
 
-                if (!odd && (j === 0 - carret || j === carret)) sum += item[keys[i + j]].value * (1.0 / halfVOS);
-                else sum += item[keys[i + j]].value * (1.0 / state.vizOptionSmoothing);
-              } catch (e) {
-                warnings.add(keys[i+j]);
-              }
+            for (let j = -carret; j <= carret; j++) {
+              const currentKey = keys[i + j];
+              if (!item[currentKey]) continue;
+
+              item[currentKey].dates.forEach((d) => dates.add(d));
+
+                if (odd || (j !== -carret && j !== carret)) {
+                sum += item[currentKey].value * (1.0 / state.vizOptionSmoothing);
+                } else {
+                sum += item[currentKey].value * (1.0 / halfVOS);
+                }
             }
 
             nval[keys[i]] = {
