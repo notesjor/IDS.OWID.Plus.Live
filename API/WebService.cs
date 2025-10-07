@@ -33,6 +33,7 @@ using System.Threading.Tasks;
 using CorpusExplorer.Sdk.Blocks.NgramMultiLayerSelectiveQuery;
 using CorpusExplorer.Sdk.Utils.CorpusManipulation.CorpusMergerTransformation;
 using CorpusExplorer.Sdk.Utils.CorpusManipulation.CorpusMergerTransformation.Abstract;
+using CorpusExplorer.Sdk.Model;
 
 namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 {
@@ -44,17 +45,14 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     private object _hashLock = new object();
 
     private object _syncLock = new object();
-    private bool _syncPending = false;
     private CorpusAdapterWriteIndirect[] _corpora = Array.Empty<CorpusAdapterWriteIndirect>();
-    private Dictionary<int, int> _year2corpusIndex = new Dictionary<int, int>();
-    private Dictionary<int, Dictionary<string, Guid>> _selections = new Dictionary<int, Dictionary<string, Guid>>();
+    private Dictionary<int, HashSet<int>> _yearDateCorpus = new Dictionary<int, HashSet<int>>();
 
     private string _cec6path = "";
 
     private List<Dictionary<string, uint>> _normData = new List<Dictionary<string, uint>>();
     private string _normDataStr = "";
     private int _defaultYear = 0;
-    private int[] _years;
 
     private long _maxPostSize;
     private int _maxItems;
@@ -108,6 +106,19 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       }
     }
 
+    private Selection LoadYear(int year)
+    {
+      if (!_yearDateCorpus.ContainsKey(year))
+        return null;
+
+      var corpora = _yearDateCorpus[year];
+      if (corpora.Count == 1)
+        return _corpora[corpora.First()].ToSelection();
+
+      var selections = corpora.Select(x => _corpora[x].ToSelection()).ToArray();
+      return selections.JoinFull(null);
+    }
+
     private void Lookup(HttpContext arg)
     {
       try
@@ -117,7 +128,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
         var keys = request.Query.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
 
-        var select = _corpora[_year2corpusIndex[year]].ToSelection();
+        var select = LoadYear(year);
         var block = select.CreateBlock<CorrespondingLayerValueSelectedBlock>();
         block.Layer1Displayname = "Wort";
         block.Layer2Displayname = request.LayerDisplayname;
@@ -140,7 +151,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     {
       try
       {
-        arg.Response.Send(_years);
+        arg.Response.Send(_yearDateCorpus.Keys);
       }
       catch
       {
@@ -185,8 +196,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       var limitter = new Dictionary<string, double>();
       var res = new Dictionary<string, Dictionary<string, double>>();
 
-      var selections = _selections[year];
-      var corpus = _corpora[_year2corpusIndex[year]];
+      var yearSelection = LoadYear(year);
 
       #region Validation 
       if (request.N < 1)
@@ -200,11 +210,17 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         return;
       }
       #endregion
-      var compiledQueries = QueryCompiler.Compile(corpus.ToSelection(), GetLayerAndQueries(request));
+      var compiledQueries = QueryCompiler.Compile(yearSelection, GetLayerAndQueries(request));
 
-      Parallel.ForEach(selections, selection =>
+      var cluster = yearSelection.CreateBlock<SelectionClusterBlock>();
+      cluster.ClusterGenerator = new SelectionClusterGeneratorStringValue();
+      cluster.NoParent = false;
+      cluster.MetadataKey = "D";
+      cluster.Calculate();
+
+      Parallel.ForEach(cluster.GetTemporarySelectionClusters(), selection =>
       {
-        var block = corpus.ToSelection(new[] { selection.Value }).CreateBlock<NgramMultiLayerSelectiveBlock>();
+        var block = selection.CreateBlock<NgramMultiLayerSelectiveBlock>();
         block.LayerDisplayname = "Wort";
         block.LayerQueriesPreCompiled = compiledQueries;
         block.Calculate();
@@ -218,18 +234,18 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
               limitter.Add(x.Key, x.Value);
             if (!res.ContainsKey(x.Key))
               res.Add(x.Key, new Dictionary<string, double>());
-            res[x.Key].Add(selection.Key, x.Value);
+            res[x.Key].Add(selection.Displayname, x.Value);
           }
       });
 
       var limit = limitter.Count <= _maxItems ? limitter.Keys.ToArray() : limitter.OrderByDescending(x => x.Value).Take(_maxItems).Select(x => x.Key).ToArray();
-      File.WriteAllLines(Path.Combine(dir, "limit.txt"), limit, Encoding.UTF8);
+      WriteAllLines(Path.Combine(dir, "limit.txt"), limit);
       limitter.Clear();
       res = limit.ToDictionary(x => x, x => res[x]);
       var str = JsonConvert.SerializeObject(res);
       res.Clear();
       arg.Response.Send(str);
-      File.WriteAllText(Path.Combine(dir, $"{year}.json"), str, Encoding.UTF8);
+      WriteAllText(Path.Combine(dir, $"{year}.json"), str);
     }
 
     private static Dictionary<string, string[]> GetLayerAndQueries(SearchRequest request)
@@ -242,6 +258,26 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       return layerAndQueries;
     }
 
+    private void WriteAllText(string path, string text)
+    {
+      using (var fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.Read))
+      using (var sw = new StreamWriter(fs, Encoding.UTF8))
+        sw.Write(text);
+    }
+
+    private void WriteAllLines(string path, string[] lines)
+      => WriteAllText(path, string.Join("\r\n", lines));
+
+    private string ReadAllText(string path)
+    {
+      using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+      using (var sr = new StreamReader(fs, Encoding.UTF8))
+        return sr.ReadToEnd();
+    }
+
+    private string[] ReadAllLines(string path)
+      => ReadAllText(path).Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+
     private void SearchResponseGetAdditionalYear(HttpContext arg, SearchRequest request, string dir, int year)
     {
       if (!Directory.Exists(dir))
@@ -249,15 +285,19 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
       var @lock = new object();
       var res = new Dictionary<string, Dictionary<string, double>>();
-      var limit = File.ReadAllLines(Path.Combine(dir, "limit.txt"), Encoding.UTF8);
+      var limit = ReadAllLines(Path.Combine(dir, "limit.txt"));
 
-      var selections = _selections[year];
-      var corpus = _corpora[_year2corpusIndex[year]];
+      var yearSelection = LoadYear(year);
+      var cluster = yearSelection.CreateBlock<SelectionClusterBlock>();
+      cluster.ClusterGenerator = new SelectionClusterGeneratorStringValue();
+      cluster.NoParent = false;
+      cluster.MetadataKey = "D";
+      cluster.Calculate();
 
       // no validation nessesary, because it is already done in the initial search
-      Parallel.ForEach(selections, selection =>
+      Parallel.ForEach(cluster.GetTemporarySelectionClusters(), selection =>
       {
-        var block = corpus.ToSelection(new[] { selection.Value }).CreateBlock<Ngram1LayerSelectiveQuickLookupBlock>();
+        var block = selection.CreateBlock<Ngram1LayerSelectiveQuickLookupBlock>();
         block.LayerDisplayname = "Wort";
         block.LayerQueries = limit;
         block.Calculate();
@@ -267,18 +307,18 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
           {
             if (!res.ContainsKey(x))
               res.Add(x, new Dictionary<string, double>());
-            res[x].Add(selection.Key, block.NGramFrequency.ContainsKey(x) ? block.NGramFrequency[x] : 0.0);
+            res[x].Add(selection.Displayname, block.NGramFrequency.ContainsKey(x) ? block.NGramFrequency[x] : 0.0);
           }
       });
 
       var str = JsonConvert.SerializeObject(res);
       res.Clear();
       arg.Response.Send(str);
-      File.WriteAllText(Path.Combine(dir, $"{year}.json"), str, Encoding.UTF8);
+      WriteAllText(Path.Combine(dir, $"{year}.json"), str);
     }
 
     private void SearchResponseFullCached(HttpContext arg, string file)
-      => arg.Response.Send(File.ReadAllText(file));
+      => arg.Response.Send(ReadAllText(file));
 
     private SearchRequest GetSearchRequest(HttpContext arg)
     {
@@ -299,7 +339,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     {
       try
       {
-        var settings = JsonConvert.DeserializeObject<ServiceConfiguration>(File.ReadAllText(Path.Combine(AppPath, "config.cnf")));
+        var settings = JsonConvert.DeserializeObject<ServiceConfiguration>(ReadAllText(Path.Combine(AppPath, "config.cnf")));
         _maxPostSize = settings.MaxPostSize;
         _maxItems = settings.MaxItems;
         _secureUpdateToken = settings.SecureUpdateToken;
@@ -311,17 +351,14 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
         lock (_syncLock)
         {
-          _syncPending = false;
           try
           {
             foreach (var c in _corpora)
               c.Dispose();
 
             var corpora = new List<CorpusAdapterWriteIndirect>();
-            GetCorpusFiles(out var corporaFilesByYear, out var corporaFilesExtra);
 
-            // Korpora die nicht jahrbasiert sind (z. B.: STATIC.cec6)
-            foreach (var fn in corporaFilesExtra)
+            foreach (var fn in Directory.GetFiles(_cec6path, "*.cec6"))
             {
               var corpus = CorpusAdapterWriteIndirect.Create(fn);
               var idx = corpora.Count;
@@ -340,44 +377,10 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
               var years = days.Keys.Select(x => int.Parse(x.Substring(0, 4))).Distinct().ToArray();
               foreach (var year in years)
               {
-                var sdays = days.Where(x => x.Key.StartsWith($"{year}-")).ToDictionary(x => x.Key, x => x.Value);
-                _selections.Add(year, sdays);
-                _year2corpusIndex.Add(year, idx);
+                if (!_yearDateCorpus.ContainsKey(year))
+                  _yearDateCorpus.Add(year, new HashSet<int>());
+                _yearDateCorpus[year].Add(idx);
               }
-
-              foreach (var d in days)
-              {
-                var sel = corpus.ToSelection(new[] { d.Value });
-                var sizes = sel.CountNGramNormalization(range);
-                foreach (var s in sizes)
-                  if (_normData[s.Key - 1].ContainsKey(d.Key))
-                    _normData[s.Key - 1][d.Key] += (uint)s.Value;
-                  else
-                    _normData[s.Key - 1].Add(d.Key, (uint)s.Value);
-              }
-            }
-            // Korpora die jahrbasiert (Dateiname: 2025.cec6) sind
-            foreach (var fn in corporaFilesByYear)
-            {
-              var year = int.Parse(Path.GetFileNameWithoutExtension(fn));
-              if (year > _defaultYear)
-                _defaultYear = year;
-              var corpus = CorpusAdapterWriteIndirect.Create(fn);
-
-              _year2corpusIndex.Add(year, corpora.Count);
-              corpora.Add(corpus);
-
-              var cluster = corpus.ToSelection().CreateBlock<SelectionClusterBlock>();
-              cluster.ClusterGenerator = new SelectionClusterGeneratorStringValue();
-              cluster.NoParent = true;
-              cluster.MetadataKey = "D";
-              cluster.Calculate();
-
-              var days = cluster.SelectionClusters.ToDictionary(
-                x => x.Key,
-                x => x.Value.First());
-
-              _selections.Add(year, days);
 
               foreach (var d in days)
               {
@@ -392,7 +395,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
             }
 
             _corpora = corpora.ToArray();
-            _years = _year2corpusIndex.Keys.OrderBy(x => x).ToArray();
             _normDataStr = JsonConvert.SerializeObject(_normData);
           }
           catch
@@ -401,37 +403,12 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
           }
 
           ClearCache();
-
-          _syncPending = false;
         }
       }
       catch (Exception ex)
       {
         // ignore
       }
-    }
-
-    private void GetCorpusFiles(out string[] corporaFilesByYear, out string[] corporaFilesExtra)
-    {
-      var files = Directory.GetFiles(_cec6path, "*.cec6");
-      var rByYear = new List<string>();
-      var rExtra = new List<string>();
-
-      foreach (var fn in files)
-      {
-        var valid = int.TryParse(Path.GetFileNameWithoutExtension(fn), out var year);
-        if (valid)
-        {
-          if (year > _defaultYear)
-            _defaultYear = year;
-          rByYear.Add(fn);
-        }
-        else
-          rExtra.Add(fn);
-      }
-
-      corporaFilesByYear = rByYear.ToArray();
-      corporaFilesExtra = rExtra.ToArray();
     }
 
     private void Heartbeat(HttpContext arg)
@@ -483,15 +460,16 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
             return;
           }
         }
+
+        Console.WriteLine($"Update requested for {req.Year}-{req.Month}-{req.Day} ({req.Data.Length} bytes)");
+
         _lastUpdateToken = Guid.NewGuid().ToString("N");
 
         if (!Directory.Exists(_cec6path))
           Directory.CreateDirectory(_cec6path);
 
-        var fn = Path.Combine(_cec6path, $"{req.Year:D4}.cec6");
         var date = $"{req.Year:D4}-{req.Month:D2}-{req.Day:D2}";
-
-        var oldDataTask = new Task<AbstractCorpusAdapter>(() => Update_OpenCorpus(fn, date));
+        var fn = Path.Combine(_cec6path, $"{date}.cec6");
 
         byte[] raw;
         using (var ms = new MemoryStream(System.Convert.FromBase64String(req.Data)))
@@ -507,6 +485,8 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         var newTexts = new[] { new Dictionary<string, object> { { "Text", Encoding.UTF8.GetString(raw) }, { "D", date } } };
         req.Data = "";
 
+        Console.WriteLine($"Update: {date} ({raw.Length} bytes) -> {fn}");
+
         var clean01 = new StandardCleanup();
         clean01.Input.Enqueue(newTexts);
         clean01.Execute();
@@ -519,16 +499,9 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         tagger.Execute();
         var newData = tagger.Output.First();
 
-        oldDataTask.Wait();
-        var oldData = oldDataTask.Result;
+        Console.WriteLine($"Update: Tagging done ({newData.CountDocuments} documents / {newData.CountToken} tokens)");
 
         var merger = new CorpusMerger();
-        if (oldData != null)
-          merger.Input(oldData, new AbstractCorpusMergerTransformation[]
-          {
-            new CorpusMergerTransformationLowercase{ LayerDisplayname = "Wort"},
-            new CorpusMergerTransformationLowercase{ LayerDisplayname = "Lemma"}
-          });
         if (newData != null)
           merger.Input(newData, new AbstractCorpusMergerTransformation[]
           {
@@ -538,10 +511,11 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         merger.Execute();
 
         var merged = merger.Output.First();
-
-        SaveCorpus(merged, fn);
+        merged.Save(fn, false);
 
         ReloadData();
+
+        Console.WriteLine("Update: Reload done");
 
         arg.Response.Send(HttpStatusCode.OK);
       }
@@ -552,47 +526,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
         arg.Response.Send(HttpStatusCode.InternalServerError);
       }
-    }
-
-    private void SaveCorpus(AbstractCorpusAdapter merged, string fn)
-    {
-      lock (_syncLock)
-      {
-        _syncPending = true;
-        try
-        {
-          var key = int.Parse(Path.GetFileNameWithoutExtension(fn));
-          if (_year2corpusIndex.TryGetValue(key, out var idx))
-            _corpora[idx].Dispose();
-
-          merged.Save(fn, false);
-        }
-        catch
-        {
-          // ignore
-        }
-        _syncPending = false;
-      }
-    }
-
-    private AbstractCorpusAdapter Update_OpenCorpus(string fn, string excludeDate)
-    {
-      if (!File.Exists(fn))
-        return null; // komplett neues Jahr
-      var corpus = CorpusAdapterWriteDirect.Create(fn);
-
-      var select = corpus.ToSelection();
-      var tmp = select.CreateTemporary(new AbstractFilterQuery[] { new FilterQueryMetaExactMatch { MetaLabel = "D", MetaValues = new[] { excludeDate } } });
-      // Überprüfe, ob der Tag bereits existiert
-      if (tmp.CountDocuments == 0)
-        return corpus;
-
-      // Falls ja, aktualisiere den Tag
-      var guids = new HashSet<Guid>(select.DocumentGuids);
-      foreach (var x in tmp.DocumentGuids)
-        guids.Remove(x);
-
-      return select.CreateTemporary(guids).ToCorpus();
     }
 
     private void Convert(HttpContext arg)
@@ -650,7 +583,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         foreach (var year in years)
         {
           var file = Path.Combine(dir, $"{year}.json");
-          var tmp = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, double>>>(File.ReadAllText(file));
+          var tmp = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, double>>>(ReadAllText(file));
           foreach (var x in tmp)
           {
             if (!data.ContainsKey(x.Key))
@@ -971,18 +904,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
     protected override void LoadData()
     {
-    }
-
-    private static void WriteLog(Exception ex)
-    {
-      try
-      {
-        File.AppendAllText("error.log", $"-----\r\n{ex.Message}\r\n{ex.StackTrace}\r\n");
-      }
-      catch
-      {
-        // ignore
-      }
     }
   }
 }
