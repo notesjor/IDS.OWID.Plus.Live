@@ -327,8 +327,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         _nMax = settings.N;
 
         var range = Enumerable.Range(1, _nMax).Select(x => x).ToArray();
-        for (var n = 0; n < _nMax; n++)
-          _normData.Add(new Dictionary<string, uint>());
 
         lock (_syncLock)
         {
@@ -338,6 +336,10 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
             _selectYearDates.Clear();
             _project.Dispose();
             _project = CorpusExplorerEcosystem.InitializeMinimal();
+
+            _normData.Clear();
+            for (var n = 0; n < _nMax; n++)
+              _normData.Add(new Dictionary<string, uint>());
 
             foreach (var fn in Directory.GetFiles(_cec6path, "*.cec6"))
             {
