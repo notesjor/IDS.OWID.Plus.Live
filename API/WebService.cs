@@ -34,6 +34,7 @@ using CorpusExplorer.Sdk.Blocks.NgramMultiLayerSelectiveQuery;
 using CorpusExplorer.Sdk.Utils.CorpusManipulation.CorpusMergerTransformation;
 using CorpusExplorer.Sdk.Utils.CorpusManipulation.CorpusMergerTransformation.Abstract;
 using CorpusExplorer.Sdk.Model;
+using CorpusExplorer.Sdk.Ecosystem;
 
 namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 {
@@ -45,8 +46,9 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     private object _hashLock = new object();
 
     private object _syncLock = new object();
-    private CorpusAdapterWriteIndirect[] _corpora = Array.Empty<CorpusAdapterWriteIndirect>();
-    private Dictionary<int, HashSet<int>> _yearDateCorpus = new Dictionary<int, HashSet<int>>();
+
+    private Dictionary<int, Selection> _selectYear = new Dictionary<int, Selection>();
+    private Dictionary<int, List<Selection>> _selectYearDates = new Dictionary<int, List<Selection>>();
 
     private string _cec6path = "";
 
@@ -69,8 +71,13 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       {"XML", new XmlTableWriter() }
     };
 
+    private Project _project;
+    private List<int> _years = new List<int> { };
+
     protected override void ConfigureEndpoints(Server server)
     {
+      _project = CorpusExplorerEcosystem.InitializeMinimal();
+
       _cec6path = Path.Combine(AppPath, "cec6");
       _cachePath = Path.Combine(AppPath, "cache");
 
@@ -106,18 +113,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       }
     }
 
-    private Selection LoadYear(int year)
-    {
-      if (!_yearDateCorpus.ContainsKey(year))
-        return null;
 
-      var corpora = _yearDateCorpus[year];
-      if (corpora.Count == 1)
-        return _corpora[corpora.First()].ToSelection();
-
-      var selections = corpora.Select(x => _corpora[x].ToSelection()).ToArray();
-      return selections.JoinFull(null);
-    }
 
     private void Lookup(HttpContext arg)
     {
@@ -128,7 +124,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
         var keys = request.Query.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
 
-        var select = LoadYear(year);
+        var select = _selectYear[year];
         var block = select.CreateBlock<CorrespondingLayerValueSelectedBlock>();
         block.Layer1Displayname = "Wort";
         block.Layer2Displayname = request.LayerDisplayname;
@@ -151,7 +147,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
     {
       try
       {
-        arg.Response.Send(_yearDateCorpus.Keys);
+        arg.Response.Send(_years);
       }
       catch
       {
@@ -196,8 +192,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       var limitter = new Dictionary<string, double>();
       var res = new Dictionary<string, Dictionary<string, double>>();
 
-      var yearSelection = LoadYear(year);
-
       #region Validation 
       if (request.N < 1)
       {
@@ -210,15 +204,9 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         return;
       }
       #endregion
-      var compiledQueries = QueryCompiler.Compile(yearSelection, GetLayerAndQueries(request));
+      var compiledQueries = QueryCompiler.Compile(_selectYear[year], GetLayerAndQueries(request));
 
-      var cluster = yearSelection.CreateBlock<SelectionClusterBlock>();
-      cluster.ClusterGenerator = new SelectionClusterGeneratorStringValue();
-      cluster.NoParent = false;
-      cluster.MetadataKey = "D";
-      cluster.Calculate();
-
-      Parallel.ForEach(cluster.GetTemporarySelectionClusters(), selection =>
+      Parallel.ForEach(_selectYearDates[year], selection =>
       {
         var block = selection.CreateBlock<NgramMultiLayerSelectiveBlock>();
         block.LayerDisplayname = "Wort";
@@ -287,15 +275,8 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       var res = new Dictionary<string, Dictionary<string, double>>();
       var limit = ReadAllLines(Path.Combine(dir, "limit.txt"));
 
-      var yearSelection = LoadYear(year);
-      var cluster = yearSelection.CreateBlock<SelectionClusterBlock>();
-      cluster.ClusterGenerator = new SelectionClusterGeneratorStringValue();
-      cluster.NoParent = false;
-      cluster.MetadataKey = "D";
-      cluster.Calculate();
-
       // no validation nessesary, because it is already done in the initial search
-      Parallel.ForEach(cluster.GetTemporarySelectionClusters(), selection =>
+      Parallel.ForEach(_selectYearDates[year], selection =>
       {
         var block = selection.CreateBlock<Ngram1LayerSelectiveQuickLookupBlock>();
         block.LayerDisplayname = "Wort";
@@ -353,49 +334,76 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         {
           try
           {
-            foreach (var c in _corpora)
-              c.Dispose();
-
-            var corpora = new List<CorpusAdapterWriteIndirect>();
+            _selectYear.Clear();
+            _selectYearDates.Clear();
+            _project.Dispose();
+            _project = CorpusExplorerEcosystem.InitializeMinimal();
 
             foreach (var fn in Directory.GetFiles(_cec6path, "*.cec6"))
             {
-              var corpus = CorpusAdapterWriteIndirect.Create(fn);
-              var idx = corpora.Count;
-              corpora.Add(corpus);
-
-              var cluster = corpus.ToSelection().CreateBlock<SelectionClusterBlock>();
-              cluster.ClusterGenerator = new SelectionClusterGeneratorStringValue();
-              cluster.NoParent = true;
-              cluster.MetadataKey = "D";
-              cluster.Calculate();
-
-              var days = cluster.SelectionClusters.ToDictionary(
-                x => x.Key,
-                x => x.Value.First());
-
-              var years = days.Keys.Select(x => int.Parse(x.Substring(0, 4))).Distinct().ToArray();
-              foreach (var year in years)
+              try
               {
-                if (!_yearDateCorpus.ContainsKey(year))
-                  _yearDateCorpus.Add(year, new HashSet<int>());
-                _yearDateCorpus[year].Add(idx);
+                var corpus = CorpusAdapterWriteIndirect.Create(fn);
+                _project.Add(corpus);
               }
-
-              foreach (var d in days)
+              catch (Exception ex)
               {
-                var sel = corpus.ToSelection(new[] { d.Value });
-                var sizes = sel.CountNGramNormalization(range);
-                foreach (var s in sizes)
-                  if (_normData[s.Key - 1].ContainsKey(d.Key))
-                    _normData[s.Key - 1][d.Key] += (uint)s.Value;
-                  else
-                    _normData[s.Key - 1].Add(d.Key, (uint)s.Value);
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
               }
             }
 
-            _corpora = corpora.ToArray();
+            #region Cluster Dates
+            var cluster = _project.SelectAll.CreateBlock<SelectionClusterBlock>();
+            cluster.ClusterGenerator = new SelectionClusterGeneratorStringValue();
+            cluster.NoParent = false;
+            cluster.MetadataKey = "D";
+            cluster.Calculate();
+
+            var days = cluster.GetTemporarySelectionClusters();
+
+            var years = days.Select(x => int.Parse(x.Displayname.Substring(0, 4))).Distinct().ToArray();
+            foreach (var year in years)
+            {
+              if (!_selectYearDates.ContainsKey(year))
+                _selectYearDates.Add(year, new List<Selection>());
+              _selectYearDates[year].AddRange(days.Where(x => x.Displayname.StartsWith($"{year}-")));
+            }
+
+            foreach (var sel in days)
+            {
+              var sizes = sel.CountNGramNormalization(range);
+              foreach (var s in sizes)
+                if (_normData[s.Key - 1].ContainsKey(sel.Displayname))
+                  _normData[s.Key - 1][sel.Displayname] += (uint)s.Value;
+                else
+                  _normData[s.Key - 1].Add(sel.Displayname, (uint)s.Value);
+            }
+
+            for (var i = 0; i < _normData.Count; i++)
+              _normData[i] = _normData[i].OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
+            _normData = _normData.Where(x=> x.Count>0).ToList();
+
             _normDataStr = JsonConvert.SerializeObject(_normData);
+            #endregion
+
+            #region Cluster Years
+            cluster = _project.SelectAll.CreateBlock<SelectionClusterBlock>();
+            cluster.ClusterGenerator = new SelectionClusterGeneratorDateTimeYear();
+            cluster.NoParent = false;
+            cluster.MetadataKey = "D";
+            cluster.Calculate();
+
+            _years = new List<int>();
+            foreach (var year in cluster.GetTemporarySelectionClusters())
+            {
+              var y = int.Parse(year.Displayname);
+              _years.Add(y);
+              if (!_selectYear.ContainsKey(y))
+                _selectYear.Add(y, year);
+            }
+            _years = _years.OrderBy(x => x).ToList();
+            #endregion
           }
           catch
           {
@@ -461,8 +469,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
           }
         }
 
-        Console.WriteLine($"Update requested for {req.Year}-{req.Month}-{req.Day} ({req.Data.Length} bytes)");
-
         _lastUpdateToken = Guid.NewGuid().ToString("N");
 
         if (!Directory.Exists(_cec6path))
@@ -485,8 +491,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         var newTexts = new[] { new Dictionary<string, object> { { "Text", Encoding.UTF8.GetString(raw) }, { "D", date } } };
         req.Data = "";
 
-        Console.WriteLine($"Update: {date} ({raw.Length} bytes) -> {fn}");
-
         var clean01 = new StandardCleanup();
         clean01.Input.Enqueue(newTexts);
         clean01.Execute();
@@ -498,8 +502,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         var tagger = new SimpleTreeTagger { Input = clean02.Output, LanguageSelected = "Deutsch" };
         tagger.Execute();
         var newData = tagger.Output.First();
-
-        Console.WriteLine($"Update: Tagging done ({newData.CountDocuments} documents / {newData.CountToken} tokens)");
 
         var merger = new CorpusMerger();
         if (newData != null)
@@ -514,8 +516,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         merged.Save(fn, false);
 
         ReloadData();
-
-        Console.WriteLine("Update: Reload done");
 
         arg.Response.Send(HttpStatusCode.OK);
       }
