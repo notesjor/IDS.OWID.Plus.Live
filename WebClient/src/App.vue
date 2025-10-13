@@ -128,6 +128,43 @@
     </v-menu>
 
     <v-overlay :value="!tutorial">
+      <div
+        style="background-color: rgb(55, 55, 64); display: block; min-height: 410px; max-height: 410px; min-width: 300px; max-width: 300px; position: absolute; left: -320px; top: 50px; ">
+        <h3 style="margin: 7px 0px 10px 15px;">Neuigkeiten</h3>
+        <v-window v-model="newsAll" vertical>
+          <v-window-item :key="0">
+            <v-virtual-scroll :items="news" height="368" item-height="64">
+              <template v-slot:default="{ item }">
+                <v-list-item :key="item" class="newsItem" @click="newsSelected = item.id">
+                  <div>
+                    <span style="width: 100%;">
+                      <v-icon>{{ item.icon }}</v-icon>&nbsp;
+                      <b>{{ item.date }}:</b> {{ item.title }}
+                    </span>
+                  </div>
+                </v-list-item>
+                <v-divider></v-divider>
+              </template>
+            </v-virtual-scroll>
+          </v-window-item>
+          <v-window-item :key="1">
+            <div style="height: 100%; width: 100%; padding: 0px 10px 0px 10px; min-height: 352px;">
+              <v-row align="center" class="mb-4" style="margin: 5px 0px 0px 0px; font-size: 1.2rem;">
+                <v-icon>{{ news[newsSelected]?.icon }}</v-icon>&nbsp;
+                <b>{{ news[newsSelected]?.date }}:</b> {{ news[newsSelected]?.title }}
+              </v-row>
+
+              <div v-html="news[newsSelected]?.text" style="text-align:left;" class="newsText"></div>              
+              <div style="margin: 10px 0px 0px 0px; position: absolute; bottom: 0px;">
+                <v-btn @click="newsSelected = -1">
+                  <v-icon>mdi-arrow-left-circle-outline</v-icon> Zeige alle Neuigkeiten
+                </v-btn>
+              </div>
+            </div>
+          </v-window-item>
+        </v-window>
+      </div>
+
       <div class="text-center">
         <v-card>
           <v-card-title class="headline">
@@ -168,7 +205,7 @@
   </v-app>
 </template>
 
-<style scoped>
+<style>
 .blink {
   width: 200px;
   height: 50px;
@@ -180,6 +217,15 @@
 .blink span {
   color: white;
   animation: blink 3s linear infinite;
+}
+
+.newsItem {
+  background-color: rgb(75, 75, 84);
+}
+
+.newsItem:hover {
+  background-color: rgb(95, 95, 104);
+  cursor: pointer;
 }
 
 @keyframes blink {
@@ -202,6 +248,22 @@
   100% {
     opacity: 0.3;
   }
+}
+
+div.newsText > a {
+  color: #ff9800;
+  text-decoration: none;
+}
+
+div.newsText a:visited {
+  color: #ff9800;
+  text-decoration: none;
+}
+
+div.newsText {
+  font-size: 1.1rem;
+  font-weight: 200;
+  line-height: 1.4;
 }
 </style>
 
@@ -257,6 +319,57 @@ export default {
     footerContact: null,
     footerImpressum: null,
     footerDsgvo: null,
+
+    news: [
+      // Hier neue News-Items einfügen - dann alle IDs anpassen!
+      {
+        id: 0,
+        title: "Version 3.0",
+        date: "2025-10-07",
+        text: "Die neue API basiert auf dem <a href=\"https://notes.jan-oliver-ruediger.de/software/corpusexplorer-overview/\">CorpusExplorer</a>. Sie ist effizienter (schnellere Antwortzeiten / reduzierte Server-Ressourcen) und bietet mit der Auswahl eines Fokus-Jahres eine neue Möglichkeit, die Daten reproduzierbar zu analysieren. Außerdem wurde die Ausfallsicherheit verbessert.",
+        icon: "mdi-xml"
+      },
+      {
+        id: 1,
+        title: "Daten-Crash",
+        date: "2025-09-05",
+        text: "Aufgrund einer Fehlfunktion und der parallelen Migration auf einen neuen Server sind die Daten im Zeitraum 03.07.-04.09.2025 leider verloren gegangen. Bitte berücksichtigen Sie dies bei der Interpretation Ihrer Analysen.",
+        icon: "mdi-alert-decagram-outline"
+      },
+      {
+        id: 2,
+        title: "Print-Publikation",
+        date: "2024-06-27",
+        text: "Der Artikel \"Tagesaktuelle Aufbereitung, Analyse und Exploration sprachlicher Daten aus RSS-Feeds\" steht OpenAccess unter folgender DOI zur Verfügung: <a href=\"https://doi.org/10.1007/978-3-658-39625-1_1\">[Link zum Artikel]</a>",
+        icon: "mdi-book-open-variant"
+      },
+      {
+        id: 3,
+        title: "Poster-Präsentation",
+        date: "2023-03-14",
+        text: "Poster-Präsentation im Rahmen der DHd 2023 (Trier). <a href=\"https://doi.org/10.5281/zenodo.7715470\">[Link zum Abstract]</a>",
+        icon: "mdi-human-male-board"
+      }, {
+        id: 4,
+        title: "Softwaredemo",
+        date: "2022-07-14",
+        text: "Softwaredemo „Day-to-day collection, exploration, analysis, and visualization of n-gram frequencies in German (online press) language: OWIDplusLIVE“ im Rahmen der EURALEX 2022 (Mannheim). <a href=\"https://videolectures.net/euralex2022_owid_plus_live/\">[Link zum Video (auf Englisch)]</a>",
+        icon: "mdi-video-vintage"
+      }, {
+        id: 5,
+        title: "Vortrag (GAL 2021)",
+        date: "2021-09-15",
+        text: "Die Vortragsfolien zum Vortrag \"OWIDplusLIVE\" im Rahmen der Jahrestagung der Gesellschaft für Angewandte Linguistik (GAL) sind online verfügbar: <a href=\"./2021-09-15_GAL.pdf\">[Link zum Download]</a>",
+        icon: "mdi-human-male-board"
+      },
+      {
+        id: 6,
+        title: "Version 2.0",
+        date: "2021-06-18",
+        text: "Die API-basierte Version 2.0 von OWIDplusLIVE ist online. Neu: Zeitreihen-Visualisierung, Download-Funktion, verbesserte Suchfunktion, u.v.m. - Hinweis: Im News-Eintrag vom 2024-06-27 finden Sie eine Beschreibung was sich im Vergleich zur Vorversion geändert hat.",
+        icon: "mdi-xml"
+      }],
+    newsSelected: -1,
   }),
 
   methods: {
@@ -308,7 +421,7 @@ export default {
     this.footerDsgvo = config.footerDsgvo;
 
     var baseUrl = "https://www.owid.de/plus/live-2021/api/v3";
-    
+
     // Der Aufruf INIT sowie NORM lädt notwendige Normdaten herunter.
     // INIT kann serverseitig zur Flood-Detection und Loging verwendet werden.
     fetch(baseUrl + "/years")
@@ -330,7 +443,7 @@ export default {
           .then((obj) => {
             if (obj === null)
               throw new Error("No Data");
-            
+
             store.commit("init", obj);
 
             store.commit("vizOption", { r: true, s: 16, g: 1 });
@@ -386,6 +499,11 @@ export default {
       }
 
       return res.join(" / ");
+    },
+    newsAll: {
+      get() {
+        return this.newsSelected === -1 ? 0 : 1;
+      },
     },
   },
 };
