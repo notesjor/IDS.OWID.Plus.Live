@@ -394,17 +394,28 @@ export default {
       this.$vuetify.lang.current = this.$i18n.locale = locale;
     },
     closeTutorial() {
+      localStorage.setItem("tutorial", new Date().toISOString());
       this.tutorial = true;
-      localStorage.setItem("tutorial", true);
     }
-  },
+    },
 
-  created() {
-    var locale = localStorage.getItem("locale", locale);
+    created() {
+    var locale = localStorage.getItem("locale");
     if (locale != null)
       this.setLocale(locale);
 
-    this.tutorial = localStorage.getItem("tutorial") ?? false;
+    const tutorialDate = localStorage.getItem("tutorial");
+    if (tutorialDate) {
+      const last = new Date(tutorialDate);
+      if (isNaN(last.getTime())) {
+        this.tutorial = false;
+      } else {
+        const diff = (new Date()) - last;
+        this.tutorial = diff < 86400000; // 24 hours = 86400000 ms
+      }
+    } else {
+      this.tutorial = false;
+    }
   },
 
   mounted() {
