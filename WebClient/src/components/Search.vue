@@ -629,7 +629,6 @@ import { mdiMagnifyPlus } from "@mdi/js";
 import TagsetInfo from "./TagsetInfo";
 
 var global_layers = null; // wird in mounted gesetzt
-var config;
 
 class queryItem {
   layer;
@@ -666,7 +665,6 @@ async function sendSearchRequest(data, store, n, queryItems) {
   data.progressMsg = globalT.$t("search_progress_msg01");
 
   var baseUrl = "https://www.owid.de/plus/live-2021/api/v3";
-  console.log(config.baseUrl);
 
   var years = data.focusYears.sort((a, b) => b - a);  
   var max = years[0];
@@ -832,8 +830,6 @@ export default {
     },
   },
   mounted: function () {
-    config = this.$config;
-
     this.search_simple_1_layer = this.$t("layer_wordform");
     this.search_simple_2_layer = this.$t("layer_wordform");
     this.search_simple_3_layer = this.$t("layer_wordform");

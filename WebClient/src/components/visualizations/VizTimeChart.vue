@@ -71,8 +71,13 @@ export default {
             name: data.name,
             type: "line",
             data: values,
-            symbolSize: 1,
-            line: { marker: { enable: false } },
+            showSymbol: false,
+            large: true,
+            largeThreshold: 2000,
+            sampling: "minmax",
+            progressive: 400,
+            progressiveThreshold: 2000,
+            lineStyle: { width: 2 }
           });
         }
 

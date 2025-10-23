@@ -251,9 +251,9 @@ export default {
     ];
   },
   mounted: function() {
-    this.$data.relativeFrequency = this.$store.state.vizOptions.relativeFrequency;
-    this.$data.smoothValue = this.$store.state.vizOptions.smoothValue;
-    this.$data.granulationValue = this.$store.state.vizOptions.granulationValue;
+    this.$data.relativeFrequency = this.$store.state.vizOptions?.relativeFrequency;
+    this.$data.smoothValue = this.$store.state.vizOptions?.smoothValue;
+    this.$data.granulationValue = this.$store.state.vizOptions?.granulationValue;
   },
   data: () => {
     return {
