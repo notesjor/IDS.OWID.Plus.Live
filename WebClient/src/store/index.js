@@ -23,6 +23,7 @@ export default new Vuex.Store({
     vizOptionSmoothing: 16,
 
     vizData: null,
+    vizDataFunc: null,
   },
   mutations: {
     years(state, years) {
@@ -53,6 +54,10 @@ export default new Vuex.Store({
       state.searches = Object.keys(state.owid.OwidLiveSearches).length;
     },
 
+    vizDataFunc(state, func) {
+      state.vizDataFunc = func;
+    },
+
     vizOption(state, payload) {
       state.vizOptionRelative = payload.r;
       state.vizOptionGranulation = payload.g;
@@ -76,7 +81,7 @@ export default new Vuex.Store({
         state.vizData = null;
         return;
       }
-
+console.log(">>> STORE: calculate vizData");
       state.vizData = {};
       var res = {};
 
@@ -277,8 +282,10 @@ export default new Vuex.Store({
           }
       }
 
-      state.vizData = res;
+      console.log(">>> STORE: calculate vizData (END)");
+      state.vizData = state.vizDataFunc(state, res);
       state.version++;
+      console.log(">>> STORE: vizData version ", state.version);
     },
   },
   actions: {},

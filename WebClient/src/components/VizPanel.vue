@@ -129,10 +129,95 @@ export default {
       dialog_help: false,
     };
   },
+  mounted() {
+    this.$store.commit("vizDataFunc", this.chartLine);
+  },
   methods: {
     tabChange: function () {
       this.$forceUpdate();
     },
+    chartLine: function (state, vizData) {
+      console.log(">>> VizTimeChart: calculate chartOptions");
+        var availableDates = state.owid.Dates;
+
+        var series = [];
+
+        for (const key in vizData) {
+          if (key === "ALLE") continue;
+          const data = vizData[key];
+
+          var values = [];
+          availableDates.forEach((c) => {
+            values.push((c in data.data) ? data.data[c].value : 0);
+          });
+          
+          series.push({
+            name: data.name,
+            type: "line",
+            data: values,
+            symbolSize: 1,
+            line: { marker: { enable: false } },
+          });
+        }
+
+        var unit = state.vizOptionRelative ? this.$t("lbl_unit_tokenPPM") : this.$t("lbl_unit_token");
+        console.log(">>> VizTimeChart UNIT");
+
+        var res = {
+          toolbox: {
+            show: true,
+            top: "3%",
+            right: "10%",
+            feature: {
+              saveAsImage: {
+                title: this.$t("lbl_save") + " \xa0 \xa0 \xa0 \xa0 \xa0",
+                name: this.$t("lbl_export_fileName"),
+              },
+            },
+          },
+          animation: false,
+          legend: {
+            show: true,
+          },
+          xAxis: {
+            type: "category",
+            data: availableDates,
+          },
+          yAxis: {
+            type: "value",
+            scale: true,
+          },
+          series: series,
+          dataZoom: [
+            { type: "slider", show: true },
+            { type: "inside", show: true },
+          ],
+          tooltip: {
+            axisPointer: {
+              snap: true,
+              type: "cross",
+            },
+            formatter: function(params) {
+              return (
+                "<strong>" +
+                params.seriesName +
+                "</strong><br/>" +
+                params.name +
+                ": " +
+                params.value
+                  .toString()
+                  .replace(",", "'")
+                  .replace(".", ",") +
+                " " +
+                unit
+              );
+            },
+          },
+        };
+
+        console.log(JSON.stringify(res));
+        return Object.freeze(res);
+    }
   },
 };
 </script>
