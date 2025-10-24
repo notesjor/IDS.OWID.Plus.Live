@@ -53,7 +53,7 @@
     </div>
     <div>
       <div>
-        <v-tabs vertical @change="tabChange">
+        <v-tabs vertical @change="tabChange" v-model="tab">
           <v-tab>
             <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
@@ -97,7 +97,7 @@
             </v-tooltip>
           </v-tab>
           <v-tab-item :transition="false">
-            <VizTimeChart style="min-height:650px"></VizTimeChart>
+            <VizTimeChart style="min-height:650px" :chartOptions="lineChart"></VizTimeChart>
           </v-tab-item>
           <v-tab-item :transition="false">
             <VizCalendar></VizCalendar>
@@ -127,12 +127,109 @@ export default {
   data: function () {
     return {
       dialog_help: false,
+      tab: 0,
+      lineChart: null,
     };
+  },
+  mounted() {
+    this.$store.commit("setVizCalcFunc", this.calcLineChart);
   },
   methods: {
     tabChange: function () {
+      this.$store.commit("setVizCalcFunc", this.calcLineChart);
       this.$forceUpdate();
     },
+
+    calcLineChart: function (vizData, availableDates) {
+      console.log("Calculating Line Chart Data");
+      if (vizData === null) return null;
+
+      var series = [];
+
+      for (const key in vizData) {
+        if (key === "ALLE") continue;
+        const data = vizData[key];
+
+        var values = [];
+        availableDates.forEach((c) => {
+          values.push((c in data.data) ? data.data[c].value : 0);
+        });
+
+        series.push({
+          name: data.name,
+          type: "line",
+          data: values,
+          showSymbol: false,
+          large: true,
+          largeThreshold: 1000,
+          sampling: "lttb",
+          progressive: 250,
+          progressiveThreshold: 1000,
+          lineStyle: { width: 2 }
+        });
+      }
+
+      var unit = this.$store.state.vizOptionRelative ? this.$t("lbl_unit_tokenPPM") : this.$t("lbl_unit_token");
+
+      console.log("final");
+      var res = Object.freeze({
+        toolbox: {
+          show: true,
+          top: "3%",
+          right: "10%",
+          feature: {
+            saveAsImage: {
+              title: this.$t("lbl_save") + " \xa0 \xa0 \xa0 \xa0 \xa0",
+              name: this.$t("lbl_export_fileName"),
+            },
+          },
+        },
+        animation: false,
+        legend: {
+          show: true,
+        },
+        xAxis: {
+          type: "category",
+          data: Object.freeze(availableDates),
+        },
+        yAxis: {
+          type: "value",
+          scale: true,
+        },
+        series: Object.freeze(series),
+        dataZoom: [
+          { type: "slider", show: true },
+          { type: "inside", show: true },
+        ],
+        tooltip: {
+          axisPointer: {
+            snap: true,
+            type: "cross",
+          },
+          formatter: function (params) {
+            return (
+              "<strong>" +
+              params.seriesName +
+              "</strong><br/>" +
+              params.name +
+              ": " +
+              params.value
+                .toString()
+                .replace(",", "'")
+                .replace(".", ",") +
+              " " +
+              unit
+            );
+          },
+        },
+      });
+      console.log("apply");
+      console.log(res);
+      console.log(JSON.stringify(res));
+      console.log("length: " + JSON.stringify(res).length);
+      this.lineChart = res;
+      console.log("done");
+    }
   },
 };
 </script>

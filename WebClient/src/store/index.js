@@ -22,7 +22,8 @@ export default new Vuex.Store({
     vizOptionGranulation: 0,
     vizOptionSmoothing: 16,
 
-    vizData: null,
+    vizCalcFunc: null,
+    vizCalcResult: null,
   },
   mutations: {
     years(state, years) {
@@ -46,6 +47,10 @@ export default new Vuex.Store({
 
     updateN(state, N) {
       state.owid.N = N;
+    },
+
+    setVizCalcFunc(state, func) {
+      state.vizCalcFunc = func;
     },
 
     search(state, { n, queryItems, items }) {
@@ -72,12 +77,11 @@ export default new Vuex.Store({
     },
 
     calculate(state) {
-      if (state.owid === null || state.owid.OwidLiveSearches === null) {
-        state.vizData = null;
+      if (state.owid === null || state.owid.OwidLiveSearches === null || state.vizCalcFunc === null) {
+        state.vizCalcResult = null;
         return;
       }
 
-      state.vizData = {};
       var res = {};
 
       // Set Granulation
@@ -277,7 +281,7 @@ export default new Vuex.Store({
           }
       }
 
-      state.vizData = res;
+      state.vizCalcResult = state.vizCalcFunc(res, state.owid.Dates);
       state.version++;
     },
   },

@@ -24,12 +24,12 @@
         </v-row>
         <v-row class="text-center">
           <v-col>
-            <VizPanel id="vizPanel" v-show="this.$store.state.vizData != null" />
+            <VizPanel id="vizPanel" />
           </v-col>
         </v-row>
         <v-row class="text-center">
           <v-col>
-            <VizOptions v-show="this.$store.state.vizData != null" />
+            <VizOptions />
           </v-col>
         </v-row>
         <v-row class="text-center">
