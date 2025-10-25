@@ -112,18 +112,9 @@
 </template>
 
 <script>
-import VizTimeChart from "./visualizations/VizTimeChart";
-import VizCalendar from "./visualizations/VizCalendar";
-import VizSankey from "./visualizations/VizSankey";
-
 export default {
   name: "VizPanel",
   theme: { dark: false },
-  components: {
-    VizTimeChart,
-    VizCalendar,
-    VizSankey,
-  },
   data: function () {
     return {
       dialog_help: false,

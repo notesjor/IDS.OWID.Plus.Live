@@ -1,8 +1,10 @@
 <template> 
   <v-container>
-    <v-expansion-panels :value="expensionPanelOpen">
+    <v-text-field v-model="search_simple_1_value">Berg</v-text-field>
+    <v-btn @click="demo">ok</v-btn>
+    <v-expansion-panels v-model="expensionPanelOpen">
       <v-expansion-panel>
-        <v-expansion-panel-header class="justify-self-start">
+        <v-expansion-panel-title class="justify-self-start">
           <v-dialog v-model="dialog_helpSearchSetting" width="600" scrollable>
             <template v-slot:activator="{ on, attrs }">
               <div v-bind="attrs" v-on="on" style="float:right; display:block;" @click="stopClickSimple">
@@ -36,8 +38,8 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
+        </v-expansion-panel-title>
+        <v-expansion-panel-text>
           <v-row>
             <v-col cols="3">
               <h5>{{ $t("search_lbl_focusYear") }}:</h5>
@@ -57,10 +59,10 @@
               style="margin:40px 0px 0px 0px"></v-range-slider>
             </v-col>
           </v-row>
-        </v-expansion-panel-content>
+        </v-expansion-panel-text>
       </v-expansion-panel>
       <v-expansion-panel>
-        <v-expansion-panel-header class="justify-self-start">
+        <v-expansion-panel-title class="justify-self-start">
           <v-dialog v-model="dialog_helpSearchSimple" width="600" scrollable>
             <template v-slot:activator="{ on, attrs }">
               <div v-bind="attrs" v-on="on" style="float:right; display:block;" @click="stopClickSimple">
@@ -94,8 +96,8 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
+        </v-expansion-panel-title>
+        <v-expansion-panel-text>
           <v-row>
             <v-col>
               <h5>{{ $t("search_lbl_windowSize") }}:</h5>
@@ -123,7 +125,7 @@
                           :label="$t('lbl_layer')" style="display:block-inline;"></v-overflow-btn>
                         <TagsetInfo v-if="search_simple_1_layer_show_pos" />
                       </v-col>
-                      <v-col cols="9" style="margin-top:7px">
+                      <v-col cols="9" style="margin-top:7px">                        
                         <v-text-field
                           :label="$t('search_lbl_queryExpression') + ' (' + $t('search_simple_singleToken') + ')'"
                           v-model="search_simple_1_value" :rules="inputRules"
@@ -136,7 +138,7 @@
                           <h5>{{ $t("lbl_samples") }}:</h5>
                           <div class="sampleSection">
                             <ul>
-                              <li v-for="item in this.$config.sample_simple_1" :key="item.label">
+                              <li v-for="item in config.sample_simple_1" :key="item.label">
                                 <a v-on:click="
                                   sample_simple_click(fixSampleLanguage(item.query), [
                                     ['search_simple_1_layer', 'search_simple_1_value'],
@@ -187,7 +189,7 @@
                           <h5>{{ $t("lbl_samples") }}:</h5>
                           <div class="sampleSection">
                             <ul>
-                              <li v-for="item in this.$config.sample_simple_2" :key="item.label">
+                              <li v-for="item in config.sample_simple_2" :key="item.label">
                                 <a v-on:click="
                                   sample_simple_click(fixSampleLanguage(item.query), [
                                     ['search_simple_1_layer', 'search_simple_1_value'],
@@ -249,7 +251,7 @@
                           <h5>{{ $t("lbl_samples") }}:</h5>
                           <div class="sampleSection">
                             <ul>
-                              <li v-for="item in this.$config.sample_simple_3" :key="item.label">
+                              <li v-for="item in config.sample_simple_3" :key="item.label">
                                 <a v-on:click="
                                   sample_simple_click(fixSampleLanguage(item.query), [
                                     ['search_simple_1_layer', 'search_simple_1_value'],
@@ -281,10 +283,10 @@
               </v-btn>
             </v-col>
           </v-row>
-        </v-expansion-panel-content>
+        </v-expansion-panel-text>
       </v-expansion-panel>
       <v-expansion-panel>
-        <v-expansion-panel-header class="justify-self-start">
+        <v-expansion-panel-title class="justify-self-start">
           <v-dialog v-model="dialog_helpSearchComplex" width="600" scrollable>
             <template v-slot:activator="{ on, attrs }">
               <div v-bind="attrs" v-on="on" style="float:right; display:block;" @click="stopClickComplex">
@@ -318,8 +320,8 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
+        </v-expansion-panel-title>
+        <v-expansion-panel-text>
           <v-row>
             <v-col>
               <div>
@@ -376,7 +378,7 @@
                           <h5>{{ $t("lbl_samples") }}:</h5>
                           <div class="sampleSection">
                             <ul>
-                              <li v-for="item in this.$config.sample_complex_1" :key="item.label">
+                              <li v-for="item in config.sample_complex_1" :key="item.label">
                                 <a v-on:click="
                                   sample_complex_click(fixSampleLanguage(item.query), 'search_complex_1_');
                                 search_complex();
@@ -452,7 +454,7 @@
                           <h5>{{ $t("lbl_samples") }}:</h5>
                           <div class="sampleSection">
                             <ul>
-                              <li v-for="item in this.$config.sample_complex_2" :key="item.label">
+                              <li v-for="item in config.sample_complex_2" :key="item.label">
                                 <a v-on:click="
                                   sample_complex_click(fixSampleLanguage(item.query), 'search_complex_2_');
                                 search_complex();
@@ -550,7 +552,7 @@
                           <h5>{{ $t("lbl_samples") }}:</h5>
                           <div class="sampleSection">
                             <ul>
-                              <li v-for="item in this.$config.sample_complex_3" :key="item.label">
+                              <li v-for="item in config.sample_complex_3" :key="item.label">
                                 <a v-on:click="
                                   sample_complex_click(fixSampleLanguage(item.query), 'search_complex_3_');
                                 search_complex();
@@ -577,11 +579,11 @@
                 <v-icon style="color:#1976d2">mdi-magnify</v-icon>{{ $t("search_btn_start") }}</v-btn>
             </v-col>
           </v-row>
-        </v-expansion-panel-content>
+        </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
 
-    <v-overlay :value="progressWait">
+    <v-overlay v-model="progressWait">
       <div class="text-center">
         <v-progress-circular indeterminate size="64"></v-progress-circular>
         <h3>{{ $t("lbl_wait") }}</h3>
@@ -660,7 +662,7 @@ class queryItem {
   }
 }
 
-async function sendSearchRequest(data, store, n, queryItems) {
+async function sendSearchRequest(data, api, n, queryItems) {
   data.progressWait = true; 
   data.progressMsg = globalT.$t("search_progress_msg01");
 
@@ -722,13 +724,13 @@ async function sendSearchRequest(data, store, n, queryItems) {
 
   try {
     data.progressMsg = globalT.$t("search_progress_msg03");
-    store.commit("search", {
+    api.search({
       n: n,
       queryItems: queryItems,
       items: results,
     });
-    store.state.vizNoCommit = 1;
-    store.commit("calculate");
+    api.vizNoCommit = 1;
+    api.calculate();
   } catch (error) {
     data.snackbar = true;
     data.progressError = error.message;
@@ -742,6 +744,16 @@ export default {
   name: "Search",
   components: {
     TagsetInfo,
+  },
+  props:{
+    config: {
+      type: Object,
+      default: () => ({}),
+    },
+    api: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   data: () => {
     return {
@@ -811,14 +823,15 @@ export default {
   },
   created: function () {
     var self = this;
-    this.yearWatcher = this.$store.watch(
-      (state) => state.years,
-      (newValue) => {
-        self.years = newValue;
-        self.focusYears = newValue;
-        self.searchRange = [newValue[0], newValue[newValue.length - 1]];
-      }
-    );
+   // TODO
+   //this.yearWatcher = this.$store.watch(
+   //  (state) => state.years,
+   //  (newValue) => {
+   //    self.years = newValue;
+   //    self.focusYears = newValue;
+   //    self.searchRange = [newValue[0], newValue[newValue.length - 1]];
+   //  }
+   //);
   },
   watch: {
     searchRange: function (newVal) {
@@ -826,7 +839,7 @@ export default {
       this.focusYear = this.focusYears.length > 2 ? this.focusYears[this.focusYears.length - 2] : this.focusYears[this.focusYears.length - 1];
     },
     focusYear: function (newVal) {
-      this.$store.commit("focusYear", newVal);
+      this.api.setFocusYear(newVal);
     },
   },
   mounted: function () {
@@ -851,6 +864,11 @@ export default {
     }
   },
   methods: {
+    demo: function () {
+      this.search_simple_n_change(1);
+      this.search_simple();
+    },
+
     delete_simple: function () {
       this.search_simple_1_value = "";
       this.search_simple_2_value = "";
@@ -913,11 +931,11 @@ export default {
     },
     search_simple_n_change: function (n) {
       this.$data.search_simple_n = n;
-      this.$store.commit("updateN", n);
+      this.api.updateN(n);
     },
     search_complex_n_change: function (n) {
       this.$data.search_complex_n = n;
-      this.$store.commit("updateN", n);
+      this.api.updateN(n);
     },
     search_invoke: function (queries) {
       var set = new Set();
@@ -927,10 +945,10 @@ export default {
         set.add(x.position);
       });
 
-      this.$store.state.owid.N = set.size;
+      this.api.updateN(set.size);
 
       this.$emit("searchRequestSubmitted");
-      sendSearchRequest(this.$data, this.$store, set.size, qs);
+      sendSearchRequest(this.$data, this.api, set.size, qs);
     },
     search_simple: function () {
       var queryItems = [
@@ -961,7 +979,7 @@ export default {
         );
 
       this.$emit("searchRequestSubmitted");
-      sendSearchRequest(this.$data, this.$store, this.$data.search_simple_n, queryItems);
+      sendSearchRequest(this.$data, this.api, this.$data.search_simple_n, queryItems);
     },
     search_complex: function () {
       var queryItems = [];
@@ -995,7 +1013,7 @@ export default {
       }
 
       this.$emit("searchRequestSubmitted");
-      sendSearchRequest(this.$data, this.$store, this.$data.search_complex_n, queryItems);
+      sendSearchRequest(this.$data, this.api, this.$data.search_complex_n, queryItems);
     },
     validate_notEmpty: function (value) {
       return value === "" || value == "*" ? this.$t("search_error_notEmpty") : true;
