@@ -137,7 +137,6 @@ export default {
       this.$forceUpdate();
     },
     chartLine: function (state, vizData) {
-      console.log(">>> VizTimeChart: calculate chartOptions");
         var availableDates = state.owid.Dates;
 
         var series = [];
@@ -157,11 +156,13 @@ export default {
             data: values,
             symbolSize: 1,
             line: { marker: { enable: false } },
+            large: true,
+            sampling: "lttb"
           });
         }
 
         var unit = state.vizOptionRelative ? this.$t("lbl_unit_tokenPPM") : this.$t("lbl_unit_token");
-        console.log(">>> VizTimeChart UNIT");
+        const nf = new Intl.NumberFormat('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
 
         var res = {
           toolbox: {
@@ -198,24 +199,12 @@ export default {
               type: "cross",
             },
             formatter: function(params) {
-              return (
-                "<strong>" +
-                params.seriesName +
-                "</strong><br/>" +
-                params.name +
-                ": " +
-                params.value
-                  .toString()
-                  .replace(",", "'")
-                  .replace(".", ",") +
-                " " +
-                unit
-              );
+              const val = (typeof params.value === 'number') ? params.value : (Array.isArray(params.value) ? params.value[1] : params.value);
+              return "<strong>" + params.seriesName + "</strong><br/>" + params.name + ": " + nf.format(val) + " " + unit;
             },
           },
         };
 
-        console.log(JSON.stringify(res));
         return Object.freeze(res);
     }
   },

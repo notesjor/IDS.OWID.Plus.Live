@@ -53,7 +53,10 @@ export default {
   computed:{
     chartOptions(){
       if (this.$store.state.vizData === null) return null;
-      return this.$store.state.vizData;
+      console.log(">>> VizTimeChart: get chartOptions");
+      var res =this.$store.state.vizData;
+      console.log(">>> VizTimeChart: return chartOptions");
+      return res;
     },
   },
 };
