@@ -17,13 +17,13 @@
     "sass": "^1.93.2",
     "tailwindcss": "^3.4.18",
     "vite-svg-loader": "^4.0.0",
-    "vue-i18n": "^9.14.5",
-	"echarts": "^5.6.0",
-	"vue-echarts": "^6.7.3"
+    "vue-i18n": "^9.14.5"
   },
   "dependencies": {
     "@pinia/nuxt": "^0.4.11",
+    "echarts": "^6.0.0",
     "pinia": "^2.3.1",
+    "vue-echarts": "^8.0.1",
     "vuetify": "^3.10.7"
   },
   "overrides": {

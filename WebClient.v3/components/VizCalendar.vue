@@ -1,19 +1,15 @@
 <template>
-  <v-chart
-    ref="myChart"
-    autoresize
-    :option="chartOptions"
-    :init-options="initOptions"
-    :style="chartStyle"
-  />
+  <v-chart ref="myChart" autoresize :option="chartOptions" :init-options="initOptions" :style="chartStyle" />
 </template>
 
 <script>
-import { defineComponent, ref, computed, onMounted, provide, nextTick } from "vue";
+import Vue from "vue";
 import VueECharts, { THEME_KEY } from "vue-echarts";
 
 import { use } from "echarts/core";
-import { HeatmapChart } from "echarts/charts";
+import {
+  HeatmapChart
+} from "echarts/charts";
 import {
   GridComponent,
   TooltipComponent,
@@ -21,7 +17,7 @@ import {
   TitleComponent,
   VisualMapComponent,
   ToolboxComponent,
-  DataZoomComponent,
+  DataZoomComponent
 } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
 
@@ -34,136 +30,101 @@ use([
   VisualMapComponent,
   CanvasRenderer,
   ToolboxComponent,
-  DataZoomComponent,
+  DataZoomComponent
 ]);
 
-export default defineComponent({
+Vue.component('v-chart', VueECharts);
+
+var monthMap = {
+  nameMap: null,
+};
+
+var dayMap = {
+  firstDay: 1,
+  nameMap: null,
+};
+
+export default {
   name: "VizCalendar",
-  components: {
-    "v-chart": VueECharts,
+  theme: { dark: false },
+  provide: {
+    [THEME_KEY]: "light"
   },
-  setup() {
-    // Theme provide (wie vorher)
-    provide(THEME_KEY, "light");
+  data() {
+    return {
+      initOptions: {
+        renderer: "canvas"
+      },
+      chartStyle: "min-height:650px;"
+    };
+  },
+  methods: {
+    setChartHeight: function (height) {
+      this.$data.chartStyle = `min-height:${height}px;`;
 
-    // init options & style
-    const initOptions = ref({ renderer: "canvas" });
-    const chartStyle = ref("min-height:650px;");
-
-    // refs
-    const myChart = ref(null);
-
-    // month/day maps
-    const monthMap = ref({ nameMap: [] });
-    const dayMap = ref({ firstDay: 1, nameMap: [] });
-
-    // i18n / store access (Anpassung ggf. nötig)
-    // Versuche useI18n falls installiert, ansonsten useNuxtApp.$t
-    let t = (s) => s;
-    try {
-      // eslint-disable-next-line no-undef
-      const { useI18n } = require("vue-i18n");
-      t = useI18n ? useI18n().t : t;
-    } catch (e) {
-      // fallback zu Nuxt runtime (wenn verfügbar)
-      try {
-        // eslint-disable-next-line no-undef
-        const { useNuxtApp } = require("#app");
-        const nuxt = useNuxtApp();
-        if (nuxt && nuxt.$t) t = nuxt.$t.bind(nuxt);
-      } catch (err) {
-        // leave default
-      }
+      var refs = this.$refs;
+      setTimeout(() => {
+        refs.myChart.resize({ height: height });
+      }, 0);
     }
+  },
+  created() {
+    monthMap.nameMap = [
+      this.$t("lbl_month_short_january"),
+      this.$t("lbl_month_short_february"),
+      this.$t("lbl_month_short_march"),
+      this.$t("lbl_month_short_april"),
+      this.$t("lbl_month_short_may"),
+      this.$t("lbl_month_short_june"),
+      this.$t("lbl_month_short_july"),
+      this.$t("lbl_month_short_august"),
+      this.$t("lbl_month_short_september"),
+      this.$t("lbl_month_short_october"),
+      this.$t("lbl_month_short_november"),
+      this.$t("lbl_month_short_december"),
+    ];
+    dayMap.nameMap = [
+      this.$t("lbl_weekday_short_monday"),
+      this.$t("lbl_weekday_short_tuesday"),
+      this.$t("lbl_weekday_short_wednesday"),
+      this.$t("lbl_weekday_short_thursday"),
+      this.$t("lbl_weekday_short_friday"),
+      this.$t("lbl_weekday_short_saturday"),
+      this.$t("lbl_weekday_short_sunday"),
+    ];
+    dayMap.firstDay = parseInt(this.$t("lbl_weekday_firstIndex"));
+  },
+  computed: {
+    chartOptions() {
+      if (this.$store.state.vizData === null) return;
 
-    // Nuxt store access: versucht nuxtApp.$store (Vuex) als Fallback.
-    let nuxtStore = null;
-    try {
-      // eslint-disable-next-line no-undef
-      const { useNuxtApp } = require("#app");
-      const nuxt = useNuxtApp();
-      if (nuxt) {
-        nuxtStore = nuxt.$store || nuxt.$pinia || null;
-      }
-    } catch (e) {
-      nuxtStore = null;
-    }
-
-    // Helper: set chart height and trigger resize
-    function setChartHeight(height) {
-      chartStyle.value = `min-height:${height}px;`;
-      // wait nextTick then call resize on chart instance
-      nextTick(() => {
-        const inst = myChart.value && myChart.value.__chart ? myChart.value.__chart : myChart.value;
-        try {
-          if (inst && typeof inst.resize === "function") inst.resize({ height });
-        } catch (e) {
-          // ignore
-        }
-      });
-    }
-
-    // populate month/day names on mount
-    onMounted(() => {
-      monthMap.value.nameMap = [
-        t("lbl_month_short_january"),
-        t("lbl_month_short_february"),
-        t("lbl_month_short_march"),
-        t("lbl_month_short_april"),
-        t("lbl_month_short_may"),
-        t("lbl_month_short_june"),
-        t("lbl_month_short_july"),
-        t("lbl_month_short_august"),
-        t("lbl_month_short_september"),
-        t("lbl_month_short_october"),
-        t("lbl_month_short_november"),
-        t("lbl_month_short_december"),
-      ];
-      dayMap.value.nameMap = [
-        t("lbl_weekday_short_monday"),
-        t("lbl_weekday_short_tuesday"),
-        t("lbl_weekday_short_wednesday"),
-        t("lbl_weekday_short_thursday"),
-        t("lbl_weekday_short_friday"),
-        t("lbl_weekday_short_saturday"),
-        t("lbl_weekday_short_sunday"),
-      ];
-      const firstIdx = parseInt(t("lbl_weekday_firstIndex"));
-      dayMap.value.firstDay = isNaN(firstIdx) ? 1 : firstIdx;
-    });
-
-    // computed chart options (reads store if vorhanden)
-    const chartOptions = computed(() => {
-      const storeState = nuxtStore && nuxtStore.state ? nuxtStore.state : (nuxtStore || {}).state || null;
-      // if no store state, return undefined to avoid rendering wrong config
-      if (!storeState || !storeState.vizData) return {};
-
-      const vizData = storeState.vizData;
-      const tmp = {};
-      Object.keys(vizData).forEach((sK) => {
-        Object.keys(vizData[sK].data).forEach((d) => {
-          vizData[sK].data[d].dates.forEach((i) => {
-            if (i in tmp) tmp[i] += parseFloat(vizData[sK].data[d].value);
-            else tmp[i] = parseFloat(vizData[sK].data[d].value);
+      var tmp = {};
+      Object.keys(this.$store.state.vizData).forEach((sK) => {
+        Object.keys(this.$store.state.vizData[sK].data).forEach((d) => {
+          this.$store.state.vizData[sK].data[d].dates.forEach((i) => {
+            if (i in tmp) tmp[i] += parseFloat(this.$store.state.vizData[sK].data[d].value);
+            else tmp[i] = parseFloat(this.$store.state.vizData[sK].data[d].value);
           });
         });
       });
 
-      const res = [];
+      var res = [];
       Object.keys(tmp).forEach((k) => {
         res.push([k, tmp[k]]);
       });
 
-      let min = 2020;
-      let max = 0;
+      var min = 2020;
+      var max = 0;
+
       res.forEach((r) => {
-        const val = parseInt(r[0].substring(0, 4));
+        var val = parseInt(r[0].substring(0, 4));
+
         if (val < min) min = val;
         if (val > max) max = val;
       });
 
-      const diff = max - min + 1;
-      const series = [];
+      var diff = max - min + 1;
+      var series = [];
       for (let si = 0; si < diff; si++) {
         series.push({
           type: "heatmap",
@@ -173,22 +134,21 @@ export default defineComponent({
         });
       }
 
-      const calenderHeight = 175;
-      const chartSize = series.length * calenderHeight + 425;
-      // set height
-      setChartHeight(chartSize);
+      var calenderHeight = 175;
+      var chartSize = series.length * calenderHeight + 425;
+      console.log(chartSize)
+      this.setChartHeight(chartSize);      
 
-      const unit = storeState.vizOptionRelative ? t("lbl_unit_tokenPPM") : t("lbl_unit_token");
+      var unit = this.$store.state.vizOptionRelative ? this.$t("lbl_unit_tokenPPM") : this.$t("lbl_unit_token");
 
-      const calendars = [];
-      let top = 35;
-      const years = storeState.years || [];
-      years.forEach((year) => {
+      var calendars = [];
+      var top = 35;
+      this.$store.state.years.forEach((year) => {
         calendars.push({
           range: year,
           cellSize: ["auto", 20],
-          dayLabel: dayMap.value,
-          monthLabel: monthMap.value,
+          dayLabel: dayMap,
+          monthLabel: monthMap,
           top: top,
         });
         top += calenderHeight;
@@ -199,8 +159,8 @@ export default defineComponent({
           show: true,
           feature: {
             saveAsImage: {
-              title: t("lbl_save") + " \xa0 \xa0 \xa0 \xa0 \xa0",
-              name: t("lbl_export_fileName"),
+              title: this.$t("lbl_save") + " \xa0 \xa0 \xa0 \xa0 \xa0",
+              name: this.$t("lbl_export_fileName"),
             },
           },
         },
@@ -230,15 +190,7 @@ export default defineComponent({
         calendar: calendars,
         series: series,
       };
-    });
-
-    return {
-      initOptions,
-      chartStyle,
-      chartOptions,
-      myChart,
-      setChartHeight,
-    };
+    },
   },
-});
+};
 </script>

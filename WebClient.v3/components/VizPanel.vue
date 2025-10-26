@@ -1,4 +1,5 @@
 <template>
+  <v-btn @click="renderIt">RENDER</v-btn>
   <div style="min-height:700px">
     <div style="display:block; position:relative; top:0px; left:-49.5%">
       <v-dialog v-model="dialog_help" width="600" scrollable>
@@ -53,8 +54,10 @@
     </div>
     <div>
       <div>
-        <v-tabs vertical @change="tabChange">
-          <v-tab>
+<VizTimeChart :config="$config" :api="api" style="min-height:650px;" ref="chartLine"></VizTimeChart>
+<!--
+        <v-tabs vertical @change="tabChange" v-model="tab">
+          <v-tab value="line">
             <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
                 <div v-bind="attrs" v-on="on">
@@ -68,7 +71,7 @@
               </span>
             </v-tooltip>
           </v-tab>
-          <v-tab>
+          <v-tab value="calendar">
             <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
                 <div v-bind="attrs" v-on="on">
@@ -82,7 +85,7 @@
               </span>
             </v-tooltip>
           </v-tab>
-          <v-tab>
+          <v-tab value="sankey">
             <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
                 <div v-bind="attrs" v-on="on">
@@ -96,16 +99,20 @@
               </span>
             </v-tooltip>
           </v-tab>
-          <v-tab-item :transition="false">
-            <VizTimeChart style="min-height:650px"></VizTimeChart>
-          </v-tab-item>
-          <v-tab-item :transition="false">
-            <VizCalendar></VizCalendar>
-          </v-tab-item>
-          <v-tab-item :transition="false">
-            <VizSankey></VizSankey>
-          </v-tab-item>
+
+          <v-tabs-window v-model="tab">
+            <v-tabs-window-item value="line" style="background-color: red;">
+              <VizTimeChart :config="$config" :api="api" style="min-height:650px" ref="chartLine"></VizTimeChart>
+            </v-tabs-window-item>
+            <v-tabs-window-item value="calendar">
+              !-- TODO<VizCalendar :config="$config" :api="api"></VizCalendar>--
+            </v-tabs-window-item>
+            <v-tabs-window-item value="sankey">
+              !-- TODO<VizSankey :config="$config" :api="api"></VizSankey>--
+            </v-tabs-window-item>
+          </v-tabs-window>
         </v-tabs>
+      -->
       </div>
     </div>
   </div>
@@ -115,15 +122,30 @@
 export default {
   name: "VizPanel",
   theme: { dark: false },
+  props: {
+    config: {
+      type: Object,
+      default: () => ({}),
+    },
+    api: {
+      type: Object,
+      default: () => ({}),
+    },
+  },
   data: function () {
     return {
       dialog_help: false,
+      tab: "line",
     };
   },
   methods: {
     tabChange: function () {
       this.$forceUpdate();
     },
+    renderIt: function () {
+      console.log("RENDER IT");
+      this.$refs.chartLine.updateChart();
+    }
   },
 };
 </script>

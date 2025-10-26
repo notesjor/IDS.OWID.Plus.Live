@@ -28,8 +28,6 @@ export default defineNuxtConfig({
     })]
   },
 
-  modules: ['@pinia/nuxt'],
-
   runtimeConfig: {
     public: {
       "baseUrl": "https://www.owid.de/plus/live-2021/api",

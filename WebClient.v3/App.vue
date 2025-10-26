@@ -19,19 +19,15 @@
     <v-main>
       <v-container>
 
-{{ api.vizData }}
-
         <v-row>
           <v-col>
             <Search ref="searchComponent" @searchRequestSubmitted="scrollToVizPanel" :config="$config" :api="api" />
           </v-col>
         </v-row>
         <v-row class="text-center">
-        <!-- TODO
           <v-col>
-            <VizPanel id="vizPanel" /> // TODO: v-show="owidApi.vizData != null"
+            <VizPanel id="vizPanel" :config="$config" :api="api"/> <!-- TODO: v-show="owidApi.vizData != null" -->
           </v-col>
-        -->
         </v-row>
 
         <v-row>

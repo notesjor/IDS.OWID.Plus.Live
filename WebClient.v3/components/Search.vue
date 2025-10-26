@@ -1,7 +1,76 @@
-<template> 
+<template>
   <v-container>
-    <v-text-field v-model="search_simple_1_value">Berg</v-text-field>
+    <v-text-field v-model="search_simple_1_value"></v-text-field>
     <v-btn @click="demo">ok</v-btn>
+    <v-card flat>
+                    <v-row>
+                      <v-col style="padding:0px; margin: 40px 0 -20px 15px">
+                        <h5>{{ $t("search_lbl_query") }}:</h5>
+                      </v-col>
+                    </v-row>
+                    <v-row cols="27">
+                      <v-col cols="2">
+                        <v-combobox persistent-hint :items="layer" v-model="search_simple_1_layer"
+                          :label="$t('lbl_layer')"></v-combobox>
+                        <TagsetInfo v-if="search_simple_1_layer_show_pos" />
+                      </v-col>
+                      <v-col cols="2">
+                        <v-text-field :label="$t('search_lbl_queryExpressionPosition', { pos: 1 })"
+                          v-model="search_simple_1_value" :rules="inputRules"
+                          @keydown.enter="search_simple"></v-text-field>
+                      </v-col>
+                      <v-col cols="2">
+                        <v-combobox persistent-hint :items="layer" v-model="search_simple_2_layer"
+                          :label="$t('lbl_layer')"></v-combobox>
+                        <TagsetInfo v-if="search_simple_2_layer_show_pos" />
+                      </v-col>
+                      <v-col cols="2">
+                        <v-text-field :label="$t('search_lbl_queryExpressionPosition', { pos: 2 })"
+                          v-model="search_simple_2_value" :rules="inputRules"
+                          @keydown.enter="search_simple"></v-text-field>
+                      </v-col>
+                      <v-col cols="2">
+                        <v-combobox persistent-hint :items="layer" v-model="search_simple_3_layer"
+                          :label="$t('lbl_layer')"></v-combobox>
+                        <TagsetInfo v-if="search_simple_3_layer_show_pos" />
+                      </v-col>
+                      <v-col cols="2">
+                        <v-text-field :label="$t('search_lbl_queryExpressionPosition', { pos: 3 })"
+                          v-model="search_simple_3_value" :rules="inputRules"
+                          @keydown.enter="search_simple"></v-text-field>
+                      </v-col>
+                    </v-row>
+
+                    <v-row>
+                      <v-col style="padding:0px; margin: -20px 0 15px 15px;">
+                        <div>
+                          <h5>{{ $t("lbl_samples") }}:</h5>
+                          <div class="sampleSection">
+                            <ul>
+                              <li v-for="item in config.sample_simple_3" :key="item.label">
+                                <a v-on:click="
+                                  sample_simple_click(fixSampleLanguage(item.query), [
+                                    ['search_simple_1_layer', 'search_simple_1_value'],
+                                    ['search_simple_2_layer', 'search_simple_2_value'],
+                                    ['search_simple_3_layer', 'search_simple_3_value'],
+                                  ]);
+                                search_simple();
+                                ">{{ fixSampleLanguage(item.label) }}</a>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                      </v-col>
+                    </v-row>
+                  </v-card>
+
+
+
+
+
+
+
+
     <v-expansion-panels v-model="expensionPanelOpen">
       <v-expansion-panel>
         <v-expansion-panel-title class="justify-self-start">
@@ -43,20 +112,14 @@
           <v-row>
             <v-col cols="3">
               <h5>{{ $t("search_lbl_focusYear") }}:</h5>
-                <v-select outlined v-model="focusYear" :items="years" style="max-width: 150px;margin:10px 0px 0px 0px"></v-select>
+              <v-select outlined v-model="focusYear" :items="years"
+                style="max-width: 150px;margin:10px 0px 0px 0px"></v-select>
             </v-col>
             <v-col>
               <h5 style="margin:0px 0px 0px -10px">{{ $t("search_lbl_focusYearRange") }}:</h5>
-              <v-range-slider 
-              v-model="searchRange" 
-              :max="years[years.length - 1]" 
-              :min="years[0]" 
-              step="1" 
-              thumb-label="always" 
-              ticks="always" 
-              tick-size="5" 
-              tick-labels
-              style="margin:40px 0px 0px 0px"></v-range-slider>
+              <v-range-slider v-model="searchRange" :max="years[years.length - 1]" :min="years[0]" step="1"
+                thumb-label="always" ticks="always" tick-size="5" tick-labels
+                style="margin:40px 0px 0px 0px"></v-range-slider>
             </v-col>
           </v-row>
         </v-expansion-panel-text>
@@ -121,11 +184,11 @@
                     </v-row>
                     <v-row>
                       <v-col cols="2">
-                        <v-overflow-btn persistent-hint :items="layer" v-model="search_simple_1_layer"
-                          :label="$t('lbl_layer')" style="display:block-inline;"></v-overflow-btn>
+                        <v-combobox persistent-hint :items="layer" v-model="search_simple_1_layer"
+                          :label="$t('lbl_layer')" style="display:block-inline;"></v-combobox>
                         <TagsetInfo v-if="search_simple_1_layer_show_pos" />
                       </v-col>
-                      <v-col cols="9" style="margin-top:7px">                        
+                      <v-col cols="9" style="margin-top:7px">
                         <v-text-field
                           :label="$t('search_lbl_queryExpression') + ' (' + $t('search_simple_singleToken') + ')'"
                           v-model="search_simple_1_value" :rules="inputRules"
@@ -162,8 +225,8 @@
                     </v-row>
                     <v-row>
                       <v-col cols="2">
-                        <v-overflow-btn persistent-hint :items="layer" v-model="search_simple_1_layer"
-                          :label="$t('lbl_layer')"></v-overflow-btn>
+                        <v-combobox persistent-hint :items="layer" v-model="search_simple_1_layer"
+                          :label="$t('lbl_layer')"></v-combobox>
                         <TagsetInfo v-if="search_simple_1_layer_show_pos" />
                       </v-col>
                       <v-col cols="4">
@@ -172,8 +235,8 @@
                           @keydown.enter="search_simple"></v-text-field>
                       </v-col>
                       <v-col cols="2">
-                        <v-overflow-btn persistent-hint :items="layer" v-model="search_simple_2_layer"
-                          :label="$t('lbl_layer')"></v-overflow-btn>
+                        <v-combobox persistent-hint :items="layer" v-model="search_simple_2_layer"
+                          :label="$t('lbl_layer')"></v-combobox>
                         <TagsetInfo v-if="search_simple_2_layer_show_pos" />
                       </v-col>
                       <v-col cols="4">
@@ -214,8 +277,8 @@
                     </v-row>
                     <v-row cols="27">
                       <v-col cols="2">
-                        <v-overflow-btn persistent-hint :items="layer" v-model="search_simple_1_layer"
-                          :label="$t('lbl_layer')"></v-overflow-btn>
+                        <v-combobox persistent-hint :items="layer" v-model="search_simple_1_layer"
+                          :label="$t('lbl_layer')"></v-combobox>
                         <TagsetInfo v-if="search_simple_1_layer_show_pos" />
                       </v-col>
                       <v-col cols="2">
@@ -224,8 +287,8 @@
                           @keydown.enter="search_simple"></v-text-field>
                       </v-col>
                       <v-col cols="2">
-                        <v-overflow-btn persistent-hint :items="layer" v-model="search_simple_2_layer"
-                          :label="$t('lbl_layer')"></v-overflow-btn>
+                        <v-combobox persistent-hint :items="layer" v-model="search_simple_2_layer"
+                          :label="$t('lbl_layer')"></v-combobox>
                         <TagsetInfo v-if="search_simple_2_layer_show_pos" />
                       </v-col>
                       <v-col cols="2">
@@ -234,8 +297,8 @@
                           @keydown.enter="search_simple"></v-text-field>
                       </v-col>
                       <v-col cols="2">
-                        <v-overflow-btn persistent-hint :items="layer" v-model="search_simple_3_layer"
-                          :label="$t('lbl_layer')"></v-overflow-btn>
+                        <v-combobox persistent-hint :items="layer" v-model="search_simple_3_layer"
+                          :label="$t('lbl_layer')"></v-combobox>
                         <TagsetInfo v-if="search_simple_3_layer_show_pos" />
                       </v-col>
                       <v-col cols="2">
@@ -663,15 +726,17 @@ class queryItem {
 }
 
 async function sendSearchRequest(data, api, n, queryItems) {
-  data.progressWait = true; 
+  data.progressWait = true;
   data.progressMsg = globalT.$t("search_progress_msg01");
 
   var baseUrl = "https://www.owid.de/plus/live-2021/api/v3";
 
-  var years = data.focusYears.sort((a, b) => b - a);  
+  var years = api.years.sort((a, b) => b - a);
   var max = years[0];
-  years = years.filter((x) => x !== data.focusYear);
-  years = [data.focusYear].concat(years);
+  years = years.filter((x) => x !== api.yearFocus);
+  years = [api.yearFocus].concat(years);
+
+  console.log("Searching in years: ", years);
 
   var results = {};
 
@@ -720,7 +785,7 @@ async function sendSearchRequest(data, api, n, queryItems) {
       data.snackbar = true;
       data.progressError = error.message;
     }
-  }  
+  }
 
   try {
     data.progressMsg = globalT.$t("search_progress_msg03");
@@ -745,7 +810,7 @@ export default {
   components: {
     TagsetInfo,
   },
-  props:{
+  props: {
     config: {
       type: Object,
       default: () => ({}),
@@ -762,7 +827,7 @@ export default {
       dialog_helpSearchSetting: false,
       expensionPanelOpen: 1,
 
-      layer: null,
+      layer: ['Wortform', 'Lemma', 'POS'],
       search_simple_1_layer: "",
       search_simple_2_layer: "",
       search_simple_3_layer: "",
@@ -823,15 +888,15 @@ export default {
   },
   created: function () {
     var self = this;
-   // TODO
-   //this.yearWatcher = this.$store.watch(
-   //  (state) => state.years,
-   //  (newValue) => {
-   //    self.years = newValue;
-   //    self.focusYears = newValue;
-   //    self.searchRange = [newValue[0], newValue[newValue.length - 1]];
-   //  }
-   //);
+    // TODO
+    //this.yearWatcher = this.$store.watch(
+    //  (state) => state.years,
+    //  (newValue) => {
+    //    self.years = newValue;
+    //    self.focusYears = newValue;
+    //    self.searchRange = [newValue[0], newValue[newValue.length - 1]];
+    //  }
+    //);
   },
   watch: {
     searchRange: function (newVal) {
@@ -848,9 +913,9 @@ export default {
     this.search_simple_3_layer = this.$t("layer_wordform");
 
     global_layers = [this.$t("layer_wordform"), this.$t("layer_lemma"), this.$t("layer_pos")];
-    this.layer = global_layers;
+    //TODO: this.layer = ;
 
-    globalT = this;    
+    globalT = this;
   },
   computed: {
     search_simple_1_layer_show_pos: function () {
@@ -865,7 +930,7 @@ export default {
   },
   methods: {
     demo: function () {
-      this.search_simple_n_change(1);
+      this.search_simple_n_change(3);
       this.search_simple();
     },
 
