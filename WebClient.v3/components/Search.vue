@@ -1,76 +1,5 @@
 <template>
   <v-container>
-    <v-text-field v-model="search_simple_1_value"></v-text-field>
-    <v-btn @click="demo">ok</v-btn>
-    <v-card flat>
-                    <v-row>
-                      <v-col style="padding:0px; margin: 40px 0 -20px 15px">
-                        <h5>{{ $t("search_lbl_query") }}:</h5>
-                      </v-col>
-                    </v-row>
-                    <v-row cols="27">
-                      <v-col cols="2">
-                        <v-combobox persistent-hint :items="layer" v-model="search_simple_1_layer"
-                          :label="$t('lbl_layer')"></v-combobox>
-                        <TagsetInfo v-if="search_simple_1_layer_show_pos" />
-                      </v-col>
-                      <v-col cols="2">
-                        <v-text-field :label="$t('search_lbl_queryExpressionPosition', { pos: 1 })"
-                          v-model="search_simple_1_value" :rules="inputRules"
-                          @keydown.enter="search_simple"></v-text-field>
-                      </v-col>
-                      <v-col cols="2">
-                        <v-combobox persistent-hint :items="layer" v-model="search_simple_2_layer"
-                          :label="$t('lbl_layer')"></v-combobox>
-                        <TagsetInfo v-if="search_simple_2_layer_show_pos" />
-                      </v-col>
-                      <v-col cols="2">
-                        <v-text-field :label="$t('search_lbl_queryExpressionPosition', { pos: 2 })"
-                          v-model="search_simple_2_value" :rules="inputRules"
-                          @keydown.enter="search_simple"></v-text-field>
-                      </v-col>
-                      <v-col cols="2">
-                        <v-combobox persistent-hint :items="layer" v-model="search_simple_3_layer"
-                          :label="$t('lbl_layer')"></v-combobox>
-                        <TagsetInfo v-if="search_simple_3_layer_show_pos" />
-                      </v-col>
-                      <v-col cols="2">
-                        <v-text-field :label="$t('search_lbl_queryExpressionPosition', { pos: 3 })"
-                          v-model="search_simple_3_value" :rules="inputRules"
-                          @keydown.enter="search_simple"></v-text-field>
-                      </v-col>
-                    </v-row>
-
-                    <v-row>
-                      <v-col style="padding:0px; margin: -20px 0 15px 15px;">
-                        <div>
-                          <h5>{{ $t("lbl_samples") }}:</h5>
-                          <div class="sampleSection">
-                            <ul>
-                              <li v-for="item in config.sample_simple_3" :key="item.label">
-                                <a v-on:click="
-                                  sample_simple_click(fixSampleLanguage(item.query), [
-                                    ['search_simple_1_layer', 'search_simple_1_value'],
-                                    ['search_simple_2_layer', 'search_simple_2_value'],
-                                    ['search_simple_3_layer', 'search_simple_3_value'],
-                                  ]);
-                                search_simple();
-                                ">{{ fixSampleLanguage(item.label) }}</a>
-                              </li>
-                            </ul>
-                          </div>
-                        </div>
-                      </v-col>
-                    </v-row>
-                  </v-card>
-
-
-
-
-
-
-
-
     <v-expansion-panels v-model="expensionPanelOpen">
       <v-expansion-panel>
         <v-expansion-panel-title class="justify-self-start">
@@ -174,11 +103,13 @@
                 <v-tab @click="search_simple_n_change(3)">
                   <span>N=3</span>
                 </v-tab>
+              </v-tabs>
 
-                <v-tab-item>
+              <v-tabs-window v-model="search_simple_n">
+                <v-tabs-window-item :value="1">
                   <v-card flat>
                     <v-row>
-                      <v-col style="padding:0px; margin: 40px 0 -20px 15px">
+                      <v-col style="padding:0px; margin: 40px 0px 5px 20px">
                         <h5>{{ $t("search_lbl_query") }}:</h5>
                       </v-col>
                     </v-row>
@@ -188,8 +119,9 @@
                           :label="$t('lbl_layer')" style="display:block-inline;"></v-combobox>
                         <TagsetInfo v-if="search_simple_1_layer_show_pos" />
                       </v-col>
-                      <v-col cols="9" style="margin-top:7px">
+                      <v-col cols="10" style="margin-top:7px">
                         <v-text-field
+                          style="margin: -7px 0px 0px 0px"
                           :label="$t('search_lbl_queryExpression') + ' (' + $t('search_simple_singleToken') + ')'"
                           v-model="search_simple_1_value" :rules="inputRules"
                           @keydown.enter="search_simple"></v-text-field>
@@ -201,7 +133,7 @@
                           <h5>{{ $t("lbl_samples") }}:</h5>
                           <div class="sampleSection">
                             <ul>
-                              <li v-for="item in config.sample_simple_1" :key="item.label">
+                              <li v-for="item in config.public.sample_simple_1" :key="item.label">
                                 <a v-on:click="
                                   sample_simple_click(fixSampleLanguage(item.query), [
                                     ['search_simple_1_layer', 'search_simple_1_value'],
@@ -215,11 +147,11 @@
                       </v-col>
                     </v-row>
                   </v-card>
-                </v-tab-item>
-                <v-tab-item>
+                </v-tabs-window-item>
+                <v-tabs-window-item :value="2">
                   <v-card flat>
                     <v-row>
-                      <v-col style="padding:0px; margin: 40px 0 -20px 15px">
+                      <v-col style="padding:0px; margin: 40px 0px 5px 20px">
                         <h5>{{ $t("search_lbl_query") }}:</h5>
                       </v-col>
                     </v-row>
@@ -252,7 +184,7 @@
                           <h5>{{ $t("lbl_samples") }}:</h5>
                           <div class="sampleSection">
                             <ul>
-                              <li v-for="item in config.sample_simple_2" :key="item.label">
+                              <li v-for="item in config.public.sample_simple_2" :key="item.label">
                                 <a v-on:click="
                                   sample_simple_click(fixSampleLanguage(item.query), [
                                     ['search_simple_1_layer', 'search_simple_1_value'],
@@ -267,11 +199,11 @@
                       </v-col>
                     </v-row>
                   </v-card>
-                </v-tab-item>
-                <v-tab-item>
+                </v-tabs-window-item>
+                <v-tabs-window-item :value="3">
                   <v-card flat>
                     <v-row>
-                      <v-col style="padding:0px; margin: 40px 0 -20px 15px">
+                      <v-col style="padding:0px; margin: 40px 0px 5px 20px">
                         <h5>{{ $t("search_lbl_query") }}:</h5>
                       </v-col>
                     </v-row>
@@ -314,7 +246,7 @@
                           <h5>{{ $t("lbl_samples") }}:</h5>
                           <div class="sampleSection">
                             <ul>
-                              <li v-for="item in config.sample_simple_3" :key="item.label">
+                              <li v-for="item in config.public.sample_simple_3" :key="item.label">
                                 <a v-on:click="
                                   sample_simple_click(fixSampleLanguage(item.query), [
                                     ['search_simple_1_layer', 'search_simple_1_value'],
@@ -330,8 +262,8 @@
                       </v-col>
                     </v-row>
                   </v-card>
-                </v-tab-item>
-              </v-tabs>
+                </v-tabs-window-item>
+              </v-tabs-window>
             </v-col>
           </v-row>
           <v-row>
@@ -828,6 +760,7 @@ export default {
       expensionPanelOpen: 1,
 
       layer: ['Wortform', 'Lemma', 'POS'],
+
       search_simple_1_layer: "",
       search_simple_2_layer: "",
       search_simple_3_layer: "",
@@ -886,18 +819,6 @@ export default {
       ],
     };
   },
-  created: function () {
-    var self = this;
-    // TODO
-    //this.yearWatcher = this.$store.watch(
-    //  (state) => state.years,
-    //  (newValue) => {
-    //    self.years = newValue;
-    //    self.focusYears = newValue;
-    //    self.searchRange = [newValue[0], newValue[newValue.length - 1]];
-    //  }
-    //);
-  },
   watch: {
     searchRange: function (newVal) {
       this.focusYears = this.years.filter((x) => x >= newVal[0] && x <= newVal[1]);
@@ -906,14 +827,20 @@ export default {
     focusYear: function (newVal) {
       this.api.setFocusYear(newVal);
     },
+    api: function (newVal) {
+      this.years = newVal.years;
+      console.log("Available years (api-update): ", this.years);
+    }
   },
   mounted: function () {
+    this.years = this.api.years;
+    console.log("Available years: ", this.years);
     this.search_simple_1_layer = this.$t("layer_wordform");
     this.search_simple_2_layer = this.$t("layer_wordform");
     this.search_simple_3_layer = this.$t("layer_wordform");
 
     global_layers = [this.$t("layer_wordform"), this.$t("layer_lemma"), this.$t("layer_pos")];
-    //TODO: this.layer = ;
+    this.layer = global_layers;
 
     globalT = this;
   },
@@ -929,11 +856,6 @@ export default {
     }
   },
   methods: {
-    demo: function () {
-      this.search_simple_n_change(3);
-      this.search_simple();
-    },
-
     delete_simple: function () {
       this.search_simple_1_value = "";
       this.search_simple_2_value = "";
@@ -968,7 +890,7 @@ export default {
       e.stopPropagation();
     },
     abortProgress: function () {
-      this.$data.progressWait = false;
+      this.progressWait = false;
     },
     fixSampleLanguage: function (str) {
       str = str.replace("Wortform", this.$t("layer_wordform"));
@@ -981,8 +903,8 @@ export default {
         const position = query[i];
         var key = Object.keys(position)[0];
 
-        this.$data[controlIds[i][0]] = key;
-        this.$data[controlIds[i][1]] = position[key];
+        this[controlIds[i][0]] = key;
+        this[controlIds[i][1]] = position[key];
       }
     },
     sample_complex_click: function (queryStr, controlIdTemplate) {
@@ -990,16 +912,16 @@ export default {
       for (let i = 0; i < query.length; i++) {
         const position = query[i];
         Object.keys(position).forEach((key) => {
-          this.$data[controlIdTemplate + (i + 1) + "_" + key[0].toLowerCase()] = position[key];
+          this[controlIdTemplate + (i + 1) + "_" + key[0].toLowerCase()] = position[key];
         });
       }
     },
     search_simple_n_change: function (n) {
-      this.$data.search_simple_n = n;
+      this.search_simple_n = n;
       this.api.updateN(n);
     },
     search_complex_n_change: function (n) {
-      this.$data.search_complex_n = n;
+      this.search_complex_n = n;
       this.api.updateN(n);
     },
     search_invoke: function (queries) {
@@ -1013,72 +935,72 @@ export default {
       this.api.updateN(set.size);
 
       this.$emit("searchRequestSubmitted");
-      sendSearchRequest(this.$data, this.api, set.size, qs);
+      sendSearchRequest(this, this.api, set.size, qs);
     },
     search_simple: function () {
       var queryItems = [
         new queryItem(
-          this.$data.layer.indexOf(this.$data.search_simple_1_layer),
+          this.layer.indexOf(this.search_simple_1_layer),
           0,
-          this.$data.search_simple_1_value,
-          this.$data.layer.indexOf(this.$data.search_simple_1_layer) === 2
+          this.search_simple_1_value,
+          this.layer.indexOf(this.search_simple_1_layer) === 2
         ),
       ];
-      if (this.$data.search_simple_n > 1)
+      if (this.search_simple_n > 1)
         queryItems.push(
           new queryItem(
-            this.$data.layer.indexOf(this.$data.search_simple_2_layer),
+            this.layer.indexOf(this.search_simple_2_layer),
             1,
-            this.$data.search_simple_2_value,
-            this.$data.layer.indexOf(this.$data.search_simple_2_layer) === 2
+            this.search_simple_2_value,
+            this.layer.indexOf(this.search_simple_2_layer) === 2
           )
         );
-      if (this.$data.search_simple_n > 2)
+      if (this.search_simple_n > 2)
         queryItems.push(
           new queryItem(
-            this.$data.layer.indexOf(this.$data.search_simple_3_layer),
+            this.layer.indexOf(this.search_simple_3_layer),
             2,
-            this.$data.search_simple_3_value,
-            this.$data.layer.indexOf(this.$data.search_simple_3_layer) === 2
+            this.search_simple_3_value,
+            this.layer.indexOf(this.search_simple_3_layer) === 2
           )
         );
 
       this.$emit("searchRequestSubmitted");
-      sendSearchRequest(this.$data, this.api, this.$data.search_simple_n, queryItems);
+      sendSearchRequest(this, this.api, this.search_simple_n, queryItems);
     },
     search_complex: function () {
       var queryItems = [];
-      if (this.$data.search_complex_n === 1) {
+      if (this.search_complex_n === 1) {
         queryItems = [
-          new queryItem(0, 0, this.$data.search_complex_1_1_w),
-          new queryItem(1, 0, this.$data.search_complex_1_1_l),
-          new queryItem(2, 0, this.$data.search_complex_1_1_p, true),
+          new queryItem(0, 0, this.search_complex_1_1_w),
+          new queryItem(1, 0, this.search_complex_1_1_l),
+          new queryItem(2, 0, this.search_complex_1_1_p, true),
         ];
-      } else if (this.$data.search_complex_n === 2) {
+      } else if (this.search_complex_n === 2) {
         queryItems = [
-          new queryItem(0, 0, this.$data.search_complex_2_1_w),
-          new queryItem(1, 0, this.$data.search_complex_2_1_l),
-          new queryItem(2, 0, this.$data.search_complex_2_1_p, true),
-          new queryItem(0, 1, this.$data.search_complex_2_2_w),
-          new queryItem(1, 1, this.$data.search_complex_2_2_l),
-          new queryItem(2, 1, this.$data.search_complex_2_2_p, true),
+          new queryItem(0, 0, this.search_complex_2_1_w),
+          new queryItem(1, 0, this.search_complex_2_1_l),
+          new queryItem(2, 0, this.search_complex_2_1_p, true),
+          new queryItem(0, 1, this.search_complex_2_2_w),
+          new queryItem(1, 1, this.search_complex_2_2_l),
+          new queryItem(2, 1, this.search_complex_2_2_p, true),
         ];
-      } else if (this.$data.search_complex_n === 3) {
+      } else if (this.search_complex_n === 3) {
         queryItems = [
-          new queryItem(0, 0, this.$data.search_complex_3_1_w),
-          new queryItem(1, 0, this.$data.search_complex_3_1_l),
-          new queryItem(2, 0, this.$data.search_complex_3_1_p, true),
-          new queryItem(0, 1, this.$data.search_complex_3_2_w),
-          new queryItem(1, 1, this.$data.search_complex_3_2_l),
-          new queryItem(2, 1, this.$data.search_complex_3_2_p, true),
-          new queryItem(0, 2, this.$data.search_complex_3_3_w),
-          new queryItem(1, 2, this.$data.search_complex_3_3_l),
-          new queryItem(2, 2, this.$data.search_complex_3_3_p, true),
+          new queryItem(0, 0, this.search_complex_3_1_w),
+          new queryItem(1, 0, this.search_complex_3_1_l),
+          new queryItem(2, 0, this.search_complex_3_1_p, true),
+          new queryItem(0, 1, this.search_complex_3_2_w),
+          new queryItem(1, 1, this.search_complex_3_2_l),
+          new queryItem(2, 1, this.search_complex_3_2_p, true),
+          new queryItem(0, 2, this.search_complex_3_3_w),
+          new queryItem(1, 2, this.search_complex_3_3_l),
+          new queryItem(2, 2, this.search_complex_3_3_p, true),
         ];
       }
 
       this.$emit("searchRequestSubmitted");
-      sendSearchRequest(this.$data, this.api, this.$data.search_complex_n, queryItems);
+      sendSearchRequest(this, this.api, this.search_complex_n, queryItems);
     },
     validate_notEmpty: function (value) {
       return value === "" || value == "*" ? this.$t("search_error_notEmpty") : true;
