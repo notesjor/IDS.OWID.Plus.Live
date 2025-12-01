@@ -5,7 +5,6 @@ using System.Net;
 using IDS.Lexik.cOWIDplusViewer.v2.WebService.Model.Configuration;
 using IDS.Lexik.cOWIDplusViewer.v2.WebService.Model.Request;
 using IDS.Lexik.WebService.Sdk.WebService.Abstract;
-using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Tfres;
 using HttpContext = Tfres.HttpContext;
@@ -14,16 +13,12 @@ using System.IO.Compression;
 using CorpusExplorer.Sdk.Model.Adapter.Corpus;
 using System.Linq;
 using CorpusExplorer.Sdk.Helper;
-using CorpusExplorer.Sdk.Model.Adapter.Corpus.Abstract;
 using CorpusExplorer.Sdk.Utils.DocumentProcessing.Cleanup;
 using CorpusExplorer.Sdk.Utils.DocumentProcessing.Tagger.TreeTagger;
 using CorpusExplorer.Sdk.Utils.CorpusManipulation;
 using IDS.OWIDplusLIVE.API.Model.Response;
 using CorpusExplorer.Sdk.Utils.DataTableWriter.Abstract;
 using CorpusExplorer.Sdk.Utils.DataTableWriter;
-using CorpusExplorer.Sdk.Model.Extension;
-using CorpusExplorer.Sdk.Utils.Filter.Abstract;
-using CorpusExplorer.Sdk.Utils.Filter.Queries;
 using System.Security.Cryptography;
 using System.Text;
 using IDS.OWIDplusLIVE.API.Helper;
@@ -35,6 +30,8 @@ using CorpusExplorer.Sdk.Utils.CorpusManipulation.CorpusMergerTransformation;
 using CorpusExplorer.Sdk.Utils.CorpusManipulation.CorpusMergerTransformation.Abstract;
 using CorpusExplorer.Sdk.Model;
 using CorpusExplorer.Sdk.Ecosystem;
+using Microsoft.OpenApi;
+using System.Net.Http;
 
 namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 {
@@ -384,7 +381,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
             for (var i = 0; i < _normData.Count; i++)
               _normData[i] = _normData[i].OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value);
-            _normData = _normData.Where(x=> x.Count>0).ToList();
+            _normData = _normData.Where(x => x.Count > 0).ToList();
 
             _normDataStr = JsonConvert.SerializeObject(_normData);
             #endregion
@@ -661,10 +658,10 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
           {
             "/v3/years", new OpenApiPathItem
             {
-              Operations = new Dictionary<OperationType, OpenApiOperation>
+              Operations = new Dictionary<HttpMethod, OpenApiOperation>
               {
                 {
-                  OperationType.Get, new OpenApiOperation
+                  HttpMethod.Get, new OpenApiOperation
                   {
                     Description = "Gibt die verfügbaren Jahre zurück.",
                     Responses = new OpenApiResponses
@@ -679,10 +676,10 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
           {
             "/v3/norm", new OpenApiPathItem
             {
-              Operations = new Dictionary<OperationType, OpenApiOperation>
+              Operations = new Dictionary<HttpMethod, OpenApiOperation>
               {
                 {
-                  OperationType.Get, new OpenApiOperation
+                  HttpMethod.Get, new OpenApiOperation
                   {
                     Description = "Gibt die Norm-Daten (Tages-Summe) zurück.",
                     Responses = new OpenApiResponses
@@ -697,13 +694,13 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
           {
             "/v3/search", new OpenApiPathItem
             {
-              Operations = new Dictionary<OperationType, OpenApiOperation>
+              Operations = new Dictionary<HttpMethod, OpenApiOperation>
               {
                 {
-                  OperationType.Post, new OpenApiOperation
+                  HttpMethod.Post, new OpenApiOperation
                   {
                     Description = "Sucht nach verfügbaren N-Grammen.",
-                    Parameters = new List<OpenApiParameter>
+                    Parameters = new List<IOpenApiParameter>
                     {
                       new OpenApiParameter
                       {
@@ -711,23 +708,23 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
                         Description = "Suchanfrage",
                         Schema = new OpenApiSchema
                         {
-                          Type = "object",
-                          Properties = new Dictionary<string, OpenApiSchema>
+                          Type = JsonSchemaType.Object,
+                          Properties = new Dictionary<string, IOpenApiSchema>
                           {
-                            {"N", new OpenApiSchema {Type = "integer", Description = "Legt die Größe des N-Gramms fest."}},
-                            {"Year", new OpenApiSchema {Type = "integer", Description = "Jahr das abgefragt wird (siehe GET /v3/years). Das erste Jahr pro Abfrage ist das Fokus-Jahr (zusätzliche Berechnung der 1000 häufigsten N-Gramme)."}},
+                            {"N", new OpenApiSchema {Type = JsonSchemaType.Number, Description = "Legt die Größe des N-Gramms fest."}},
+                            {"Year", new OpenApiSchema {Type = JsonSchemaType.Number, Description = "Jahr das abgefragt wird (siehe GET /v3/years). Das erste Jahr pro Abfrage ist das Fokus-Jahr (zusätzliche Berechnung der 1000 häufigsten N-Gramme)."}},
                             {"Items", new OpenApiSchema
                               {
-                                Type = "array",
+                                Type = JsonSchemaType.Array,
                                 Description = "Detailangabe zu Layer/Poistion/Token",
                                 Items = new OpenApiSchema
                                 {
-                                  Type = "object",
-                                  Properties = new Dictionary<string, OpenApiSchema>
+                                  Type = JsonSchemaType.Object,
+                                  Properties = new Dictionary<string, IOpenApiSchema>
                                   {
-                                    {"Position", new OpenApiSchema {Type = "integer", Description = "0-basierte Positionsangabe"}},
-                                    {"Layer", new OpenApiSchema {Type = "integer", Description = "Wortform = 0 / Lemma = 1 / POS = 2"}},
-                                    {"Token", new OpenApiSchema {Type = "string"}},
+                                    {"Position", new OpenApiSchema {Type = JsonSchemaType.Number, Description = "0-basierte Positionsangabe"}},
+                                    {"Layer", new OpenApiSchema {Type = JsonSchemaType.Number, Description = "Wortform = 0 / Lemma = 1 / POS = 2"}},
+                                    {"Token", new OpenApiSchema {Type = JsonSchemaType.String}},
                                   }
                                 }
                               }
@@ -748,13 +745,13 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
           {
             "/v3/lookup", new OpenApiPathItem
             {
-              Operations = new Dictionary<OperationType, OpenApiOperation>
+              Operations = new Dictionary<HttpMethod, OpenApiOperation>
               {
                 {
-                  OperationType.Post, new OpenApiOperation
+                  HttpMethod.Post, new OpenApiOperation
                   {
                     Description = "Löst ein N-Gramm in korrespondierende Layer-Werte auf.",
-                    Parameters = new List<OpenApiParameter>
+                    Parameters = new List<IOpenApiParameter>
                     {
                       new OpenApiParameter
                       {
@@ -762,12 +759,12 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
                         Description = "Lookup-Anfrage",
                         Schema = new OpenApiSchema
                         {
-                          Type = "object",
-                          Properties = new Dictionary<string, OpenApiSchema>
+                          Type = JsonSchemaType.Object,
+                          Properties = new Dictionary<string, IOpenApiSchema>
                           {
-                            {"Year", new OpenApiSchema {Type = "integer", Description = "Jahr das abgefragt wird (siehe GET /v3/years)."}},
-                            {"Layer", new OpenApiSchema {Type = "integer", Description = "Wortform = 0 / Lemma = 1 / POS = 2"}},
-                            {"Query", new OpenApiSchema {Type = "string", Description = "N-Gramme als string (Leerzeichen getrennt)"}}
+                            {"Year", new OpenApiSchema {Type = JsonSchemaType.Number, Description = "Jahr das abgefragt wird (siehe GET /v3/years)."}},
+                            {"Layer", new OpenApiSchema {Type = JsonSchemaType.Number, Description = "Wortform = 0 / Lemma = 1 / POS = 2"}},
+                            {"Query", new OpenApiSchema {Type = JsonSchemaType.String, Description = "N-Gramme als string (Leerzeichen getrennt)"}}
                           }
                         }
                       }
@@ -784,13 +781,13 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
           {
             "/v3/convert", new OpenApiPathItem
             {
-              Operations = new Dictionary<OperationType, OpenApiOperation>
+              Operations = new Dictionary<HttpMethod, OpenApiOperation>
               {
                 {
-                  OperationType.Post, new OpenApiOperation
+                  HttpMethod.Post, new OpenApiOperation
                   {
                     Description = "Konvertiert die Ausgabe von POST /v3/search in ein gewünschtes Format.",
-                    Parameters = new List<OpenApiParameter>
+                    Parameters = new List<IOpenApiParameter>
                     {
                       new OpenApiParameter
                       {
@@ -803,7 +800,7 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
                         Description = "Ausgabe von POST /v3/search",
                         Schema = new OpenApiSchema
                         {
-                          Type = "object",
+                          Type = JsonSchemaType.Object,
                         }
                       }
                     },
@@ -819,10 +816,10 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
           {
             "/v3/token", new OpenApiPathItem
             {
-              Operations = new Dictionary<OperationType, OpenApiOperation>
+              Operations = new Dictionary<HttpMethod, OpenApiOperation>
               {
                 {
-                  OperationType.Get, new OpenApiOperation
+                  HttpMethod.Get, new OpenApiOperation
                   {
                     Description = "Sollte als erstes aufgerufen werden, wenn man Daten auf den Server schreiben möchte. Gibt einen zufällige Token zurück.",
                     Responses = new OpenApiResponses
@@ -837,13 +834,13 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
           {
             "/v3/update", new OpenApiPathItem
             {
-              Operations = new Dictionary<OperationType, OpenApiOperation>
+              Operations = new Dictionary<HttpMethod, OpenApiOperation>
               {
                 {
-                  OperationType.Post, new OpenApiOperation
+                  HttpMethod.Post, new OpenApiOperation
                   {
                     Description = "Schreibt neue Daten auf den Server. Nur für autorisierte  Apps und Nutzer*innen.",
-                    Parameters = new List<OpenApiParameter>
+                    Parameters = new List<IOpenApiParameter>
                     {
                       new OpenApiParameter
                       {
@@ -851,14 +848,14 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
                         Description = "Update",
                         Schema = new OpenApiSchema
                         {
-                          Type = "object",
-                          Properties = new Dictionary<string, OpenApiSchema>
+                          Type = JsonSchemaType.Object,
+                          Properties = new Dictionary<string, IOpenApiSchema>
                           {
-                            {"Year", new OpenApiSchema {Type = "integer", Description = "Jahreszahl (vierstellig)"}},
-                            {"Month", new OpenApiSchema {Type = "integer", Description = "Monat (zweistellig)"}},
-                            {"Day", new OpenApiSchema {Type = "integer", Description = "Tag (zweistellig)"}},
-                            {"Data", new OpenApiSchema {Type = "string", Description = "Alle Dokumente als ein String. Keine Umbrüche im Dokument. Neue Zeile (\\n) = Neues Dokument."}},
-                            {"SessionKey", new OpenApiSchema {Type = "string", Description = "Der SessionKey muss clientseitig berechnet werden. Berechnung: SHA512-Hash folgender Zeichenfolge: 'SHA512(Data)-TOKEN-SECRET'. SHA512(Data) ist der SHA512-Hash des GZip komprimierten Base64-Strings. Einmal TOKEN kann über /token abgerufen werden (nur einmalig gültig). SECRET muss bekannt sein und ist geheim."}},
+                            {"Year", new OpenApiSchema {Type = JsonSchemaType.Number, Description = "Jahreszahl (vierstellig)"}},
+                            {"Month", new OpenApiSchema {Type = JsonSchemaType.Number, Description = "Monat (zweistellig)"}},
+                            {"Day", new OpenApiSchema {Type = JsonSchemaType.Number, Description = "Tag (zweistellig)"}},
+                            {"Data", new OpenApiSchema {Type = JsonSchemaType.String, Description = "Alle Dokumente als ein String. Keine Umbrüche im Dokument. Neue Zeile (\\n) = Neues Dokument."}},
+                            {"SessionKey", new OpenApiSchema {Type = JsonSchemaType.String, Description = "Der SessionKey muss clientseitig berechnet werden. Berechnung: SHA512-Hash folgender Zeichenfolge: 'SHA512(Data)-TOKEN-SECRET'. SHA512(Data) ist der SHA512-Hash des GZip komprimierten Base64-Strings. Einmal TOKEN kann über /token abgerufen werden (nur einmalig gültig). SECRET muss bekannt sein und ist geheim."}},
                           }
                         }
                       }
@@ -875,10 +872,10 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
           {
             "/heartbeat", new OpenApiPathItem
             {
-              Operations = new Dictionary<OperationType, OpenApiOperation>
+              Operations = new Dictionary<HttpMethod, OpenApiOperation>
               {
                 {
-                  OperationType.Get, new OpenApiOperation
+                  HttpMethod.Get, new OpenApiOperation
                   {
                     Description = "Führt eine schnelle Validierung durch, die überprüft, ob alles wie erwartet funktioniert. Sollte in der Regel nur von Monitoring-Services aufgerufen werden.",
                     Responses = new OpenApiResponses
