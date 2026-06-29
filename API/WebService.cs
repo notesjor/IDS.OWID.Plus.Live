@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using Tfres;
 using HttpContext = Tfres.HttpContext;
 using System.Data;
+using System.Globalization;
 using System.IO.Compression;
 using CorpusExplorer.Sdk.Model.Adapter.Corpus;
 using System.Linq;
@@ -70,6 +71,8 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 
     private Project _project;
     private List<int> _years = new List<int> { };
+    private string _infoLast = "0001-01-01";
+    private string _infoMissing = "";
 
     protected override void ConfigureEndpoints(Server server)
     {
@@ -81,19 +84,21 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       if (!Directory.Exists(_cec6path))
         Directory.CreateDirectory(_cec6path);
 
-      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/heartbeat", Heartbeat);
-      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/ping", (arg) => arg.Response.Send(200));
+      server.AddEndpoint(HttpMethod.Get, "/heartbeat", Heartbeat);
+      server.AddEndpoint(HttpMethod.Get, "/ping", (arg) => arg.Response.Send(200));
 
       ReloadData();
 
-      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/v3/norm", Norm);
-      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/v3/years", Years);
-      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/v3/search", Search);
-      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/v3/convert", Convert);
-      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/v3/lookup", Lookup);
+      server.AddEndpoint(HttpMethod.Get, "/v3/last", (args)=> args.Response.Send(_infoLast));
+      server.AddEndpoint(HttpMethod.Get, "/v3/missing", (args) => args.Response.Send(_infoMissing));
+      server.AddEndpoint(HttpMethod.Get, "/v3/norm", Norm);
+      server.AddEndpoint(HttpMethod.Get, "/v3/years", Years);
+      server.AddEndpoint(HttpMethod.Post, "/v3/search", Search);
+      server.AddEndpoint(HttpMethod.Post, "/v3/convert", Convert);
+      server.AddEndpoint(HttpMethod.Post, "/v3/lookup", Lookup);
 
-      server.AddEndpoint(System.Net.Http.HttpMethod.Get, "/v3/token", Token);
-      server.AddEndpoint(System.Net.Http.HttpMethod.Post, "/v3/update", Update);
+      server.AddEndpoint(HttpMethod.Get, "/v3/token", Token);
+      server.AddEndpoint(HttpMethod.Post, "/v3/update", Update);
     }
 
     private void ClearCache()
@@ -109,8 +114,6 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
         // ignore
       }
     }
-
-
 
     private void Lookup(HttpContext arg)
     {
@@ -384,6 +387,8 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
             _normData = _normData.Where(x => x.Count > 0).ToList();
 
             _normDataStr = JsonConvert.SerializeObject(_normData);
+            GenerateAdditionalInformation();
+
             #endregion
 
             #region Cluster Years
@@ -416,6 +421,34 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
       {
         // ignore
       }
+    }
+
+    private void GenerateAdditionalInformation()
+    {
+      var dates = _normData[0].Keys.OrderBy(x => x);
+      // Last
+      _infoLast = dates.Last();
+
+      // Missing
+      _infoMissing = "";
+      var first = DateTime.ParseExact(dates.First(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
+      var last = DateTime.ParseExact(dates.Last(), "yyyy-MM-dd", CultureInfo.InvariantCulture);
+
+      if (first == DateTime.MinValue || last > DateTime.Now)
+        return;
+
+      var data = new HashSet<DateTime>(dates.Select(x => DateTime.ParseExact(x, "yyyy-MM-dd", CultureInfo.InvariantCulture)));
+      var missing = new List<string>();
+
+      for(var i = first; i < last; i = i.AddDays(1))
+      {
+        if (data.Contains(i))
+          continue;
+
+        missing.Add(i.ToString("yyyy-MM-dd"));
+      }
+
+      _infoMissing = JsonConvert.SerializeObject(missing);
     }
 
     private void Heartbeat(HttpContext arg)
@@ -685,6 +718,42 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
                     Responses = new OpenApiResponses
                     {
                       {"200", new OpenApiResponse {Description = "Ein Dictionary (Tag : t/s) - t = Basiswert für N=1 / zur Berchnung von N=2 (t - s) / zur Berechnung von N=3 (t - s*2) / usw."}}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "/v3/last", new OpenApiPathItem
+            {
+              Operations = new Dictionary<HttpMethod, OpenApiOperation>
+              {
+                {
+                  HttpMethod.Get, new OpenApiOperation
+                  {
+                    Description = "Gibt das zuletzt erfasste Datum zurück.",
+                    Responses = new OpenApiResponses
+                    {
+                      {"200", new OpenApiResponse {Description = "Ein string im Format yyyy-MM-dd."}}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "/v3/missing", new OpenApiPathItem
+            {
+              Operations = new Dictionary<HttpMethod, OpenApiOperation>
+              {
+                {
+                  HttpMethod.Get, new OpenApiOperation
+                  {
+                    Description = "Gibt zurück, welche Tage nicht erfasst wurden (zwischen Start-Datum de Erhebung und letztem Erhebungsdatum [siehe /v3/last]).",
+                    Responses = new OpenApiResponses
+                    {
+                      {"200", new OpenApiResponse {Description = "Ein Array mit stings - Datumsformat yyyy-MM-dd."}}
                     }
                   }
                 }
