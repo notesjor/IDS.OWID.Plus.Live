@@ -2,7 +2,7 @@
   "profiles": {
     "IDS.Lexik.OWIDplusLIVE.Upload": {
       "commandName": "Project",
-      "commandLineArgs": "http://lexik07.ids-mannheim.de/api/owid-plus-live/v3/ 43de7346ef884d4ab3bfdfc43d6d0ce2 2025-09-09.txt"
+      "commandLineArgs": "http://10.1.1.35/api/owid-plus-live/v3/ 43de7346ef884d4ab3bfdfc43d6d0ce2 2026-07-02.txt"
     }
   }
 }
