@@ -1,0 +1,346 @@
+<template>
+  <div>
+    <v-app-bar app dark class="d-print-none" style="z-index: 999">
+      <div>
+        <a :href="config.leftIconHref" target="_blank">
+          <img alt="Logo" height="40px" src="/logo_left.svg" />
+        </a>
+      </div>
+
+      <v-spacer />
+
+      <div>
+        <a :href="config.rightIconHref" target="_blank">
+          <img alt="Logo" height="70px" src="/logo_right.svg" />
+        </a>
+      </div>
+    </v-app-bar>
+
+    <v-main>
+      <v-container>
+        <v-row>
+          <v-col>
+            <Search ref="searchComponent" @searchRequestSubmitted="scrollToVizPanel" />
+          </v-col>
+        </v-row>
+
+        <v-row class="text-center">
+          <v-col>
+            <VizPanel id="vizPanel" v-show="store.vizData != null" />
+          </v-col>
+        </v-row>
+
+        <v-row class="text-center">
+          <v-col>
+            <VizOptions v-show="store.vizData != null" />
+          </v-col>
+        </v-row>
+
+        <v-row class="text-center">
+          <v-col>
+            <Clipboard />
+          </v-col>
+        </v-row>
+
+        <v-row>
+          <v-col>
+            <v-footer padless>
+              <v-card class="flex" flat tile>
+                <v-card-text class="py-2" style="text-align: left">
+                  <div style="display: inline-block">
+                    {{ $t('footer_corpusSize') }}
+                    <i>
+                      ({{ $t('footer_lastUpdate') }}: {{ store.owid === null ? '' : store.owid.LastDate }}):
+                    </i>
+                    <br />
+                    {{ totalLabel }}
+                  </div>
+                </v-card-text>
+              </v-card>
+            </v-footer>
+          </v-col>
+
+          <v-col>
+            <v-footer padless>
+              <v-card class="flex" flat tile>
+                <v-card-text class="py-2" style="text-align: right">
+                  <div style="display: inline-block">
+                    {{ new Date().getFullYear() }} — <strong>{{ config.appName }}</strong>
+                  </div>
+                  <div style="display: inline-block">
+                    <a v-if="config.footerContact && config.footerContact.length > 1" :href="config.footerContact" style="margin-left: 15px">{{ $t('footer_Contact') }}</a>
+                    <a v-if="config.footerImpressum && config.footerImpressum.length > 1" :href="config.footerImpressum" style="margin-left: 15px">{{ $t('footer_Impressum') }}</a>
+                    <a v-if="config.footerDsgvo && config.footerDsgvo.length > 1" :href="config.footerDsgvo" style="margin-left: 15px">{{ $t('footer_Dsgvo') }}</a>
+                  </div>
+                </v-card-text>
+              </v-card>
+            </v-footer>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-main>
+
+    <v-menu top>
+      <template #activator="{ props }">
+        <v-btn color="#EF7D00" fab style="position: fixed; right: 1em; bottom: 1em" v-bind="props">
+          <v-icon>mdi-menu</v-icon>
+        </v-btn>
+      </template>
+
+      <v-list>
+        <v-list-item @click="newProject">
+          <div>
+            <v-icon style="font-size: 32px; float: left; margin-right: 5px">mdi-file-outline</v-icon>
+            <div class="d-none d-sm-flex">
+              <span style="font-size: 14px; line-height: 1; font-weight: 200">
+                <p v-html="$t('main_menu_new')" />
+              </span>
+            </div>
+          </div>
+        </v-list-item>
+
+        <v-list-item v-if="config.tutorialUrl && config.tutorialUrl.length > 0" @click="showTutorial">
+          <v-icon style="font-size: 32px; float: left; margin-right: 5px">mdi-help-circle-outline</v-icon>
+          <div class="d-none d-sm-flex">
+            <span style="font-size: 14px; line-height: 1; font-weight: 200; margin-top: 10px">
+              <p v-html="$t('main_menu_videoTutorial')" />
+            </span>
+          </div>
+        </v-list-item>
+
+        <v-list-item>
+          <div class="d-none d-sm-flex">
+            <span style="font-size: 14px; line-height: 1; font-weight: 200; margin-top: 10px">
+              <p>
+                <strong>{{ $t('main_menu_language') }}</strong><br />
+                <a @click="setLocale('de')"><img src="/locales/de.svg" alt="Deutsch" style="height: 24px; margin: 10px 10px 5px 0px" /></a>
+                <a @click="setLocale('en')"><img src="/locales/gb.svg" alt="Englisch" style="height: 24px; margin: 10px 10px 5px 0px" /></a>
+                <a @click="setLocale('th')"><img src="/locales/th.svg" alt="Thai" style="height: 24px; margin: 10px 10px 5px 0px" /></a>
+                <a @click="setLocale('cmn')"><img src="/locales/cn.svg" alt="Mandarin" style="height: 24px; margin: 10px 10px 5px 0px" /></a>
+              </p>
+            </span>
+          </div>
+        </v-list-item>
+      </v-list>
+    </v-menu>
+
+    <v-overlay :model-value="!tutorial">
+      <div style="background-color: rgb(55, 55, 64); display: block; min-height: 410px; max-height: 410px; min-width: 300px; max-width: 300px; position: absolute; left: -320px; top: 50px;">
+        <h3 style="margin: 7px 0px 10px 15px;">Neuigkeiten</h3>
+        <v-window v-model="newsAll" vertical>
+          <v-window-item :key="0">
+            <v-virtual-scroll :items="news" height="368" item-height="64">
+              <template #default="{ item }">
+                <v-list-item :key="item" class="newsItem" @click="newsSelected = item.id">
+                  <div>
+                    <span style="width: 100%">
+                      <v-icon>{{ item.icon }}</v-icon>&nbsp;
+                      <b>{{ item.date }}:</b> {{ item.title }}
+                    </span>
+                  </div>
+                </v-list-item>
+                <v-divider />
+              </template>
+            </v-virtual-scroll>
+          </v-window-item>
+
+          <v-window-item :key="1">
+            <div style="height: 100%; width: 100%; padding: 0px 10px 0px 10px; min-height: 352px;">
+              <v-row align="center" class="mb-4" style="margin: 5px 0px 0px 0px; font-size: 1.2rem;">
+                <v-icon>{{ news[newsSelected]?.icon }}</v-icon>&nbsp;
+                <b>{{ news[newsSelected]?.date }}:</b> {{ news[newsSelected]?.title }}
+              </v-row>
+
+              <div v-html="news[newsSelected]?.text" style="text-align: left;" class="newsText" />
+              <div style="margin: 10px 0px 0px 0px; position: absolute; bottom: 0px;">
+                <v-btn @click="newsSelected = -1">
+                  <v-icon>mdi-arrow-left-circle-outline</v-icon> Zeige alle Neuigkeiten
+                </v-btn>
+              </div>
+            </div>
+          </v-window-item>
+        </v-window>
+      </div>
+
+      <div class="text-center">
+        <v-card>
+          <v-card-title class="headline">
+            {{ $t('app_dialog_welcome_message') }} {{ config.appName }}
+          </v-card-title>
+          <iframe :src="tutorialIframeSrc" title="Video-Tutorial" style="width: 600px; max-width: 600px; height: 414px; max-height: 414px;" />
+          <v-card-text>
+            {{ $t('app_dialog_welcome_message_info') }}
+          </v-card-text>
+          <v-card-actions>
+            <v-btn text class="blink" @click="closeTutorial">
+              <v-icon style="margin-right: 10px">mdi-arrow-right-circle-outline</v-icon>
+              <span>{{ $t('app_dialog_welcome_message_btn') }}</span>
+            </v-btn>
+            <v-spacer />
+          </v-card-actions>
+        </v-card>
+      </div>
+    </v-overlay>
+
+    <v-overlay :model-value="alert">
+      <div class="text-center">
+        <v-card>
+          <v-card-title class="headline">
+            {{ $t('app_dialog_serverError_message') }} {{ config.appName }}
+          </v-card-title>
+          <v-card-text>
+            {{ $t('app_dialog_serverError_message_info') }}
+          </v-card-text>
+        </v-card>
+      </div>
+    </v-overlay>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { computed, onMounted, ref } from 'vue'
+import { useOwidStore } from '~/stores/owid'
+
+const config = useNuxtApp().$config || {}
+const store = useOwidStore()
+const searchComponent = ref()
+const tutorial = ref(false)
+const tutorialIframeSrc = ref('')
+const alert = ref(false)
+const newsSelected = ref(-1)
+const news = ref([
+  { id: 0, title: 'Version 3.0', date: '2025-10-07', text: 'Die neue API basiert auf dem <a href="https://notes.jan-oliver-ruediger.de/software/corpusexplorer-overview/">CorpusExplorer</a>.', icon: 'mdi-xml' },
+  { id: 1, title: 'Daten-Crash', date: '2025-09-05', text: 'Die Daten im Zeitraum 03.07.-04.09.2025 sind verloren gegangen.', icon: 'mdi-alert-decagram-outline' },
+  { id: 2, title: 'Print-Publikation', date: '2024-06-27', text: 'OpenAccess Artikel verfügbar.', icon: 'mdi-book-open-variant' }
+])
+
+const totalLabel = computed(() => {
+  if (store.owid === null) return ''
+  const totals = store.owid.Total
+  return totals.map((value, index) => `N=${index + 1}: ${value}`).join(' / ')
+})
+
+const newsAll = computed({
+  get: () => (newsSelected.value === -1 ? 0 : 1),
+  set: () => {}
+})
+
+function newProject() {
+  location.reload()
+}
+
+function showTutorial() {
+  tutorial.value = false
+}
+
+function setLocale(locale: string) {
+  localStorage.setItem('locale', locale)
+  const { $i18n } = useNuxtApp()
+  if ($i18n && $i18n.locale !== undefined) {
+    $i18n.locale = locale
+  }
+}
+
+function closeTutorial() {
+  localStorage.setItem('tutorial', new Date().toISOString())
+  tutorial.value = true
+}
+
+function scrollToVizPanel() {
+  document.getElementById('vizPanel')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  window.scrollBy(0, -100)
+}
+
+onMounted(() => {
+  const locale = localStorage.getItem('locale')
+  if (locale) setLocale(locale)
+
+  const tutorialDate = localStorage.getItem('tutorial')
+  if (tutorialDate) {
+    const last = new Date(tutorialDate)
+    if (Number.isNaN(last.getTime())) {
+      tutorial.value = false
+    } else {
+      tutorial.value = Date.now() - last.getTime() < 86400000
+    }
+  } else {
+    tutorial.value = false
+  }
+
+  const baseUrl = 'https://www.owid.de/plus/live-2021/api/v3'
+
+  fetch(baseUrl + '/years')
+    .then((response) => response.json())
+    .then((response) => {
+      store.setYears(response)
+
+      return fetch(baseUrl + '/norm', { method: 'GET' })
+    })
+    .then((resp) => {
+      if (resp.status !== 200) throw new Error('Server Error')
+      return resp.json()
+    })
+    .then((obj) => {
+      store.init(obj)
+      store.vizOption({ r: true, s: 16, g: 1 })
+    })
+    .catch((ex) => {
+      console.error(ex)
+      alert.value = true
+    })
+
+  if (!config.tutorialUrl || config.tutorialUrl.length < 1) {
+    tutorial.value = true
+  } else {
+    tutorialIframeSrc.value = config.tutorialUrl
+  }
+})
+</script>
+
+<style scoped>
+.blink {
+  width: 200px;
+  height: 50px;
+  padding: 15px;
+  text-align: center;
+  line-height: 50px;
+}
+
+.blink span {
+  color: white;
+  animation: blink 3s linear infinite;
+}
+
+.newsItem {
+  background-color: rgb(75, 75, 84);
+}
+
+.newsItem:hover {
+  background-color: rgb(95, 95, 104);
+  cursor: pointer;
+}
+
+@keyframes blink {
+  0% { opacity: 0.3; }
+  25% { opacity: 0.7; }
+  50% { opacity: 1; }
+  75% { opacity: 0.7; }
+  100% { opacity: 0.3; }
+}
+
+div.newsText > a {
+  color: #ff9800;
+  text-decoration: none;
+}
+
+div.newsText a:visited {
+  color: #ff9800;
+  text-decoration: none;
+}
+
+div.newsText {
+  font-size: 1.1rem;
+  font-weight: 200;
+  line-height: 1.4;
+}
+</style>
