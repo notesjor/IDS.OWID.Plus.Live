@@ -1,71 +1,35 @@
 {
   "name": "OWIDplusLIVE",
-  "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
-    "i18n:report": "vue-cli-service i18n:report --src \"./src/**/*.?(js|vue)\" --locales \"./src/locales/**/*.json\""
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "lint": "eslint ."
   },
   "dependencies": {
-    "caniuse-lite": "^1.0.30001751",
-    "core-js": "^3.46.0",
+    "@mdi/font": "^7.4.47",
+    "@pinia/nuxt": "^0.9.0",
     "echarts": "^5.6.0",
     "highlight.js": "^11.11.1",
+    "nuxt": "^3.17.0",
     "panzoom": "^9.4.3",
-    "vue": "^2.7.16",
+    "pinia": "^2.3.1",
+    "vue": "^3.5.0",
     "vue-cookie": "^1.1.4",
     "vue-echarts": "^6.7.3",
-    "vue-i18n": "^8.28.2",
-    "vue-meta": "^2.4.0",
-    "vue-panzoom": "^1.1.6",
-    "vuetify": "^2.7.2",
-    "vuex": "^3.6.2"
+    "vue-i18n": "^9.0.0",
+    "vuetify": "^3.7.2"
   },
   "devDependencies": {
-    "@intlify/vue-i18n-loader": "^1.1.0",
-    "@mdi/font": "^5.9.55",
-    "@mdi/js": "^5.9.55",
-    "@vue/cli-plugin-babel": "^4.5.19",
-    "@vue/cli-plugin-eslint": "^4.5.19",
-    "@vue/cli-plugin-vuex": "^4.5.19",
-    "@vue/cli-service": "^4.5.19",
-    "babel-eslint": "^10.1.0",
-    "css-loader": "^5.2.7",
-    "eslint": "^6.8.0",
-    "eslint-plugin-vue": "^6.2.2",
-    "material-design-icons-iconfont": "^6.7.0",
-    "sass": "^1.93.2",
-    "sass-loader": "^8.0.2",
-    "vee-validate": "^3.4.15",
-    "vue-cli-plugin-i18n": "^2.3.2",
-    "vue-cli-plugin-vuetify": "^2.5.8",
-    "vue-cli-plugin-vuetify-preset-rally": "^1.0.4",
-    "vue-template-compiler": "^2.7.16",
-    "vuetify-loader": "^1.9.2"
-  },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "plugin:vue/essential",
-      "eslint:recommended"
-    ],
-    "parserOptions": {
-      "parser": "babel-eslint"
-    },
-    "rules": {}
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead"
-  ],
-  "trustedDependencies": [
-    "core-js",
-    "ejs"
-  ]
+    "@nuxt/devtools": "^1.7.0",
+    "@nuxt/eslint-config": "^1.0.0",
+    "eslint": "^9.0.0",
+    "eslint-plugin-vue": "^9.0.0",
+    "sass": "^1.77.0",
+    "typescript": "^5.8.0",
+    "vue-tsc": "^2.1.0"
+  }
 }
