@@ -1,10 +1,10 @@
 import { createI18n } from 'vue-i18n'
 
-const localeModules = import.meta.glob('../src/locales/*.json', { eager: true })
-const messages = Object.entries(localeModules).reduce((acc, [filePath, mod]) => {
+const localeModules = import.meta.glob('../locales/*.json', { eager: true })
+const messages = Object.entries(localeModules).reduce<Record<string, any>>((acc, [filePath, mod]) => {
   const fileName = filePath.split('/').pop() || filePath
   const locale = fileName.replace(/\.json$/, '')
-  acc[locale] = (mod.default || mod)
+  acc[locale] = (mod as any).default || mod
   return acc
 }, {})
 

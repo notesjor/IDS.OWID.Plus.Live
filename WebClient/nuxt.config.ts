@@ -3,6 +3,9 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
   modules: ['@pinia/nuxt'],
   css: ['@mdi/font/css/materialdesignicons.css'],
+  experimental: {
+    appManifest: false
+  },
   app: {
     head: {
       title: 'OWIDplusLIVE',
