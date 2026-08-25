@@ -1,139 +1,75 @@
 <template>
-  <v-chart ref="myChart" autoresize :option="chartOptions" :init-options="initOptions" />
+  <v-container>
+    <v-expansion-panels>
+      <v-expansion-panel>
+        <v-expansion-panel-title>Suche</v-expansion-panel-title>
+        <v-expansion-panel-text>
+          <v-row>
+            <v-col cols="12" md="4">
+              <v-select v-model="focusYear" :items="years" label="Fokusjahr" outlined />
+            </v-col>
+            <v-col cols="12" md="8">
+              <v-range-slider v-model="searchRange" :max="maxYear" :min="minYear" step="1" thumb-label="always" />
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12">
+              <v-text-field v-model="query" label="Suchausdruck" @keydown.enter="search_simple" />
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="6">
+              <v-btn block color="error" variant="outlined" @click="delete_simple">Löschen</v-btn>
+            </v-col>
+            <v-col cols="6">
+              <v-btn block color="primary" @click="search_simple">Suchen</v-btn>
+            </v-col>
+          </v-row>
+        </v-expansion-panel-text>
+      </v-expansion-panel>
+    </v-expansion-panels>
+  </v-container>
 </template>
 
 <script>
-import { use } from "echarts/core";
-import { SankeyChart } from "echarts/charts";
-import {
-  GridComponent,
-  TooltipComponent,
-  LegendComponent,
-  VisualMapComponent,
-  ToolboxComponent,
-} from "echarts/components";
-import { CanvasRenderer } from "echarts/renderers";
-
-use([
-  SankeyChart,
-  GridComponent,
-  TooltipComponent,
-  LegendComponent,
-  VisualMapComponent,
-  CanvasRenderer,
-  ToolboxComponent,
-]);
-
 export default {
-  name: "VizSankey",
-  theme: { dark: false },
+  name: 'Search',
   data() {
     return {
-      initOptions: {
-        renderer: "canvas",
-      },
-    };
+      years: [],
+      focusYear: null,
+      searchRange: [2000, 2024],
+      minYear: 2000,
+      maxYear: 2024,
+      query: '',
+    }
+  },
+  mounted() {
+    const storeYears = this.$store?.state?.years || []
+    this.years = storeYears
+    if (storeYears.length) {
+      this.minYear = storeYears[0]
+      this.maxYear = storeYears[storeYears.length - 1]
+      this.focusYear = storeYears[0]
+      this.searchRange = [storeYears[0], storeYears[storeYears.length - 1]]
+    }
   },
   methods: {
-    setChartHeight(height) {
-      const refs = this.$refs;
-      setTimeout(() => {
-        refs.myChart.resize({ height });
-      }, 0);
+    search_simple() {
+      this.$store?.commit?.('calculate')
     },
-  },
-  computed: {
-    chartOptions() {
-      if (this.$store.state.vizData === null) return;
-
-      const tnodes = new Set();
-      const links = [];
-
-      for (const key in this.$store.state.vizData) {
-        if (key === "ALLE") continue;
-        const data = this.$store.state.vizData[key];
-
-        Object.keys(data.items).forEach((key2) => {
-          let sum = 0;
-          Object.keys(data.items[key2].data).forEach((key3) => {
-            sum += data.items[key2].data[key3].value;
-          });
-
-          const tokens = data.items[key2].name.split(" ");
-          let last = "0>>>";
-          let n = 1;
-          tokens.forEach((t) => {
-            const ntk = n + t;
-            tnodes.add(ntk);
-            n++;
-
-            if (last != null) links.push({ source: last, target: ntk, value: sum });
-            last = ntk;
-          });
-        });
-      }
-
-      const nodes = [{ name: "", id: "0>>>" }];
-      Array.from(tnodes).forEach((nt) => {
-        nodes.push({ name: nt.substring(1), id: nt });
-      });
-
-      this.setChartHeight(nodes.length * 20);
-
-      const unit = this.$store.state.vizOptionRelative ? this.$t("lbl_unit_tokenPPM") : this.$t("lbl_unit_token");
-
-      return {
-        toolbox: {
-          show: true,
-          feature: {
-            saveAsImage: {
-              title: this.$t("lbl_save") + " \xa0 \xa0 \xa0 \xa0 \xa0",
-              name: this.$t("lbl_export_fileName"),
-            },
-          },
-        },
-        animation: false,
-        tooltip: {
-          trigger: "item",
-          triggerOn: "mousemove",
-          formatter: function (params) {
-            return (
-              (params.data.source === "START >>>" ? "" : params.data.source.substring(1)) +
-              " -- " +
-              params.data.value
-                .toFixed(3)
-                .replace(",", "'")
-                .replace(".", ",") +
-              " " +
-              unit +
-              " -> " +
-              params.data.target.substring(1)
-            );
-          },
-        },
-        series: [
-          {
-            type: "sankey",
-            data: nodes,
-            dataLabels: {
-              allowOverlap: false,
-            },
-            links,
-            emphasis: {
-              focus: "adjacency",
-            },
-            lineStyle: {
-              curveness: 0.5,
-            },
-            label: {
-              formatter: function (params) {
-                return params.data.name;
-              },
-            },
-          },
-        ],
-      };
+    delete_simple() {
+      this.query = ''
+      this.searchRange = [this.minYear, this.maxYear]
     },
+    search_invoke() {},
+    sample_simple_click() {},
+    fixSampleLanguage(value) { return value },
+    search_simple_n_change() {},
+    search_complex_n_change() {},
+    search_complex() {},
+    stopClickSimple() {},
+    stopClickComplex() {},
   },
-};
+}
 </script>

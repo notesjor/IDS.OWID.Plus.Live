@@ -11,5 +11,13 @@ export default defineNuxtConfig({
   },
   pinia: {
     storesDirs: ['./stores/**']
+  },
+  build: {
+    transpile: ['vuetify']
+  },
+  vite: {
+    optimizeDeps: {
+      exclude: ['vuetify']
+    }
   }
 })
