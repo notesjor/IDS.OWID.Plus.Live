@@ -1,100 +1,138 @@
 <template>
-  <v-chart ref="myChart" autoresize :option="chartOptions" :init-options="initOptions" />
+  <v-chart ref="myChart" autoresize :option="chartOptions" :init-options="initOptions" :style="chartStyle" />
 </template>
 
 <script>
-import Vue from "vue";
-import VueECharts, { THEME_KEY } from "vue-echarts";
-
 import { use } from "echarts/core";
-import {
-  SankeyChart
-} from "echarts/charts";
+import { HeatmapChart } from "echarts/charts";
 import {
   GridComponent,
   TooltipComponent,
   LegendComponent,
+  TitleComponent,
   VisualMapComponent,
   ToolboxComponent,
+  DataZoomComponent,
 } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
 
 use([
-  SankeyChart,
+  HeatmapChart,
   GridComponent,
   TooltipComponent,
   LegendComponent,
+  TitleComponent,
   VisualMapComponent,
   CanvasRenderer,
-  ToolboxComponent
+  ToolboxComponent,
+  DataZoomComponent,
 ]);
 
-Vue.component('v-chart', VueECharts);
+const monthMap = { nameMap: null };
+const dayMap = { firstDay: 1, nameMap: null };
 
 export default {
-  name: "VizSankey",
+  name: "VizCalendar",
   theme: { dark: false },
-  provide: {
-    [THEME_KEY]: "light"
-  },
   data() {
     return {
       initOptions: {
-        renderer: "canvas"
-      }
+        renderer: "canvas",
+      },
+      chartStyle: "min-height:650px;",
     };
   },
-  methods:{
-    setChartHeight: function (height) {
-      var refs = this.$refs;
+  methods: {
+    setChartHeight(height) {
+      this.chartStyle = `min-height:${height}px;`;
+      const refs = this.$refs;
       setTimeout(() => {
-        refs.myChart.resize({ height: height });
+        refs.myChart.resize({ height });
       }, 0);
-    }
+    },
+  },
+  created() {
+    monthMap.nameMap = [
+      this.$t("lbl_month_short_january"),
+      this.$t("lbl_month_short_february"),
+      this.$t("lbl_month_short_march"),
+      this.$t("lbl_month_short_april"),
+      this.$t("lbl_month_short_may"),
+      this.$t("lbl_month_short_june"),
+      this.$t("lbl_month_short_july"),
+      this.$t("lbl_month_short_august"),
+      this.$t("lbl_month_short_september"),
+      this.$t("lbl_month_short_october"),
+      this.$t("lbl_month_short_november"),
+      this.$t("lbl_month_short_december"),
+    ];
+    dayMap.nameMap = [
+      this.$t("lbl_weekday_short_monday"),
+      this.$t("lbl_weekday_short_tuesday"),
+      this.$t("lbl_weekday_short_wednesday"),
+      this.$t("lbl_weekday_short_thursday"),
+      this.$t("lbl_weekday_short_friday"),
+      this.$t("lbl_weekday_short_saturday"),
+      this.$t("lbl_weekday_short_sunday"),
+    ];
+    dayMap.firstDay = parseInt(this.$t("lbl_weekday_firstIndex"));
   },
   computed: {
     chartOptions() {
       if (this.$store.state.vizData === null) return;
 
-      var tnodes = new Set();
-      var links = [];
-
-      console.log(this.$store.state.vizData);
-
-      for (const key in this.$store.state.vizData) {
-        if (key === "ALLE") continue;
-        const data = this.$store.state.vizData[key];
-
-        Object.keys(data.items).forEach((key2) => {
-          var sum = 0;
-          Object.keys(data.items[key2].data).forEach((key3) => {
-            sum += data.items[key2].data[key3].value;
+      const tmp = {};
+      Object.keys(this.$store.state.vizData).forEach((sK) => {
+        Object.keys(this.$store.state.vizData[sK].data).forEach((d) => {
+          this.$store.state.vizData[sK].data[d].dates.forEach((i) => {
+            if (i in tmp) tmp[i] += parseFloat(this.$store.state.vizData[sK].data[d].value);
+            else tmp[i] = parseFloat(this.$store.state.vizData[sK].data[d].value);
           });
+        });
+      });
 
-          var tokens = data.items[key2].name.split(" ");
-          var last = "0>>>";
-          var n = 1;
-          tokens.forEach((t) => {
-            var ntk = n + t;
-            tnodes.add(ntk);
-            n++;
+      const res = [];
+      Object.keys(tmp).forEach((k) => {
+        res.push([k, tmp[k]]);
+      });
 
-            if (last != null) links.push({ source: last, target: ntk, value: sum });
+      let min = 2020;
+      let max = 0;
+      res.forEach((r) => {
+        const val = parseInt(r[0].substring(0, 4));
+        if (val < min) min = val;
+        if (val > max) max = val;
+      });
 
-            last = ntk;
-          });
+      const diff = max - min + 1;
+      const series = [];
+      for (let si = 0; si < diff; si++) {
+        series.push({
+          type: "heatmap",
+          coordinateSystem: "calendar",
+          calendarIndex: si,
+          data: res,
         });
       }
 
-      var nodes = [];
-      nodes.push({ name: "", id: "0>>>" });
-      Array.from(tnodes).forEach((nt) => {
-        nodes.push({ name: nt.substring(1), id: nt });
+      const calenderHeight = 175;
+      const chartSize = series.length * calenderHeight + 425;
+      this.setChartHeight(chartSize);
+
+      const unit = this.$store.state.vizOptionRelative ? this.$t("lbl_unit_tokenPPM") : this.$t("lbl_unit_token");
+
+      const calendars = [];
+      let top = 35;
+      this.$store.state.years.forEach((year) => {
+        calendars.push({
+          range: year,
+          cellSize: ["auto", 20],
+          dayLabel: dayMap,
+          monthLabel: monthMap,
+          top,
+        });
+        top += calenderHeight;
       });
-
-      this.setChartHeight(nodes.length * 20);
-
-      var unit = this.$store.state.vizOptionRelative ? this.$t("lbl_unit_tokenPPM") : this.$t("lbl_unit_token");
 
       return {
         toolbox: {
@@ -106,46 +144,31 @@ export default {
             },
           },
         },
-        animation: false,
         tooltip: {
-          trigger: "item",
-          triggerOn: "mousemove",
+          position: "top",
           formatter: function (params) {
             return (
-              (params.data.source === "START >>>" ? "" : params.data.source.substring(1)) +
-              " -- " +
-              params.data.value
-                .toFixed(3)
-                .replace(",", "'")
-                .replace(".", ",") +
+              params.value[0].substring(0, 10) +
+              ": " +
+              params.value[1].toFixed(3).replace(",", "'").replace(".", ",") +
               " " +
-              unit +
-              " -> " +
-              params.data.target.substring(1)
+              unit
             );
           },
         },
-        series: [
-          {
-            type: "sankey",
-            data: nodes,
-            dataLabels: {
-              allowOverlap: false
-            },
-            links: links,
-            emphasis: {
-              focus: "adjacency",
-            },
-            lineStyle: {
-              curveness: 0.5,
-            },
-            label: {
-              formatter: function (params) {
-                return params.data.name;
-              },
-            },
+        visualMap: {
+          min: Math.min(...res.map((o) => o[1]), 0),
+          max: Math.max(...res.map((o) => o[1]), 0),
+          calculable: true,
+          orient: "horizontal",
+          left: "center",
+          top: "bottom",
+          inRange: {
+            color: ["#1feaea", "#ffd200", "#f72047"],
           },
-        ],
+        },
+        calendar: calendars,
+        series,
       };
     },
   },
