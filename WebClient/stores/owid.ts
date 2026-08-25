@@ -4,55 +4,56 @@ import { Normalize, Prefill } from './DataHelper'
 
 export const useOwidStore = defineStore('owid', {
   state: () => ({
-    years: [],
+    years: [] as number[],
     yearMin: 0,
     yearMax: 0,
     yearInc: 0,
     yearFocus: 2024,
-    owid: null,
+    owid: null as OwidLiveStorage | null,
     version: 0,
     searches: 0,
     vizNoCommit: 0,
     vizOptionRelative: true,
     vizOptionGranulation: 0,
     vizOptionSmoothing: 16,
-    vizData: null
+    vizData: null as Record<string, any> | null
   }),
   actions: {
-    setYears(years) {
+    setYears(years: number[]) {
       this.years = years
       this.yearMin = Math.min(...years)
       this.yearMax = Math.max(...years)
       this.yearInc = -1
     },
-    focusYear(year) {
+    focusYear(year: number) {
       this.yearFocus = year
     },
-    init(payload) {
+    init(payload: any) {
       this.owid = new OwidLiveStorage(payload)
     },
     clearAll() {
-      this.owid.clearAll()
+      this.owid?.clearAll()
     },
-    updateN(N) {
-      this.owid.N = N
+    updateN(N: number) {
+      if (this.owid) this.owid.N = N
     },
-    search({ n, queryItems, items }) {
+    search({ n, queryItems, items }: { n: number, queryItems: any, items: any[] }) {
+      if (!this.owid) return
       this.owid.addOwidLiveSearchItem(n, queryItems, items)
       this.searches = Object.keys(this.owid.OwidLiveSearches).length
     },
-    vizOption(payload) {
+    vizOption(payload: { r: boolean, g: number, s: number }) {
       this.vizOptionRelative = payload.r
       this.vizOptionGranulation = payload.g
       this.vizOptionSmoothing = payload.s
     },
-    selectSearchChange(payload) {
-      this.owid.selectSearchItems(payload)
+    selectSearchChange(payload: any[]) {
+      this.owid?.selectSearchItems(payload)
     },
-    selectSearchHistoryItemsChange(payload) {
-      this.owid.selectSearchHistoryItem(payload)
+    selectSearchHistoryItemsChange(payload: any[]) {
+      this.owid?.selectSearchHistoryItem(payload)
     },
-    modelLoad(o) {
+    modelLoad(o: any) {
       this.owid = OwidLiveStorage.load(o.Norm, o.OwidLiveSearches, o.N, o.Dates, o.Total, o.NormTotal)
     },
     calculate() {
@@ -62,7 +63,7 @@ export const useOwidStore = defineStore('owid', {
       }
 
       this.vizData = {}
-      const res = {}
+      const res: Record<string, any> = {}
 
       switch (this.vizOptionGranulation) {
         case 1:
@@ -85,7 +86,7 @@ export const useOwidStore = defineStore('owid', {
         const search = this.owid.OwidLiveSearches[s]
         if (search.N !== this.owid.N) continue
 
-        const subItems = {}
+        const subItems: Record<string, any> = {}
         for (const i in search.OwidLiveStorageTimeItems) {
           const item = search.OwidLiveStorageTimeItems[i]
           if (!item.IsSelected) continue
@@ -115,6 +116,7 @@ export const useOwidStore = defineStore('owid', {
             items: null
           }
         }
+
         if (Object.keys(subItems).length === 0) continue
 
         if (search.IsSelected) {
@@ -146,7 +148,7 @@ export const useOwidStore = defineStore('owid', {
           Object.keys(subItems).forEach((x) => {
             res[x] = {
               name: subItems[x].name,
-              label: subItems[x].Label,
+              label: subItems[x].label,
               data: subItems[x].data,
               items: [subItems[x]]
             }
@@ -193,8 +195,8 @@ export const useOwidStore = defineStore('owid', {
       }
 
       if (this.vizOptionSmoothing > 1) {
-        let carret
-        let odd
+        let carret: number
+        let odd: boolean
 
         if (this.vizOptionSmoothing % 2 === 0) {
           carret = parseInt((this.vizOptionSmoothing / 2).toFixed(0))
@@ -209,18 +211,18 @@ export const useOwidStore = defineStore('owid', {
         Object.keys(res).forEach((key) => {
           const item = res[key].data
           const keys = this.owid.Dates
-          const nval = {}
+          const nval: Record<string, any> = {}
           const keysLength = keys.length
 
           for (let i = carret; i < keysLength - carret; i++) {
-            const dates = new Set()
+            const dates = new Set<string>()
             let sum = 0.0
 
             for (let j = -carret; j <= carret; j++) {
               const currentKey = keys[i + j]
               if (!item[currentKey]) continue
 
-              item[currentKey].dates.forEach((d) => dates.add(d))
+              item[currentKey].dates.forEach((d: string) => dates.add(d))
 
               if (odd || (j !== -carret && j !== carret)) {
                 sum += item[currentKey].value * (1.0 / this.vizOptionSmoothing)

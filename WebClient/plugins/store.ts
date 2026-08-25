@@ -35,5 +35,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   }
 
   nuxtApp.config.globalProperties.$store = compatStore
+  nuxtApp.vueApp.config.globalProperties.$store = compatStore
+  nuxtApp.vueApp.config.globalProperties.$pinia = store
   nuxtApp.provide('store', compatStore)
 })
