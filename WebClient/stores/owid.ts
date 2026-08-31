@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-import { OwidLiveStorage } from '~/src/store/OwidLiveStorage'
-import { Normalize, Prefill } from '~/src/store/DataHelper'
+import { OwidLiveStorage } from './OwidLiveStorage'
+import { Normalize, Prefill } from './DataHelper'
 
 export const useOwidStore = defineStore('owid', {
   state: () => ({

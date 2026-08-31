@@ -1,5 +1,5 @@
 import { OwidLiveSearch } from "./OwidLiveSearch";
-require("./DateHelper.js");
+import "./DateHelper.js";
 
 export class OwidLiveStorage {
   #OwidLiveSearches;
