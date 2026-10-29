@@ -287,7 +287,8 @@ export const useOwidStore = defineStore("owid", {
           }
       }
 
-      state.vizData = res;
+      // vizData ist groß und wird nur komplett ersetzt -> kein tiefer Reactive-Proxy
+      state.vizData = markRaw(res);
       state.version++;
     },
   },

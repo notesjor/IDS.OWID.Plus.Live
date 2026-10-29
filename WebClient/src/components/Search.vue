@@ -630,6 +630,7 @@
 </style>
 
 <script>
+import { nextTick } from "vue";
 import TagsetInfo from "./TagsetInfo.vue";
 import { useOwidStore } from "../store/owid";
 
@@ -664,6 +665,8 @@ class queryItem {
     return "[" + (this.position + 1) + ". " + global_layers[this.layer] + "] = " + this.token;
   }
 }
+
+const nextFrame = () => new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)));
 
 async function sendSearchRequest(data, store, n, queryItems) {
   data.progressWait = true; 
@@ -727,6 +730,7 @@ async function sendSearchRequest(data, store, n, queryItems) {
 
   try {
     data.progressMsg = globalT.$t("search_progress_msg03");
+    await nextFrame();
     store.search({
       n: n,
       queryItems: queryItems,
@@ -734,6 +738,8 @@ async function sendSearchRequest(data, store, n, queryItems) {
     });
     store.vizNoCommit = 1;
     store.calculate();
+    await nextTick();
+    await nextFrame();
   } catch (error) {
     data.snackbar = true;
     data.progressError = error.message;
