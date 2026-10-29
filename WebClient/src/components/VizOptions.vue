@@ -339,10 +339,20 @@ export default {
       ],
     };
   },
+  beforeUnmount() {
+    clearTimeout(this.commitTimer);
+  },
+  methods: {
+    // Slider-Drag erzeugt viele Änderungen: nur den letzten Wert berechnen
+    commitDebounced() {
+      clearTimeout(this.commitTimer);
+      this.commitTimer = setTimeout(() => commit.call(this), 150);
+    },
+  },
   watch: {
-    relativeFrequency: commit,
-    smoothValue: commit,
-    granulationValue: commit,
+    relativeFrequency() { this.commitDebounced(); },
+    smoothValue() { this.commitDebounced(); },
+    granulationValue() { this.commitDebounced(); },
   },
 };
 </script>
