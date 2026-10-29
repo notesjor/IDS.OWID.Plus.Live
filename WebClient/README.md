@@ -1,24 +1,11 @@
-# vuejs
+# OWIDplusLIVE – WebClient
 
-## Project setup
-```
-npm install
-```
+Vue 3 · Vite · Vuetify 3 · Pinia · vue-i18n · ECharts 6 (vue-echarts)
 
-### Compiles and hot-reloads for development
+## Befehle
 ```
-npm run serve
+npm install      # Abhängigkeiten installieren
+npm run dev      # Entwicklungsserver
+npm run build    # Produktions-Build (Basispfad /plus/live-2021/)
+npm run preview  # Build lokal testen
 ```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
