@@ -1,20 +1,18 @@
-import Vue from "vue";
-import Vuetify from "vuetify/lib";
-import de from "vuetify/es5/locale/de";
-import en from "vuetify/es5/locale/en";
-import th from "vuetify/es5/locale/th";
-import { preset } from "vue-cli-plugin-vuetify-preset-rally/preset";
+import { createVuetify } from "vuetify";
+import { de, en, th } from "vuetify/locale";
 
-Vue.use(Vuetify);
-
-export default new Vuetify({
-  preset,
-  lang: {
-    locales: { de, en, th },
-    current: "de",
+export default createVuetify({
+  locale: {
+    locale: "de",
+    fallback: "en",
+    messages: { de, en, th },
   },
-  theme: { dark: false },
+  theme: { defaultTheme: "light" },
   icons: {
-    iconfont: "mdi",
+    defaultSet: "mdi",
+  },
+  defaults: {
+    VTextField: { variant: "underlined" },
+    VSelect: { variant: "underlined" },
   },
 });

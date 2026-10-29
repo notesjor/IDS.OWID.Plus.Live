@@ -2,17 +2,17 @@
   <div style="min-height:700px">
     <div style="display:block; position:relative; top:0px; left:-49.5%">
       <v-dialog v-model="dialog_help" width="600" scrollable>
-        <template v-slot:activator="{ on, attrs }">
-          <div v-bind="attrs" v-on="on">
+        <template v-slot:activator="{ props }">
+          <div v-bind="props">
             <sup>
-              <v-icon left small>
+              <v-icon start small>
                 mdi-information-outline
               </v-icon>
             </sup>
           </div>
         </template>
         <v-card>
-          <v-card-title class="headline grey lighten-2">
+          <v-card-title class="text-h5 bg-grey-lighten-2">
             {{ $t("vizPanel_help") }}
           </v-card-title>
           <v-divider></v-divider>
@@ -22,17 +22,17 @@
               <br />
               <ul>
                 <li>
-                  <strong><v-icon left> mdi-chart-line </v-icon>{{ $t("viz_name_timechart") }}</strong>
+                  <strong><v-icon start> mdi-chart-line </v-icon>{{ $t("viz_name_timechart") }}</strong>
                   <br />
                   {{ $t("viz_name_timechart_info") }}
                 </li>
                 <li>
-                  <strong><v-icon left> mdi-calendar-multiselect </v-icon>{{ $t("viz_name_calendar") }}</strong>
+                  <strong><v-icon start> mdi-calendar-multiselect </v-icon>{{ $t("viz_name_calendar") }}</strong>
                   <br />
                   {{ $t("viz_name_calendar_info") }}
                 </li>
                 <li>
-                  <strong><v-icon left> mdi-view-dashboard-variant </v-icon>{{ $t("viz_name_sankey") }}</strong>
+                  <strong><v-icon start> mdi-view-dashboard-variant </v-icon>{{ $t("viz_name_sankey") }}</strong>
                   <br />
                   {{ $t("viz_name_sankey_info") }}
                 </li>
@@ -44,7 +44,7 @@
           <v-divider></v-divider>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="primary" text @click="dialog_help = false">
+            <v-btn color="primary" variant="text" @click="dialog_help = false">
               {{ $t("lbl_closeWindow") }}
             </v-btn>
           </v-card-actions>
@@ -53,12 +53,13 @@
     </div>
     <div>
       <div>
-        <v-tabs vertical @change="tabChange">
-          <v-tab>
-            <v-tooltip bottom>
-              <template v-slot:activator="{ on, attrs }">
-                <div v-bind="attrs" v-on="on">
-                  <v-icon left>
+        <div class="d-flex flex-row">
+        <v-tabs v-model="tab" direction="vertical">
+          <v-tab :value="0">
+            <v-tooltip location="bottom">
+              <template v-slot:activator="{ props }">
+                <div v-bind="props">
+                  <v-icon start>
                     mdi-chart-line
                   </v-icon>
                 </div>
@@ -68,11 +69,11 @@
               </span>
             </v-tooltip>
           </v-tab>
-          <v-tab>
-            <v-tooltip bottom>
-              <template v-slot:activator="{ on, attrs }">
-                <div v-bind="attrs" v-on="on">
-                  <v-icon left>
+          <v-tab :value="1">
+            <v-tooltip location="bottom">
+              <template v-slot:activator="{ props }">
+                <div v-bind="props">
+                  <v-icon start>
                     mdi-calendar-multiselect
                   </v-icon>
                 </div>
@@ -82,11 +83,11 @@
               </span>
             </v-tooltip>
           </v-tab>
-          <v-tab>
-            <v-tooltip bottom>
-              <template v-slot:activator="{ on, attrs }">
-                <div v-bind="attrs" v-on="on">
-                  <v-icon left>
+          <v-tab :value="2">
+            <v-tooltip location="bottom">
+              <template v-slot:activator="{ props }">
+                <div v-bind="props">
+                  <v-icon start>
                     mdi-view-dashboard-variant
                   </v-icon>
                 </div>
@@ -96,25 +97,28 @@
               </span>
             </v-tooltip>
           </v-tab>
-          <v-tab-item :transition="false">
-            <VizTimeChart style="min-height:650px"></VizTimeChart>
-          </v-tab-item>
-          <v-tab-item :transition="false">
-            <VizCalendar></VizCalendar>
-          </v-tab-item>
-          <v-tab-item :transition="false">
-            <VizSankey></VizSankey>
-          </v-tab-item>
         </v-tabs>
+        <v-window v-model="tab" class="viz-window flex-grow-1" :touch="false" style="min-width:0">
+          <v-window-item :value="0">
+            <VizTimeChart style="height:650px"></VizTimeChart>
+          </v-window-item>
+          <v-window-item :value="1">
+            <VizCalendar></VizCalendar>
+          </v-window-item>
+          <v-window-item :value="2">
+            <VizSankey></VizSankey>
+          </v-window-item>
+        </v-window>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import VizTimeChart from "./visualizations/VizTimeChart";
-import VizCalendar from "./visualizations/VizCalendar";
-import VizSankey from "./visualizations/VizSankey";
+import VizTimeChart from "./visualizations/VizTimeChart.vue";
+import VizCalendar from "./visualizations/VizCalendar.vue";
+import VizSankey from "./visualizations/VizSankey.vue";
 
 export default {
   name: "VizPanel",
@@ -127,12 +131,17 @@ export default {
   data: function () {
     return {
       dialog_help: false,
+      tab: 0,
     };
-  },
-  methods: {
-    tabChange: function () {
-      this.$forceUpdate();
-    },
   },
 };
 </script>
+
+<style>
+.viz-window .v-window-x-transition-enter-active,
+.viz-window .v-window-x-transition-leave-active,
+.viz-window .v-window-x-reverse-transition-enter-active,
+.viz-window .v-window-x-reverse-transition-leave-active {
+  transition: none !important;
+}
+</style>

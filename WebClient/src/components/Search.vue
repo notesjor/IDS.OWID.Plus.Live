@@ -1,17 +1,17 @@
 <template> 
   <v-container>
-    <v-expansion-panels :value="expensionPanelOpen">
+    <v-expansion-panels v-model="expensionPanelOpen">
       <v-expansion-panel>
-        <v-expansion-panel-header class="justify-self-start">
+        <v-expansion-panel-title class="justify-self-start">
           <v-dialog v-model="dialog_helpSearchSetting" width="600" scrollable>
-            <template v-slot:activator="{ on, attrs }">
-              <div v-bind="attrs" v-on="on" style="float:right; display:block;" @click="stopClickSimple">
+            <template v-slot:activator="{ props }">
+              <div v-bind="props" style="float:right; display:block;" @click="stopClickSimple">
                 <div style="display:block; float:left" @click="stopClickSimple">
                   <v-icon @click="stopClickSimple" left>mdi-magnify</v-icon>
                   <span @click="stopClickSimple">{{ $t("search_settings") }}</span>
                   <a @click="dialog_helpSearchSetting = true">
                     <sup>
-                      <v-icon left small style="margin-left:5px">
+                      <v-icon start small style="margin-left:5px">
                         mdi-information-outline
                       </v-icon>
                     </sup>
@@ -20,7 +20,7 @@
               </div>
             </template>
             <v-card>
-              <v-card-title class="headline grey lighten-2">
+              <v-card-title class="text-h5 bg-grey-lighten-2">
                 {{ $t("search_settings_head") }}
               </v-card-title>
               <v-divider></v-divider>
@@ -30,18 +30,18 @@
               <v-divider></v-divider>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary" text @click="dialog_helpSearchSetting = false">
+                <v-btn color="primary" variant="text" @click="dialog_helpSearchSetting = false">
                   {{ $t("lbl_closeWindow") }}
                 </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
+        </v-expansion-panel-title>
+        <v-expansion-panel-text>
           <v-row>
             <v-col cols="3">
               <h5>{{ $t("search_lbl_focusYear") }}:</h5>
-                <v-select outlined v-model="focusYear" :items="years" style="max-width: 150px;margin:10px 0px 0px 0px"></v-select>
+                <v-select variant="outlined" v-model="focusYear" :items="years" style="max-width: 150px;margin:10px 0px 0px 0px"></v-select>
             </v-col>
             <v-col>
               <h5 style="margin:0px 0px 0px -10px">{{ $t("search_lbl_focusYearRange") }}:</h5>
@@ -49,27 +49,28 @@
               v-model="searchRange" 
               :max="years[years.length - 1]" 
               :min="years[0]" 
-              step="1" 
+              :step="1" 
               thumb-label="always" 
-              ticks="always" 
+              show-ticks="always" 
+              :ticks="yearTicks"
               tick-size="5" 
-              tick-labels
+              hide-details
               style="margin:40px 0px 0px 0px"></v-range-slider>
             </v-col>
           </v-row>
-        </v-expansion-panel-content>
+        </v-expansion-panel-text>
       </v-expansion-panel>
       <v-expansion-panel>
-        <v-expansion-panel-header class="justify-self-start">
+        <v-expansion-panel-title class="justify-self-start">
           <v-dialog v-model="dialog_helpSearchSimple" width="600" scrollable>
-            <template v-slot:activator="{ on, attrs }">
-              <div v-bind="attrs" v-on="on" style="float:right; display:block;" @click="stopClickSimple">
+            <template v-slot:activator="{ props }">
+              <div v-bind="props" style="float:right; display:block;" @click="stopClickSimple">
                 <div style="display:block; float:left" @click="stopClickSimple">
                   <v-icon @click="stopClickSimple" left>mdi-magnify</v-icon>
                   <span @click="stopClickSimple">{{ $t("search_simple_head") }}</span>
                   <a @click="dialog_helpSearchSimple = true">
                     <sup>
-                      <v-icon left small style="margin-left:5px">
+                      <v-icon start small style="margin-left:5px">
                         mdi-information-outline
                       </v-icon>
                     </sup>
@@ -78,7 +79,7 @@
               </div>
             </template>
             <v-card>
-              <v-card-title class="headline grey lighten-2">
+              <v-card-title class="text-h5 bg-grey-lighten-2">
                 {{ $t("search_simple_help_head") }}
               </v-card-title>
               <v-divider></v-divider>
@@ -88,29 +89,31 @@
               <v-divider></v-divider>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary" text @click="dialog_helpSearchSimple = false">
+                <v-btn color="primary" variant="text" @click="dialog_helpSearchSimple = false">
                   {{ $t("lbl_closeWindow") }}
                 </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
+        </v-expansion-panel-title>
+        <v-expansion-panel-text>
           <v-row>
             <v-col>
               <h5>{{ $t("search_lbl_windowSize") }}:</h5>
-              <v-tabs>
-                <v-tab @click="search_simple_n_change(1)">
+              <v-tabs v-model="tabSimple">
+                <v-tab :value="0" @click="search_simple_n_change(1)">
                   <span>N=1</span>
                 </v-tab>
-                <v-tab @click="search_simple_n_change(2)">
+                <v-tab :value="1" @click="search_simple_n_change(2)">
                   <span>N=2</span>
                 </v-tab>
-                <v-tab @click="search_simple_n_change(3)">
+                <v-tab :value="2" @click="search_simple_n_change(3)">
                   <span>N=3</span>
                 </v-tab>
 
-                <v-tab-item>
+                </v-tabs>
+<v-window v-model="tabSimple" :touch="false">
+<v-window-item :value="0">
                   <v-card flat>
                     <v-row>
                       <v-col style="padding:0px; margin: 40px 0 -20px 15px">
@@ -119,8 +122,8 @@
                     </v-row>
                     <v-row>
                       <v-col cols="2">
-                        <v-overflow-btn persistent-hint :items="layer" v-model="search_simple_1_layer"
-                          :label="$t('lbl_layer')" style="display:block-inline;"></v-overflow-btn>
+                        <v-select persistent-hint :items="layer" v-model="search_simple_1_layer"
+                          :label="$t('lbl_layer')" style="display:block-inline;"></v-select>
                         <TagsetInfo v-if="search_simple_1_layer_show_pos" />
                       </v-col>
                       <v-col cols="9" style="margin-top:7px">
@@ -136,7 +139,7 @@
                           <h5>{{ $t("lbl_samples") }}:</h5>
                           <div class="sampleSection">
                             <ul>
-                              <li v-for="item in this.$config.sample_simple_1" :key="item.label">
+                              <li v-for="item in $config.sample_simple_1" :key="item.label">
                                 <a v-on:click="
                                   sample_simple_click(fixSampleLanguage(item.query), [
                                     ['search_simple_1_layer', 'search_simple_1_value'],
@@ -150,8 +153,8 @@
                       </v-col>
                     </v-row>
                   </v-card>
-                </v-tab-item>
-                <v-tab-item>
+                </v-window-item>
+                <v-window-item :value="1">
                   <v-card flat>
                     <v-row>
                       <v-col style="padding:0px; margin: 40px 0 -20px 15px">
@@ -160,8 +163,8 @@
                     </v-row>
                     <v-row>
                       <v-col cols="2">
-                        <v-overflow-btn persistent-hint :items="layer" v-model="search_simple_1_layer"
-                          :label="$t('lbl_layer')"></v-overflow-btn>
+                        <v-select persistent-hint :items="layer" v-model="search_simple_1_layer"
+                          :label="$t('lbl_layer')"></v-select>
                         <TagsetInfo v-if="search_simple_1_layer_show_pos" />
                       </v-col>
                       <v-col cols="4">
@@ -170,8 +173,8 @@
                           @keydown.enter="search_simple"></v-text-field>
                       </v-col>
                       <v-col cols="2">
-                        <v-overflow-btn persistent-hint :items="layer" v-model="search_simple_2_layer"
-                          :label="$t('lbl_layer')"></v-overflow-btn>
+                        <v-select persistent-hint :items="layer" v-model="search_simple_2_layer"
+                          :label="$t('lbl_layer')"></v-select>
                         <TagsetInfo v-if="search_simple_2_layer_show_pos" />
                       </v-col>
                       <v-col cols="4">
@@ -187,7 +190,7 @@
                           <h5>{{ $t("lbl_samples") }}:</h5>
                           <div class="sampleSection">
                             <ul>
-                              <li v-for="item in this.$config.sample_simple_2" :key="item.label">
+                              <li v-for="item in $config.sample_simple_2" :key="item.label">
                                 <a v-on:click="
                                   sample_simple_click(fixSampleLanguage(item.query), [
                                     ['search_simple_1_layer', 'search_simple_1_value'],
@@ -202,8 +205,8 @@
                       </v-col>
                     </v-row>
                   </v-card>
-                </v-tab-item>
-                <v-tab-item>
+                </v-window-item>
+                <v-window-item :value="2">
                   <v-card flat>
                     <v-row>
                       <v-col style="padding:0px; margin: 40px 0 -20px 15px">
@@ -212,8 +215,8 @@
                     </v-row>
                     <v-row cols="27">
                       <v-col cols="2">
-                        <v-overflow-btn persistent-hint :items="layer" v-model="search_simple_1_layer"
-                          :label="$t('lbl_layer')"></v-overflow-btn>
+                        <v-select persistent-hint :items="layer" v-model="search_simple_1_layer"
+                          :label="$t('lbl_layer')"></v-select>
                         <TagsetInfo v-if="search_simple_1_layer_show_pos" />
                       </v-col>
                       <v-col cols="2">
@@ -222,8 +225,8 @@
                           @keydown.enter="search_simple"></v-text-field>
                       </v-col>
                       <v-col cols="2">
-                        <v-overflow-btn persistent-hint :items="layer" v-model="search_simple_2_layer"
-                          :label="$t('lbl_layer')"></v-overflow-btn>
+                        <v-select persistent-hint :items="layer" v-model="search_simple_2_layer"
+                          :label="$t('lbl_layer')"></v-select>
                         <TagsetInfo v-if="search_simple_2_layer_show_pos" />
                       </v-col>
                       <v-col cols="2">
@@ -232,8 +235,8 @@
                           @keydown.enter="search_simple"></v-text-field>
                       </v-col>
                       <v-col cols="2">
-                        <v-overflow-btn persistent-hint :items="layer" v-model="search_simple_3_layer"
-                          :label="$t('lbl_layer')"></v-overflow-btn>
+                        <v-select persistent-hint :items="layer" v-model="search_simple_3_layer"
+                          :label="$t('lbl_layer')"></v-select>
                         <TagsetInfo v-if="search_simple_3_layer_show_pos" />
                       </v-col>
                       <v-col cols="2">
@@ -249,7 +252,7 @@
                           <h5>{{ $t("lbl_samples") }}:</h5>
                           <div class="sampleSection">
                             <ul>
-                              <li v-for="item in this.$config.sample_simple_3" :key="item.label">
+                              <li v-for="item in $config.sample_simple_3" :key="item.label">
                                 <a v-on:click="
                                   sample_simple_click(fixSampleLanguage(item.query), [
                                     ['search_simple_1_layer', 'search_simple_1_value'],
@@ -265,8 +268,8 @@
                       </v-col>
                     </v-row>
                   </v-card>
-                </v-tab-item>
-              </v-tabs>
+                </v-window-item>
+              </v-window>
             </v-col>
           </v-row>
           <v-row>
@@ -281,19 +284,19 @@
               </v-btn>
             </v-col>
           </v-row>
-        </v-expansion-panel-content>
+        </v-expansion-panel-text>
       </v-expansion-panel>
       <v-expansion-panel>
-        <v-expansion-panel-header class="justify-self-start">
+        <v-expansion-panel-title class="justify-self-start">
           <v-dialog v-model="dialog_helpSearchComplex" width="600" scrollable>
-            <template v-slot:activator="{ on, attrs }">
-              <div v-bind="attrs" v-on="on" style="float:right; display:block;" @click="stopClickComplex">
+            <template v-slot:activator="{ props }">
+              <div v-bind="props" style="float:right; display:block;" @click="stopClickComplex">
                 <div style="float:left; display:block;" @click="stopClickComplex">
                   <v-icon @click="stopClickComplex" left>mdi-magnify</v-icon>
                   <span @click="stopClickComplex">{{ $t("search_complex_head") }}</span>
                   <a @click="dialog_helpSearchComplex = true">
                     <sup>
-                      <v-icon left small style="margin-left:5px">
+                      <v-icon start small style="margin-left:5px">
                         mdi-information-outline
                       </v-icon>
                     </sup>
@@ -302,7 +305,7 @@
               </div>
             </template>
             <v-card>
-              <v-card-title class="headline grey lighten-2">
+              <v-card-title class="text-h5 bg-grey-lighten-2">
                 {{ $t("search_complex_help_head") }}
               </v-card-title>
               <v-divider></v-divider>
@@ -312,31 +315,33 @@
               <v-divider></v-divider>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary" text @click="dialog_helpSearchComplex = false">
+                <v-btn color="primary" variant="text" @click="dialog_helpSearchComplex = false">
                   {{ $t("lbl_closeWindow") }}
                 </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
-        </v-expansion-panel-header>
-        <v-expansion-panel-content>
+        </v-expansion-panel-title>
+        <v-expansion-panel-text>
           <v-row>
             <v-col>
               <div>
                 <h5>{{ $t("search_lbl_windowSize") }}:</h5>
               </div>
-              <v-tabs>
-                <v-tab @click="search_complex_n_change(1)">
+              <v-tabs v-model="tabComplex">
+                <v-tab :value="0" @click="search_complex_n_change(1)">
                   <span>N=1</span>
                 </v-tab>
-                <v-tab @click="search_complex_n_change(2)">
+                <v-tab :value="1" @click="search_complex_n_change(2)">
                   <span>N=2</span>
                 </v-tab>
-                <v-tab @click="search_complex_n_change(3)">
+                <v-tab :value="2" @click="search_complex_n_change(3)">
                   <span>N=3</span>
                 </v-tab>
 
-                <v-tab-item>
+                </v-tabs>
+<v-window v-model="tabComplex" :touch="false">
+<v-window-item :value="0">
                   <v-card flat>
                     <v-row>
                       <v-col style="padding:0px; margin: 40px 0 -20px 15px">
@@ -376,7 +381,7 @@
                           <h5>{{ $t("lbl_samples") }}:</h5>
                           <div class="sampleSection">
                             <ul>
-                              <li v-for="item in this.$config.sample_complex_1" :key="item.label">
+                              <li v-for="item in $config.sample_complex_1" :key="item.label">
                                 <a v-on:click="
                                   sample_complex_click(fixSampleLanguage(item.query), 'search_complex_1_');
                                 search_complex();
@@ -388,8 +393,8 @@
                       </v-col>
                     </v-row>
                   </v-card>
-                </v-tab-item>
-                <v-tab-item>
+                </v-window-item>
+                <v-window-item :value="1">
                   <v-card flat>
                     <v-row>
                       <v-col style="padding:0px; margin: 40px 0 -20px 15px">
@@ -452,7 +457,7 @@
                           <h5>{{ $t("lbl_samples") }}:</h5>
                           <div class="sampleSection">
                             <ul>
-                              <li v-for="item in this.$config.sample_complex_2" :key="item.label">
+                              <li v-for="item in $config.sample_complex_2" :key="item.label">
                                 <a v-on:click="
                                   sample_complex_click(fixSampleLanguage(item.query), 'search_complex_2_');
                                 search_complex();
@@ -464,8 +469,8 @@
                       </v-col>
                     </v-row>
                   </v-card>
-                </v-tab-item>
-                <v-tab-item>
+                </v-window-item>
+                <v-window-item :value="2">
                   <v-card flat>
                     <v-row>
                       <v-col style="padding:0px; margin: 40px 0 -20px 15px">
@@ -550,7 +555,7 @@
                           <h5>{{ $t("lbl_samples") }}:</h5>
                           <div class="sampleSection">
                             <ul>
-                              <li v-for="item in this.$config.sample_complex_3" :key="item.label">
+                              <li v-for="item in $config.sample_complex_3" :key="item.label">
                                 <a v-on:click="
                                   sample_complex_click(fixSampleLanguage(item.query), 'search_complex_3_');
                                 search_complex();
@@ -562,8 +567,8 @@
                       </v-col>
                     </v-row>
                   </v-card>
-                </v-tab-item>
-              </v-tabs>
+                </v-window-item>
+              </v-window>
             </v-col>
           </v-row>
           <v-row>
@@ -577,11 +582,11 @@
                 <v-icon style="color:#1976d2">mdi-magnify</v-icon>{{ $t("search_btn_start") }}</v-btn>
             </v-col>
           </v-row>
-        </v-expansion-panel-content>
+        </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
 
-    <v-overlay :value="progressWait">
+    <v-overlay :model-value="progressWait" persistent class="align-center justify-center">
       <div class="text-center">
         <v-progress-circular indeterminate size="64"></v-progress-circular>
         <h3>{{ $t("lbl_wait") }}</h3>
@@ -593,8 +598,8 @@
     <v-snackbar v-model="snackbar">
       {{ progressError }}
 
-      <template v-slot:action="{ attrs }">
-        <v-btn text v-bind="attrs" @click="snackbar = false">
+      <template v-slot:actions>
+        <v-btn variant="text" @click="snackbar = false">
           {{ $t("lbl_ok") }}
         </v-btn>
       </template>
@@ -625,8 +630,8 @@
 </style>
 
 <script>
-import { mdiMagnifyPlus } from "@mdi/js";
-import TagsetInfo from "./TagsetInfo";
+import TagsetInfo from "./TagsetInfo.vue";
+import { useOwidStore } from "../store/owid";
 
 var global_layers = null; // wird in mounted gesetzt
 
@@ -722,13 +727,13 @@ async function sendSearchRequest(data, store, n, queryItems) {
 
   try {
     data.progressMsg = globalT.$t("search_progress_msg03");
-    store.commit("search", {
+    store.search({
       n: n,
       queryItems: queryItems,
       items: results,
     });
-    store.state.vizNoCommit = 1;
-    store.commit("calculate");
+    store.vizNoCommit = 1;
+    store.calculate();
   } catch (error) {
     data.snackbar = true;
     data.progressError = error.message;
@@ -740,6 +745,10 @@ async function sendSearchRequest(data, store, n, queryItems) {
 var globalT;
 export default {
   name: "Search",
+  emits: ["searchRequestSubmitted"],
+  setup() {
+    return { store: useOwidStore() };
+  },
   components: {
     TagsetInfo,
   },
@@ -750,7 +759,9 @@ export default {
       dialog_helpSearchSetting: false,
       expensionPanelOpen: 1,
 
-      layer: null,
+      layer: [],
+      tabSimple: 0,
+      tabComplex: 0,
       search_simple_1_layer: "",
       search_simple_2_layer: "",
       search_simple_3_layer: "",
@@ -792,7 +803,6 @@ export default {
       progressMsg: "",
       progressError: "",
 
-      iconSeachExt: mdiMagnifyPlus,
       inputRules: [
         function (v) {
           if (v === undefined) return true;
@@ -809,24 +819,18 @@ export default {
       ],
     };
   },
-  created: function () {
-    var self = this;
-    this.yearWatcher = this.$store.watch(
-      (state) => state.years,
-      (newValue) => {
-        self.years = newValue;
-        self.focusYears = newValue;
-        self.searchRange = [newValue[0], newValue[newValue.length - 1]];
-      }
-    );
-  },
   watch: {
+    "store.years": function (newValue) {
+      this.years = newValue;
+      this.focusYears = newValue;
+      this.searchRange = [newValue[0], newValue[newValue.length - 1]];
+    },
     searchRange: function (newVal) {
       this.focusYears = this.years.filter((x) => x >= newVal[0] && x <= newVal[1]);
       this.focusYear = this.focusYears.length > 2 ? this.focusYears[this.focusYears.length - 2] : this.focusYears[this.focusYears.length - 1];
     },
     focusYear: function (newVal) {
-      this.$store.commit("focusYear", newVal);
+      this.store.setFocusYear(newVal);
     },
   },
   mounted: function () {
@@ -840,6 +844,11 @@ export default {
     globalT = this;    
   },
   computed: {
+    yearTicks: function () {
+      const ticks = {};
+      this.years.forEach((y) => (ticks[y] = String(y)));
+      return ticks;
+    },
     search_simple_1_layer_show_pos: function () {
       return this.search_simple_1_layer === this.$t("layer_pos");
     },
@@ -913,11 +922,11 @@ export default {
     },
     search_simple_n_change: function (n) {
       this.$data.search_simple_n = n;
-      this.$store.commit("updateN", n);
+      this.store.updateN(n);
     },
     search_complex_n_change: function (n) {
       this.$data.search_complex_n = n;
-      this.$store.commit("updateN", n);
+      this.store.updateN(n);
     },
     search_invoke: function (queries) {
       var set = new Set();
@@ -927,10 +936,10 @@ export default {
         set.add(x.position);
       });
 
-      this.$store.state.owid.N = set.size;
+      this.store.owid.N = set.size;
 
       this.$emit("searchRequestSubmitted");
-      sendSearchRequest(this.$data, this.$store, set.size, qs);
+      sendSearchRequest(this.$data, this.store, set.size, qs);
     },
     search_simple: function () {
       var queryItems = [
@@ -961,7 +970,7 @@ export default {
         );
 
       this.$emit("searchRequestSubmitted");
-      sendSearchRequest(this.$data, this.$store, this.$data.search_simple_n, queryItems);
+      sendSearchRequest(this.$data, this.store, this.$data.search_simple_n, queryItems);
     },
     search_complex: function () {
       var queryItems = [];
@@ -995,7 +1004,7 @@ export default {
       }
 
       this.$emit("searchRequestSubmitted");
-      sendSearchRequest(this.$data, this.$store, this.$data.search_complex_n, queryItems);
+      sendSearchRequest(this.$data, this.store, this.$data.search_complex_n, queryItems);
     },
     validate_notEmpty: function (value) {
       return value === "" || value == "*" ? this.$t("search_error_notEmpty") : true;

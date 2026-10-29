@@ -1,12 +1,10 @@
-import Vue from "vue";
-import Vuex from "vuex";
+import { defineStore } from "pinia";
+import { markRaw } from "vue";
 import { OwidLiveStorage } from "./OwidLiveStorage";
 import { Normalize, Prefill } from "./DataHelper";
 
-Vue.use(Vuex);
-
-export default new Vuex.Store({
-  state: {
+export const useOwidStore = defineStore("owid", {
+  state: () => ({
     years: [],
     yearMin: 0,
     yearMax: 0,
@@ -23,55 +21,67 @@ export default new Vuex.Store({
     vizOptionSmoothing: 16,
 
     vizData: null,
-  },
-  mutations: {
-    years(state, years) {
+  }),
+  actions: {
+    setYears(years) {
+      const state = this;
       state.years = years;
       state.yearMin = Math.min(...years);
       state.yearMax = Math.max(...years);
       state.yearInc = -1;
     },
 
-    focusYear(state, year) {
+    setFocusYear(year) {
+      const state = this;
       state.yearFocus = year;
     },
 
-    init(state, payload) {
-      state.owid = new OwidLiveStorage(payload);
+    init(payload) {
+      const state = this;
+      // OwidLiveStorage nutzt private Felder (#) und darf nicht in einen Reactive-Proxy gewrappt werden
+      state.owid = markRaw(new OwidLiveStorage(payload));
     },
 
-    clearAll(state) {
+    clearAll() {
+      const state = this;
       state.owid.clearAll();
     },
 
-    updateN(state, N) {
+    updateN(N) {
+      const state = this;
       state.owid.N = N;
     },
 
-    search(state, { n, queryItems, items }) {
+    search({ n, queryItems, items }) {
+      const state = this;
       state.owid.addOwidLiveSearchItem(n, queryItems, items);
       state.searches = Object.keys(state.owid.OwidLiveSearches).length;
     },
 
-    vizOption(state, payload) {
+    setVizOption(payload) {
+      const state = this;
       state.vizOptionRelative = payload.r;
       state.vizOptionGranulation = payload.g;
       state.vizOptionSmoothing = payload.s;
     },
 
-    selectSearchChange(state, payload) {
+    selectSearchChange(payload) {
+      const state = this;
       state.owid.selectSearchItems(payload);
     },
 
-    selectSearchHistoryItemsChange(state, payload) {
+    selectSearchHistoryItemsChange(payload) {
+      const state = this;
       state.owid.selectSearchHistoryItem(payload);
     },
 
-    modelLoad(state, o) {
-      state.owid = OwidLiveStorage.load(o.Norm, o.OwidLiveSearches, o.N, o.Dates, o.Total, o.NormTotal);
+    modelLoad(o) {
+      const state = this;
+      state.owid = markRaw(OwidLiveStorage.load(o.Norm, o.OwidLiveSearches, o.N, o.Dates, o.Total, o.NormTotal));
     },
 
-    calculate(state) {
+    calculate() {
+      const state = this;
       if (state.owid === null || state.owid.OwidLiveSearches === null) {
         state.vizData = null;
         return;
@@ -281,6 +291,4 @@ export default new Vuex.Store({
       state.version++;
     },
   },
-  actions: {},
-  modules: {},
 });

@@ -1,9 +1,8 @@
 <template>
-  <v-chart ref="myChart" autoresize :option="chartOptions" :init-options="initOptions" />
+  <v-chart ref="myChart" autoresize :option="chartOptions" :init-options="initOptions" :style="chartStyle" />
 </template>
 
 <script>
-import Vue from "vue";
 import VueECharts, { THEME_KEY } from "vue-echarts";
 
 import { use } from "echarts/core";
@@ -18,6 +17,7 @@ import {
   ToolboxComponent,
 } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
+import { useOwidStore } from "../../store/owid";
 
 use([
   SankeyChart,
@@ -29,11 +29,13 @@ use([
   ToolboxComponent
 ]);
 
-Vue.component('v-chart', VueECharts);
 
 export default {
   name: "VizSankey",
-  theme: { dark: false },
+  components: { VChart: VueECharts },
+  setup() {
+    return { store: useOwidStore() };
+  },
   provide: {
     [THEME_KEY]: "light"
   },
@@ -41,29 +43,32 @@ export default {
     return {
       initOptions: {
         renderer: "canvas"
-      }
+      },
+      chartStyle: "height:400px;"
     };
   },
   methods:{
     setChartHeight: function (height) {
+      this.chartStyle = `height:${height}px;`;
+
       var refs = this.$refs;
       setTimeout(() => {
-        refs.myChart.resize({ height: height });
+        if (refs.myChart) refs.myChart.resize({ height: height });
       }, 0);
     }
   },
   computed: {
     chartOptions() {
-      if (this.$store.state.vizData === null) return;
+      if (this.store.vizData === null) return;
 
       var tnodes = new Set();
       var links = [];
 
-      console.log(this.$store.state.vizData);
+      console.log(this.store.vizData);
 
-      for (const key in this.$store.state.vizData) {
+      for (const key in this.store.vizData) {
         if (key === "ALLE") continue;
-        const data = this.$store.state.vizData[key];
+        const data = this.store.vizData[key];
 
         Object.keys(data.items).forEach((key2) => {
           var sum = 0;
@@ -94,7 +99,7 @@ export default {
 
       this.setChartHeight(nodes.length * 20);
 
-      var unit = this.$store.state.vizOptionRelative ? this.$t("lbl_unit_tokenPPM") : this.$t("lbl_unit_token");
+      var unit = this.store.vizOptionRelative ? this.$t("lbl_unit_tokenPPM") : this.$t("lbl_unit_token");
 
       return {
         toolbox: {

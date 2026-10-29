@@ -2,19 +2,19 @@
   <v-card style="pagging-bottom:-15px">
     <v-card-title>
       <v-dialog v-model="dialog_help" width="600" scrollable>
-        <template v-slot:activator="{ on, attrs }">
-          <div v-bind="attrs" v-on="on" style="float:right; display:block;">
+        <template v-slot:activator="{ props }">
+          <div v-bind="props" style="float:right; display:block;">
             <v-icon>mdi-eye-outline</v-icon>
             <span style="margin-left:10px; font-size:15px">{{ $t("vizOptions_header") }}</span>
             <sup>
-              <v-icon left small style="margin-left:5px">
+              <v-icon start small style="margin-left:5px">
                 mdi-information-outline
               </v-icon>
             </sup>
           </div>
         </template>
         <v-card>
-          <v-card-title class="headline grey lighten-2">
+          <v-card-title class="text-h5 bg-grey-lighten-2">
             {{ $t("vizOptions_help") }}
           </v-card-title>
           <v-divider></v-divider>
@@ -44,7 +44,7 @@
           <v-divider></v-divider>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="primary" text @click="dialog_help = false">
+            <v-btn color="primary" variant="text" @click="dialog_help = false">
               {{ $t("lbl_closeWindow") }}
             </v-btn>
           </v-card-actions>
@@ -56,38 +56,44 @@
         <v-col class="d-flex justify-left" style="margin-top:-30px; margin-bottom:10px">
           <v-switch
             v-model="relativeFrequency"
+            color="primary"
+            hide-details
+            density="comfortable"
             :label="relativeFrequency ? $t('vizOption_name_frequency') : $t('vizOption_name_frequency_abs')"
           ></v-switch>
         </v-col>
       </v-row>
       <v-row>
         <v-col class="d-flex justify-left">
-          <label for="granulation" class="v-label theme--light" style="margin-top:-20px"
+          <label for="granulation" class="v-label" style="margin-top:-20px; white-space:nowrap"
             >{{ $t("vizOption_name_granulation") }}:</label
           >
           <v-slider
             id="granulation"
             v-model="granulationValue"
-            min="0"
-            max="4"
-            ticks="always"
-            :tick-labels="granulationLabels"
-            step="1"
+            :min="0"
+            :max="4"
+            show-ticks="always"
+            :ticks="granulationTicks"
+            :step="1"
+            hide-details
             style="margin-left:10px; margin-top:-27px"
           ></v-slider>
         </v-col>
         <v-col class="d-flex justify-left">
-          <label for="smooth" class="v-label theme--light" style="margin-top:-20px"
+          <label for="smooth" class="v-label" style="margin-top:-20px; white-space:nowrap"
             >{{ $t("vizOption_name_smoothing") }}:</label
           >
           <v-slider
             id="smooth"
             v-model="smoothValue"
-            min="1"
+            :min="1"
+            :step="1"
             thumb-label="always"
             :max="smoothMax"
-            :tick-labels="smoothLabels"
-            ticks="always"
+            :ticks="smoothTicks"
+            show-ticks="always"
+            hide-details
             style="margin-left:10px; margin-top:-27px"
           ></v-slider>
         </v-col>
@@ -97,6 +103,8 @@
 </template>
 
 <script>
+import { useOwidStore } from "../store/owid";
+
 function commit() {
   var r = this.$data.relativeFrequency;
   var s = this.$data.smoothValue;
@@ -235,12 +243,27 @@ function commit() {
       break;
   }
 
-  this.$store.commit("vizOption", { r, s, g });
-  this.$store.commit("calculate");
+  this.store.setVizOption({ r, s, g });
+  this.store.calculate();
 }
 
 export default {
   name: "VizOptions",
+  setup() {
+    return { store: useOwidStore() };
+  },
+  computed: {
+    granulationTicks() {
+      const ticks = {};
+      (this.granulationLabels || []).forEach((l, i) => (ticks[i] = l));
+      return ticks;
+    },
+    smoothTicks() {
+      const ticks = {};
+      this.smoothLabels.forEach((l, i) => (ticks[i + 1] = l));
+      return ticks;
+    },
+  },
   created: function() {
     this.granulationLabels = [
       this.$t("granulation_lbl_day"),
@@ -249,11 +272,6 @@ export default {
       this.$t("granulation_lbl_quarter"),
       this.$t("granulation_lbl_year"),
     ];
-  },
-  mounted: function() {
-    this.$data.relativeFrequency = this.$store.state.vizOptions?.relativeFrequency;
-    this.$data.smoothValue = this.$store.state.vizOptions?.smoothValue;
-    this.$data.granulationValue = this.$store.state.vizOptions?.granulationValue;
   },
   data: () => {
     return {

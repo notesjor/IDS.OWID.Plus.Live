@@ -3,7 +3,6 @@
 </template>
 
 <script>
-import Vue from "vue";
 import VueECharts, { THEME_KEY } from "vue-echarts";
 
 import { use } from "echarts/core";
@@ -20,6 +19,7 @@ import {
   DataZoomComponent
 } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
+import { useOwidStore } from "../../store/owid";
 
 use([
   HeatmapChart,
@@ -33,7 +33,6 @@ use([
   DataZoomComponent
 ]);
 
-Vue.component('v-chart', VueECharts);
 
 var monthMap = {
   nameMap: null,
@@ -46,7 +45,10 @@ var dayMap = {
 
 export default {
   name: "VizCalendar",
-  theme: { dark: false },
+  components: { VChart: VueECharts },
+  setup() {
+    return { store: useOwidStore() };
+  },
   provide: {
     [THEME_KEY]: "light"
   },
@@ -55,16 +57,16 @@ export default {
       initOptions: {
         renderer: "canvas"
       },
-      chartStyle: "min-height:650px;"
+      chartStyle: "height:650px;"
     };
   },
   methods: {
     setChartHeight: function (height) {
-      this.$data.chartStyle = `min-height:${height}px;`;
+      this.$data.chartStyle = `height:${height}px;`;
 
       var refs = this.$refs;
       setTimeout(() => {
-        refs.myChart.resize({ height: height });
+        if (refs.myChart) refs.myChart.resize({ height: height });
       }, 0);
     }
   },
@@ -96,14 +98,14 @@ export default {
   },
   computed: {
     chartOptions() {
-      if (this.$store.state.vizData === null) return;
+      if (this.store.vizData === null) return;
 
       var tmp = {};
-      Object.keys(this.$store.state.vizData).forEach((sK) => {
-        Object.keys(this.$store.state.vizData[sK].data).forEach((d) => {
-          this.$store.state.vizData[sK].data[d].dates.forEach((i) => {
-            if (i in tmp) tmp[i] += parseFloat(this.$store.state.vizData[sK].data[d].value);
-            else tmp[i] = parseFloat(this.$store.state.vizData[sK].data[d].value);
+      Object.keys(this.store.vizData).forEach((sK) => {
+        Object.keys(this.store.vizData[sK].data).forEach((d) => {
+          this.store.vizData[sK].data[d].dates.forEach((i) => {
+            if (i in tmp) tmp[i] += parseFloat(this.store.vizData[sK].data[d].value);
+            else tmp[i] = parseFloat(this.store.vizData[sK].data[d].value);
           });
         });
       });
@@ -139,11 +141,11 @@ export default {
       console.log(chartSize)
       this.setChartHeight(chartSize);      
 
-      var unit = this.$store.state.vizOptionRelative ? this.$t("lbl_unit_tokenPPM") : this.$t("lbl_unit_token");
+      var unit = this.store.vizOptionRelative ? this.$t("lbl_unit_tokenPPM") : this.$t("lbl_unit_token");
 
       var calendars = [];
       var top = 35;
-      this.$store.state.years.forEach((year) => {
+      this.store.years.forEach((year) => {
         calendars.push({
           range: year,
           cellSize: ["auto", 20],

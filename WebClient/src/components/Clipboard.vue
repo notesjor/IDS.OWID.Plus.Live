@@ -2,22 +2,22 @@
   <v-card>
     <v-card-title>
       <v-dialog v-model="dialog_help" width="600" scrollable>
-        <template v-slot:activator="{ on, attrs }">
-          <div v-bind="attrs" v-on="on" style="width:100%">
+        <template v-slot:activator="{ props }">
+          <div v-bind="props" style="width:100%">
             <div style="display:block; float:left">
               <v-icon>mdi-compare-horizontal</v-icon>
               <span style="margin-left:10px; font-size:15px">{{ $t("clipboard_head") }}</span>
               <sup>
-                <v-icon left small style="margin-left:5px">
+                <v-icon start small style="margin-left:5px">
                   mdi-information-outline
                 </v-icon>
               </sup>
             </div>
             <div style="width:auto; display:block; text-align:right">
               <div style="display:block; float:right; margin-left:15px">
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <div v-bind="attrs" v-on="on">
+                <v-tooltip location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <div v-bind="props">
                       <v-icon @click="modelSave">mdi-content-save-outline</v-icon>
                     </div>
                   </template>
@@ -27,9 +27,9 @@
                 </v-tooltip>
               </div>
               <div style="display:block; float:right">
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <div v-bind="attrs" v-on="on">
+                <v-tooltip location="bottom">
+                  <template v-slot:activator="{ props }">
+                    <div v-bind="props">
                       <v-icon @click="modelLoad">mdi-folder-outline</v-icon>
                     </div>
                   </template>
@@ -45,7 +45,7 @@
           </div>
         </template>
         <v-card>
-          <v-card-title class="headline grey lighten-2">
+          <v-card-title class="text-h5 bg-grey-lighten-2">
             {{ $t("clipboard_help_head") }}
           </v-card-title>
           <v-divider></v-divider>
@@ -71,7 +71,7 @@
           <v-divider></v-divider>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="primary" text @click="dialog_help = false">
+            <v-btn color="primary" variant="text" @click="dialog_help = false">
               {{ $t("lbl_closeWindow") }}
             </v-btn>
           </v-card-actions>
@@ -80,13 +80,13 @@
     </v-card-title>
     <v-expansion-panels multiple v-model="expanded">
       <v-expansion-panel v-for="(i, idx) in entries" :key="idx">
-        <v-expansion-panel-header>
+        <v-expansion-panel-title>
           <div>
             <div style="display:inline;">{{ i.label }}</div>
             <div style="float:right;display:block; margin:-13px 5px 0 0">
-              <v-menu bottom left>
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn icon v-bind="attrs" v-on="on">
+              <v-menu location="bottom end">
+                <template v-slot:activator="{ props }">
+                  <v-btn icon variant="text" v-bind="props">
                     <v-icon>mdi-dots-vertical</v-icon>
                   </v-btn>
                 </template>
@@ -130,23 +130,23 @@
               </v-menu>
             </div>
           </div>
-        </v-expansion-panel-header>
+        </v-expansion-panel-title>
 
-        <v-expansion-panel-content>
-          <v-data-table :headers="headers" :items="i.grid" :search="search" :single-select="false"
-            :footer-props="{ itemsPerPageOptions: [3, 5, 10, 25, 50, 100, 250, -1], options: { itemsPerPage: 5 } }"
-            @input="selectionChanged" v-model="selected" item-key="key" mutli-sort :sort-by="['dRel']"
-            :sort-desc="[true]" show-select>
+        <v-expansion-panel-text>
+          <v-data-table :headers="headers" :items="i.grid" :search="search"
+            :items-per-page-options="itemsPerPageOptions" :items-per-page="5"
+            v-model="selected" item-value="key" return-object :sort-by="[{ key: 'dRel', order: 'desc' }]"
+            show-select>
             <!-- eslint-disable -->
             <template v-slot:item.korap="x">
               <kwicBtnSearch :query="x.item.korap" />
             </template>
             <template v-slot:item.l="x">
               <p v-if="x.item.l != null" style="text-align: center; margin-top: 5px;">{{ x.item.l }}</p>
-              <v-btn style="text-transform: none; margin-left: 10%;" small v-else-if="x.item.l === undefined">
+              <v-btn style="text-transform: none; margin-left: 10%;" size="small" v-else-if="x.item.l === undefined">
                 <v-progress-circular indeterminate color="black" :size="10"></v-progress-circular>
               </v-btn>
-              <v-btn style="text-transform: none; margin-left: 10%;" small @click="lookup(idx, x.item.key, x.item.w, 1)"
+              <v-btn style="text-transform: none; margin-left: 10%;" size="small" @click="lookup(idx, x.item.key, x.item.w, 1)"
                 v-else>
                 <v-icon>mdi-card-search-outline</v-icon>
                 Anzeigen
@@ -154,10 +154,10 @@
             </template>
             <template v-slot:item.p="x">
               <p v-if="x.item.p != null" style="text-align: center; margin-top: 5px;">{{ x.item.p }}</p>
-              <v-btn style="text-transform: none; margin-left: 10%;" small v-else-if="x.item.p === undefined">
+              <v-btn style="text-transform: none; margin-left: 10%;" size="small" v-else-if="x.item.p === undefined">
                 <v-progress-circular indeterminate color="black" :size="10"></v-progress-circular>
               </v-btn>
-              <v-btn style="text-transform: none; margin-left: 10%;" small @click="lookup(idx, x.item.key, x.item.w, 2)"
+              <v-btn style="text-transform: none; margin-left: 10%;" size="small" @click="lookup(idx, x.item.key, x.item.w, 2)"
                 v-else>
                 <v-icon>mdi-card-search-outline</v-icon>
                 Anzeigen
@@ -165,19 +165,19 @@
             </template>
             <!-- eslint-enable -->
           </v-data-table>
-        </v-expansion-panel-content>
+        </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
 
     <v-snackbar v-model="snackbar">
-      <img :src="'https://www.owid.de/api/qrcode/png?p=' + this.$data.snackbarQrcode" />
-      <v-text-field label="Link" :value="snackbarLink" readonly> </v-text-field>
+      <img :src="'https://www.owid.de/api/qrcode/png?p=' + snackbarQrcode" />
+      <v-text-field label="Link" :model-value="snackbarLink" readonly> </v-text-field>
       <a @click="copyToClipboard">
         <v-icon>mdi-content-copy</v-icon><span style="color:white;">{{ $t("lbl_copy") }}</span>
       </a>
 
-      <template v-slot:action="{ attrs }">
-        <v-btn text v-bind="attrs" @click="snackbar = false" style="vertical-aign:bottom">
+      <template v-slot:actions>
+        <v-btn variant="text" @click="snackbar = false" style="vertical-aign:bottom">
           {{ $t("lbl_ok") }}
         </v-btn>
       </template>
@@ -216,6 +216,7 @@ export function saveClipboard(str) {
 export var storeGlobal;
 
 import kwicBtnSearch from './kwicBtnSearch.vue';
+import { useOwidStore } from "../store/owid";
 
 export default {
   name: "Clipboard",
@@ -235,6 +236,16 @@ export default {
       selected: [],
       search: "",
       headers: null,
+      itemsPerPageOptions: [
+        { value: 3, title: "3" },
+        { value: 5, title: "5" },
+        { value: 10, title: "10" },
+        { value: 25, title: "25" },
+        { value: 50, title: "50" },
+        { value: 100, title: "100" },
+        { value: 250, title: "250" },
+        { value: -1, title: "$vuetify.dataFooter.itemsPerPageAll" },
+      ],
       entries: [],
 
       syncLock: false,
@@ -246,29 +257,36 @@ export default {
     };
   },
 
+  setup() {
+    return { store: useOwidStore() };
+  },
+
   mounted: function () {
     this.headers = [
-      { text: this.$t("layer_wordform"), value: "w" },
-      { text: this.$t("layer_lemma"), value: "l" },
-      { text: this.$t("layer_posTag"), value: "p" },
-      { text: this.$t("clipboard_tableHeader_detectedDays"), value: "d", align: "end" },
-      { text: this.$t("clipboard_tableHeader_detectedDaysPercent"), value: "dRel", align: "end" },
-      { text: this.$t("clipboard_tableHeader_sum"), value: "s", align: "end" },
-      { text: this.$t("clipboard_tableHeader_sumRel"), value: "sRel", align: "end" },
-      { text: "KorAP", value: "korap", sortable: false },
+      { title: this.$t("layer_wordform"), key: "w" },
+      { title: this.$t("layer_lemma"), key: "l" },
+      { title: this.$t("layer_posTag"), key: "p" },
+      { title: this.$t("clipboard_tableHeader_detectedDays"), key: "d", align: "end" },
+      { title: this.$t("clipboard_tableHeader_detectedDaysPercent"), key: "dRel", align: "end" },
+      { title: this.$t("clipboard_tableHeader_sum"), key: "s", align: "end" },
+      { title: this.$t("clipboard_tableHeader_sumRel"), key: "sRel", align: "end" },
+      { title: "KorAP", key: "korap", sortable: false },
     ];
   },
 
   watch: {
+    "store.searches": function () {
+      this.refreshData();
+    },
     selected: function (val) {
       if (this.$data.syncLock) return;
 
       var sel = [];
       for (var i in val) sel.push(val[i].key);
       this.$data.syncLock = true;
-      this.$store.commit("selectSearchHistoryItemsChange", sel);
-      if (this.$store.state.vizNoCommit === 0) this.$store.commit("calculate");
-      else this.$store.state.vizNoCommit--;
+      this.store.selectSearchHistoryItemsChange(sel);
+      if (this.store.vizNoCommit === 0) this.store.calculate();
+      else this.store.vizNoCommit--;
       this.$data.syncLock = false;
     },
   },
@@ -276,7 +294,7 @@ export default {
   methods: {
     lookup(idx, key, w, layer) {
       var baseUrl = "https://www.owid.de/plus/live-2021/api/v3";
-      var year = this.$store.state.yearFocus;
+      var year = this.store.yearFocus;
       var data = this.$data;
 
       data.entries[idx].grid.forEach((x) => {
@@ -316,30 +334,20 @@ export default {
       if (this.$data.syncLock) return;
 
       this.$data.syncLock = true;
-      this.$store.commit("selectSearchChange", this.$data.syncSumSelection);
-      this.$store.commit("calculate");
+      this.store.selectSearchChange(this.$data.syncSumSelection);
+      this.store.calculate();
       this.$data.syncLock = false;
     },
-    selectionChanged() {
-      if (this.$data.selected === null) return;
-
-      var list = [];
-      Object.keys(this.$data.selected).forEach((k) => {
-        list.push(this.$data.selected[k].key);
-      });
-
-      this.$store.commit("selectSearchHistoryItemsChange", list);
-    },
     exportLink(i) {
-      var data = this.$store.state.owid.GetSearchHistoryItemRequest(i.label);
-      var locale = this.$cookie.get("locale");
+      var data = this.store.owid.GetSearchHistoryItemRequest(i.label);
+      var locale = this.$i18n.locale;
       this.$data.snackbarLink =
         this.$config.webUrl + "?" + (locale != "de" ? "locale=" + locale + "&" : "") + "data=" + btoa(JSON.stringify(data));
       this.$data.snackbarQrcode = encodeURIComponent(this.$data.snackbarLink.replace("https://www.owid.de/"));
       this.$data.snackbar = true;
     },
     export(i, format, mime, fn){
-      var exp = this.$store.state.owid.GetSearchHistoryItem4export(i.label);
+      var exp = this.store.owid.GetSearchHistoryItem4export(i.label);
       var baseUrl = "https://www.owid.de/plus/live-2021/api/v3";
 
       fetch(`${baseUrl}/convert?N=${exp.N}&format=${format}`, {
@@ -377,7 +385,7 @@ export default {
         enc.encode(
           JSON.stringify({
             Format: "JSON",
-            Owid: this.$store.state.owid.GetSearchHistoryItem4export(i.label),
+            Owid: this.store.owid.GetSearchHistoryItem4export(i.label),
           })
         ).buffer,
         "application/json",
@@ -387,13 +395,13 @@ export default {
     modelSave() {
       var enc = new TextEncoder();
       saveBlob(
-        enc.encode(JSON.stringify({ Format: "JSON", Owid: this.$store.state.owid })).buffer,
+        enc.encode(JSON.stringify({ Format: "JSON", Owid: this.store.owid })).buffer,
         "application/json",
         "data.json"
       );
     },
     modelLoad() {
-      storeGlobal = this.$store;
+      storeGlobal = this.store;
       var fileinput = document.getElementById("fileinput");
       fileinput.addEventListener("change", this.handleFileSelect);
       fileinput.click();
@@ -418,29 +426,29 @@ export default {
         throw "Could not parse result";
       }
       var obj = JSON.parse(decodeURIComponent(escape(atob(match[2]))));
-      storeGlobal.commit("modelLoad", obj.Owid);
-      storeGlobal.commit("calculate");
+      storeGlobal.modelLoad(obj.Owid);
+      storeGlobal.calculate();
       this.refreshData();
     },
     refreshData() {
-      if (this.$store.state.owid === null) return;
+      if (this.store.owid === null) return;
 
       var selected = new Set();
       var selectedSums = [];
       var res = [];
 
-      this.$store.state.owid.GetSearchHistory().forEach((key) => {
-        var grid = this.$store.state.owid.GetSearchHistoryItem(key, this.$store.state.vizOptionGranulation);
+      this.store.owid.GetSearchHistory().forEach((key) => {
+        var grid = this.store.owid.GetSearchHistoryItem(key, this.store.vizOptionGranulation);
 
         for (var row in grid) if (grid[row].checked) selected.add(grid[row]);
 
         res.push({
           label: key,
-          checked: this.$store.state.owid.OwidLiveSearches[key].IsSelected,
+          checked: this.store.owid.OwidLiveSearches[key].IsSelected,
           grid: grid,
         });
 
-        if (this.$store.state.owid.OwidLiveSearches[key].IsSelected) selectedSums.push(key);
+        if (this.store.owid.OwidLiveSearches[key].IsSelected) selectedSums.push(key);
       });
 
       this.$data.syncLock = true;
@@ -457,21 +465,6 @@ export default {
     }
   },
 
-  created() {
-    var self = this;
-
-    this.$store.watch(
-      () => {
-        return self.$store.state.searches;
-      },
-      () => {
-        self.refreshData();
-      },
-      {
-        deep: true,
-      }
-    );
-  },
 };
 </script>
 
