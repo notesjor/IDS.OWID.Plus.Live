@@ -4,8 +4,10 @@ function Fill(item, normData, scale) {
   for (const date in normData) {
     const entry = data[date];
     if (entry !== undefined) {
-      if (scale) entry.value = (entry.value / normData[date]) * 1000000;
-      result[date] = entry;
+      // Kopie statt Mutation: Eingabedaten sind gecacht
+      result[date] = scale
+        ? { dates: entry.dates, value: (entry.value / normData[date]) * 1000000 }
+        : entry;
     } else {
       result[date] = { dates: new Set(), value: 0.0 };
     }

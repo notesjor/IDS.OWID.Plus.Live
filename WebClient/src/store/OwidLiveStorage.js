@@ -1,5 +1,5 @@
 import { OwidLiveSearch } from "./OwidLiveSearch";
-import "./DateHelper.js";
+import { granulateKey } from "./DateHelper.js";
 
 export class OwidLiveStorage {
   #OwidLiveSearches;
@@ -12,6 +12,7 @@ export class OwidLiveStorage {
   #NMax = 3;
   #Granulation;
   #AvailableYears;
+  #GranulationCache = {};
 
   toJSON() {
     return {
@@ -228,17 +229,18 @@ export class OwidLiveStorage {
       const p = tokens[2] || null;
 
       // Precompute keys and values for item.Date
-      const dateKeys = Object.keys(item.Date);
+      const itemDate = item.Date;
+      const dateKeys = Object.keys(itemDate);
       const d = dateKeys.length;
       let s = 0;
       for (let i = 0; i < dateKeys.length; i++) {
-        s += item.Date[dateKeys[i]].value;
+        s += itemDate[dateKeys[i]].value;
       }
 
       // Precompute sparkNorm array
       const sparkNorm = [];
       for (const i in normd) {
-        const v = item.Date[i]?.value || 0;
+        const v = itemDate[i]?.value || 0;
         // Only push if normd[i] is not zero to avoid division by zero
         sparkNorm.push(normd[i] ? Math.round((v / normd[i]) * 1000000.0) : 0);
       }
@@ -366,12 +368,15 @@ export class OwidLiveStorage {
    * @param  {function} func the functions needs to describe how-to find the dateTime-Key
    */
   calculateGranulation(func) {
+    const ck = "norm" + this.#N + func.name;
+    const cached = this.#GranulationCache[ck];
+    if (cached !== undefined) return cached;
     const res = new Map();
     for (const [date, value] of Object.entries(this.#Norm[this.#N - 1])) {
-      const key = func(new Date(date));
+      const key = granulateKey("n" + func.name, func, date);
       res.set(key, (res.get(key) || 0) + value);
     }
-    return Object.fromEntries(res);
+    return (this.#GranulationCache[ck] = Object.fromEntries(res));
   }
 
   /**
@@ -379,6 +384,9 @@ export class OwidLiveStorage {
    * @param  {function} func the functions needs to describe how-to find the dateTime-Key
    */
   calculateDateGranulation(func) {
-    return this.#Dates.map((date) => func(new Date(date)));
+    const ck = "dates" + func.name;
+    const cached = this.#GranulationCache[ck];
+    if (cached !== undefined) return cached;
+    return (this.#GranulationCache[ck] = this.#Dates.map((date) => granulateKey("n" + func.name, func, date)));
   }
 }

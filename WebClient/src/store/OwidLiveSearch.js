@@ -199,11 +199,13 @@ export class OwidLiveSearch {
       const data = func(item);
       if (data) {
         for (const [key, value] of Object.entries(data)) {
-            if (res[key]) {
-              res[key].value += value.value;
-              res[key].dates = new Set([...res[key].dates, ...value.dates]);
+            const target = res[key];
+            if (target) {
+              target.value += value.value;
+              value.dates.forEach((d) => target.dates.add(d));
             } else {
-              res[key] = { ...value };
+              // Set kopieren: die Daten der Zeitreihen sind gecacht und dürfen nicht verändert werden
+              res[key] = { dates: new Set(value.dates), value: value.value };
             }
         }
       }

@@ -30,3 +30,17 @@ Date.prototype.getYearWeek = function () {
 Date.prototype.getYearQuarter = function () {
   return this.getFullYear() + "-" + (Math.floor(this.getMonth() / 3) + 1);
 };
+
+// Gemeinsamer Cache: Datum-String -> granulierter Schlüssel (je Granulierung).
+// Viele Zeitreihen teilen dieselben Tage, so wird jedes Datum nur einmal geparst.
+const granulationMemo = {};
+export function granulateKey(kind, func, key) {
+  let memo = granulationMemo[kind];
+  if (memo === undefined) memo = granulationMemo[kind] = new Map();
+  let res = memo.get(key);
+  if (res === undefined) {
+    res = func(new Date(key));
+    memo.set(key, res);
+  }
+  return res;
+}
