@@ -78,3 +78,40 @@ h5 { font-size: 1.5rem; font-weight: 400; }
 .v-card-title.bg-grey-lighten-2 {
   padding-bottom: 16px;
 }
+
+// --- Kompatibilität Vuetify 3 -> 4 (altes Aussehen beibehalten) ---
+// Typografie: MD2-Klasse text-h5 (in v4 durch text-headline-small ersetzt)
+.text-h5 {
+  font-size: 1.5rem !important;
+  font-weight: 400;
+  line-height: 2rem;
+  letter-spacing: normal;
+}
+
+// CSS-Reset von Vuetify 3
+@layer vuetify-core.reset {
+  * { padding: 0; margin: 0; }
+  textarea { resize: vertical; }
+  button, input, select, textarea {
+    background-color: transparent;
+    border-style: none;
+  }
+}
+
+// Grid im Legacy-Modus (negative Margins + Spalten-Padding)
+@layer vuetify-overrides {
+  .v-row {
+    gap: unset;
+    margin: calc(var(--v-col-gap-y) * -.5) calc(var(--v-col-gap-x) * -.5);
+  }
+  .v-row + .v-row {
+    margin-top: calc(var(--v-col-gap-y) * .5);
+  }
+  .v-col {
+    padding: calc(var(--v-col-gap-y) * .5) calc(var(--v-col-gap-x) * .5);
+    flex-basis: var(--v-col-is-size, calc(100% * var(--v-col-size) / var(--v-col-size-columns))) var(--v-col-is-auto, auto) var(--v-col-is-grow, 0);
+  }
+  .v-col:where([class*='v-col--offset-']) {
+    margin-inline-start: calc(100% * var(--v-col-offset) / var(--v-col-size-columns));
+  }
+}

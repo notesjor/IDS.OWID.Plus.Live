@@ -5,6 +5,15 @@ import vuetify from "vite-plugin-vuetify";
 export default defineConfig(({ mode }) => ({
   base: mode === "production" ? "/plus/live-2021/" : "/",
   plugins: [vue(), vuetify({ autoImport: true })],
+  optimizeDeps: {
+    include: [
+      "vuetify/components/VOverlay",
+      "vuetify/components/VDialog",
+      "vuetify/components/VMenu",
+      "vuetify/components/VSelect",
+      "vuetify/components/VTooltip",
+    ],
+  },
   build: {
     sourcemap: true,
     rollupOptions: {
