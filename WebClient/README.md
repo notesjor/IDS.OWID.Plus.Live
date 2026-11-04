@@ -1,6 +1,6 @@
 # OWIDplusLIVE – WebClient
 
-Vue 3 · Vite · Vuetify 3 · Pinia · vue-i18n · ECharts 6 (vue-echarts)
+Vue 3 · Vite · Vuetify 4 · Pinia · vue-i18n · ECharts 6 (vue-echarts)
 
 ## Befehle
 ```
