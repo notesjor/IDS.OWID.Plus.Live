@@ -93,7 +93,7 @@
           <v-row>
             <v-col>
               <h5>{{ $t("search_lbl_windowSize") }}:</h5>
-              <v-tabs v-model="tabSimple">
+              <v-tabs v-model="tabSimple" color="#EF7D00">
                 <v-tab :value="0" @click="search_simple_n_change(1)">
                   <span>N=1</span>
                 </v-tab>
@@ -109,7 +109,7 @@
                 <v-window-item :value="0">
                   <v-card flat>
                     <v-row>
-                      <v-col style="padding:0px; margin: 40px 0 -5px 15px">
+                      <v-col style="padding:0px; margin: 40px 0 0 15px">
                         <h5>{{ $t("search_lbl_query") }}:</h5>
                       </v-col>
                     </v-row>
@@ -119,7 +119,7 @@
                           :label="$t('lbl_layer')" style="display:block-inline;"></v-select>
                         <TagsetInfo v-if="search_simple_1_layer_show_pos" />
                       </v-col>
-                      <v-col cols="9" style="margin-top:7px">
+                      <v-col cols="9">
                         <v-text-field
                           :label="$t('search_lbl_queryExpression') + ' (' + $t('search_simple_singleToken') + ')'"
                           v-model="search_simple_1_value" :rules="inputRules"
@@ -127,7 +127,7 @@
                       </v-col>
                     </v-row>
                     <v-row>
-                      <v-col style="padding:0px; margin: -20px 0 15px 15px;">
+                      <v-col style="padding:0px; margin: 0 0 15px 15px;">
                         <div>
                           <h5>{{ $t("lbl_samples") }}:</h5>
                           <div class="sampleSection">
@@ -150,7 +150,7 @@
                 <v-window-item :value="1">
                   <v-card flat>
                     <v-row>
-                      <v-col style="padding:0px; margin: 40px 0 -20px 15px">
+                      <v-col style="padding:0px; margin: 40px 0 0 15px">
                         <h5>{{ $t("search_lbl_query") }}:</h5>
                       </v-col>
                     </v-row>
@@ -178,7 +178,7 @@
                     </v-row>
 
                     <v-row>
-                      <v-col style="padding:0px; margin: -20px 0 15px 15px;">
+                      <v-col style="padding:0px; margin: 0 0 15px 15px;">
                         <div>
                           <h5>{{ $t("lbl_samples") }}:</h5>
                           <div class="sampleSection">
@@ -202,7 +202,7 @@
                 <v-window-item :value="2">
                   <v-card flat>
                     <v-row>
-                      <v-col style="padding:0px; margin: 40px 0 -20px 15px">
+                      <v-col style="padding:0px; margin: 40px 0 0 15px">
                         <h5>{{ $t("search_lbl_query") }}:</h5>
                       </v-col>
                     </v-row>
@@ -240,7 +240,7 @@
                     </v-row>
 
                     <v-row>
-                      <v-col style="padding:0px; margin: -20px 0 15px 15px;">
+                      <v-col style="padding:0px; margin: 0 0 15px 15px;">
                         <div>
                           <h5>{{ $t("lbl_samples") }}:</h5>
                           <div class="sampleSection">
