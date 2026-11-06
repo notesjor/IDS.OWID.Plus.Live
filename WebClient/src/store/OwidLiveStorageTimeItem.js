@@ -1,3 +1,5 @@
+import { granulateKey } from "./DateHelper.js";
+
 export class OwidLiveStorageTimeItem {
   #Key;
   #Token;
@@ -5,6 +7,7 @@ export class OwidLiveStorageTimeItem {
   #Label;
   #Dates;
   #IsSelected;
+  #Cache = {};
 
   toJSON() {
     return {
@@ -73,7 +76,7 @@ export class OwidLiveStorageTimeItem {
    */
   get Date() {
     return this.#IsSelected
-      ? this.calculateGranulation(function (x) {
+      ? this.calculateGranulation("Date", function (x) {
           return (
             x.getFullYear() +
             "-" +
@@ -104,7 +107,7 @@ export class OwidLiveStorageTimeItem {
    */
   get Week() {
     return this.#IsSelected
-      ? this.calculateGranulation(function (x) {
+      ? this.calculateGranulation("Week", function (x) {
           return x.getYearWeek();
         })
       : null;
@@ -115,7 +118,7 @@ export class OwidLiveStorageTimeItem {
    */
   get Month() {
     return this.#IsSelected
-      ? this.calculateGranulation(function (x) {
+      ? this.calculateGranulation("Month", function (x) {
           return x.getFullYear() + "-" + x.getMonth().pad(2);
         })
       : null;
@@ -126,7 +129,7 @@ export class OwidLiveStorageTimeItem {
    */
   get Quarter() {
     return this.#IsSelected
-      ? this.calculateGranulation(function (x) {
+      ? this.calculateGranulation("Quarter", function (x) {
           return x.getYearQuarter();
         })
       : null;
@@ -137,7 +140,7 @@ export class OwidLiveStorageTimeItem {
    */
   get Year() {
     return this.#IsSelected
-      ? this.calculateGranulation(function (x) {
+      ? this.calculateGranulation("Year", function (x) {
           return x.getFullYear();
         })
       : null;
@@ -147,17 +150,20 @@ export class OwidLiveStorageTimeItem {
    * HELPER-Function: Used by Weeks, Month, Quarter and Year
    * @param  {function} func the function describes how-to group the dates
    */
-  calculateGranulation(func) {
+  calculateGranulation(kind, func) {
+    // Ergebnis ist unveränderlich (Dates ändern sich nie) -> einmal berechnen, dann wiederverwenden
+    const cached = this.#Cache[kind];
+    if (cached !== undefined) return cached;
     const res = {};
     for (const [key, value] of Object.entries(this.#Dates)) {
-      const date = new Date(key);
-      const granulatedKey = func(date);
+      const granulatedKey = granulateKey(kind, func, key);
       if (!res[granulatedKey]) {
         res[granulatedKey] = { dates: new Set(), value: 0 };
       }
       res[granulatedKey].value += value;
       res[granulatedKey].dates.add(key);
     }
+    this.#Cache[kind] = res;
     return res;
   }
 }
