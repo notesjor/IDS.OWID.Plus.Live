@@ -3,7 +3,6 @@
 </template>
 
 <script>
-import Vue from "vue";
 import VueECharts, { THEME_KEY } from "vue-echarts";
 
 import {  use } from "echarts/core";
@@ -21,6 +20,7 @@ import {
   DataZoomComponent
 } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
+import { useOwidStore } from "../../store/owid";
 
 use([
   LineChart,
@@ -35,11 +35,13 @@ use([
   DataZoomComponent
 ]);
 
-Vue.component('v-chart', VueECharts);
 
 export default {
   name: "VizTimeChart",
-  theme: { dark: false },
+  components: { VChart: VueECharts },
+  setup() {
+    return { store: useOwidStore() };
+  },
   provide: {
     [THEME_KEY]: "light"
   },
@@ -52,15 +54,15 @@ export default {
   },
   computed:{
     chartOptions(){
-      if (this.$store.state.vizData === null) return null;
+      if (this.store.vizData === null) return null;
 
-        var availableDates = this.$store.state.owid.Dates;
+        var availableDates = this.store.owid.Dates;
 
         var series = [];
 
-        for (const key in this.$store.state.vizData) {
+        for (const key in this.store.vizData) {
           if (key === "ALLE") continue;
-          const data = this.$store.state.vizData[key];
+          const data = this.store.vizData[key];
 
           var values = [];
           availableDates.forEach((c) => {
@@ -81,7 +83,7 @@ export default {
           });
         }
 
-        var unit = this.$store.state.vizOptionRelative ? this.$t("lbl_unit_tokenPPM") : this.$t("lbl_unit_token");
+        var unit = this.store.vizOptionRelative ? this.$t("lbl_unit_tokenPPM") : this.$t("lbl_unit_token");
 
         return {
           toolbox: {

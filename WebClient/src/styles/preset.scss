@@ -1,0 +1,80 @@
+// Ersetzt das frühere Vuetify-2-Preset "rally" (Schriften, Radien, Schatten)
+:root {
+  --rally-font-body: "Roboto Condensed", sans-serif;
+  --rally-font-heading: "Eczar", sans-serif;
+}
+
+.v-application,
+.v-application [class*="text-"],
+.v-application .v-btn,
+.v-application .v-field,
+.v-application .v-label {
+  font-family: var(--rally-font-body) !important;
+}
+
+.v-application .v-card-title,
+.v-application .text-h5 {
+  font-family: var(--rally-font-body) !important;
+  letter-spacing: normal;
+}
+
+h1, h2, h4, h5, h6 {
+  font-family: var(--rally-font-body);
+  letter-spacing: normal;
+}
+
+h3 {
+  font-family: var(--rally-font-heading);
+  letter-spacing: normal;
+  font-weight: 400;
+}
+
+h4 { font-size: 2.125rem; font-weight: 400; }
+h5 { font-size: 1.5rem; font-weight: 400; }
+
+.v-application { font-size: 16px; }
+
+.v-btn {
+  border-radius: 0 !important;
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.0892857143em;
+}
+
+.v-card,
+.v-dialog > .v-overlay__content > .v-card {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.v-dialog > .v-overlay__content > .v-card {
+  box-shadow: none !important;
+}
+
+.v-card-title {
+  padding: 24px 24px 0 24px;
+  white-space: normal;
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 2rem;
+}
+
+.v-card-text {
+  padding: 24px;
+  font-size: 1rem;
+}
+
+.v-tab.v-btn {
+  font-size: 1.25rem !important;
+  font-weight: 500 !important;
+  min-width: 0;
+  text-transform: uppercase;
+}
+
+.v-app-bar.v-toolbar {
+  background-color: #33333d !important;
+}
+
+.v-card-title.bg-grey-lighten-2 {
+  padding-bottom: 16px;
+}

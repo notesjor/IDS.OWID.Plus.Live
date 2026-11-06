@@ -29,7 +29,7 @@
                 andere Abfrage aus.</h4>
             </div>
             <div v-else>
-              <v-alert color="#f9b211" dense outlined text type="warning">
+              <v-alert color="#f9b211" density="compact" variant="outlined" type="warning">
                 <strong>Hinweis:</strong> Diese Funktion fragt zufällige Belege via KorAP ab. 
                 Die Daten sind nicht identisch mit OWIDplusLIVE. 
               </v-alert>
@@ -56,7 +56,7 @@
                 </div>
               </div>
               <div>
-                <v-pagination :length="pageMax" v-model="page" total-visible="10" :disabled="pageMax < 2"></v-pagination>
+                <v-pagination :length="pageMax" v-model="page" :total-visible="10" :disabled="pageMax < 2"></v-pagination>
               </div>
             </div>
           </v-card-text>
@@ -68,7 +68,7 @@
     </v-dialog>
     <!-- ANMELDUNG ERFOLGREICH - SUCHE - ENDE -->
     <!-- FEHLER START -->
-    <v-alert color="red" dense outlined text type="error" v-if="dialog_signin_error">
+    <v-alert color="red" density="compact" variant="outlined" type="error" v-if="dialog_signin_error">
       Die Anmeldung war nicht erfolgreich. Bitte melden Sie sich erneut an.
     </v-alert>
     <!-- FEHLER ENDE -->

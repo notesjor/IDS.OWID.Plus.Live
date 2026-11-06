@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar app dark class="d-print-none" style="z-index:999">
+    <v-app-bar theme="dark" class="d-print-none" style="z-index:999">
       <div>
         <a :href="leftIconHref" target="_blank">
           <img alt="Logo" height="40px" src="./assets/logo_left.svg" />
@@ -24,12 +24,12 @@
         </v-row>
         <v-row class="text-center">
           <v-col>
-            <VizPanel id="vizPanel" v-show="this.$store.state.vizData != null" />
+            <VizPanel id="vizPanel" v-show="store.vizData != null" />
           </v-col>
         </v-row>
         <v-row class="text-center">
           <v-col>
-            <VizOptions v-show="this.$store.state.vizData != null" />
+            <VizOptions v-show="store.vizData != null" />
           </v-col>
         </v-row>
         <v-row class="text-center">
@@ -39,14 +39,14 @@
         </v-row>
         <v-row>
           <v-col>
-            <v-footer padless>
+            <v-footer class="pa-0">
               <v-card class="flex" flat tile>
                 <v-card-text class="py-2" style="text-align:left">
                   <div style="display:inline-block">
                     {{ $t("footer_corpusSize") }}
                     <i>
                       ({{ $t("footer_lastUpdate") }}:
-                      {{ this.$store.state.owid === null ? "" : this.$store.state.owid.LastDate }}):
+                      {{ store.owid === null ? "" : store.owid.LastDate }}):
                     </i>
                     <br />
                     {{ totalLabel }}
@@ -57,11 +57,11 @@
           </v-col>
 
           <v-col>
-            <v-footer padless>
+            <v-footer class="pa-0">
               <v-card class="flex" flat tile>
                 <v-card-text class="py-2" style="text-align:right">
                   <div style="display:inline-block">
-                    {{ new Date().getFullYear() }} — <strong>{{ this.$config.appName }}</strong>
+                    {{ new Date().getFullYear() }} — <strong>{{ $config.appName }}</strong>
                   </div>
                   <div style="display:inline-block">
                     <a :href="footerContact" style="margin-left:15px"
@@ -79,9 +79,9 @@
       </v-container>
     </v-main>
 
-    <v-menu top>
-      <template v-slot:activator="{ on, attrs }">
-        <v-btn color="#EF7D00" fab style="position:fixed; right:1em; bottom:1em" v-bind="attrs" v-on="on">
+    <v-menu location="top">
+      <template v-slot:activator="{ props }">
+        <v-btn color="#EF7D00" icon size="large" style="position:fixed; right:1em; bottom:1em" v-bind="props">
           <v-icon>
             mdi-menu
           </v-icon>
@@ -127,15 +127,15 @@
       </v-list>
     </v-menu>
 
-    <v-overlay :value="!tutorial">
+    <v-overlay :model-value="!tutorial" persistent class="align-center justify-center">
       <div
         style="background-color: rgb(55, 55, 64); display: block; min-height: 410px; max-height: 410px; min-width: 300px; max-width: 300px; position: absolute; left: -320px; top: 50px; ">
         <h3 style="margin: 7px 0px 10px 15px;">Neuigkeiten</h3>
-        <v-window v-model="newsAll" vertical>
-          <v-window-item :key="0">
+        <v-window :model-value="newsAll" direction="vertical" :touch="false">
+          <v-window-item :value="0">
             <v-virtual-scroll :items="news" height="368" item-height="64">
               <template v-slot:default="{ item }">
-                <v-list-item :key="item" class="newsItem" @click="newsSelected = item.id">
+                <v-list-item :key="item.id" class="newsItem" @click="newsSelected = item.id">
                   <div>
                     <span style="width: 100%;">
                       <v-icon>{{ item.icon }}</v-icon>&nbsp;
@@ -147,7 +147,7 @@
               </template>
             </v-virtual-scroll>
           </v-window-item>
-          <v-window-item :key="1">
+          <v-window-item :value="1">
             <div style="height: 100%; width: 100%; padding: 0px 10px 0px 10px; min-height: 352px;">
               <v-row align="center" class="mb-4" style="margin: 5px 0px 0px 0px; font-size: 1.2rem;">
                 <v-icon>{{ news[newsSelected]?.icon }}</v-icon>&nbsp;
@@ -167,8 +167,8 @@
 
       <div class="text-center">
         <v-card>
-          <v-card-title class="headline">
-            {{ $t("app_dialog_welcome_message") }} {{ this.$config.appName }}
+          <v-card-title class="text-h5">
+            {{ $t("app_dialog_welcome_message") }} {{ $config.appName }}
           </v-card-title>
           <iframe :src="tutorial_iframe_src" title="Video-Tutorial"
             style="width:600px; max-width:600px; height:414px; max-height:414px;"></iframe>
@@ -176,7 +176,7 @@
             {{ $t("app_dialog_welcome_message_info") }}
           </v-card-text>
           <v-card-actions>
-            <v-btn text @click="closeTutorial" class="blink">
+            <v-btn variant="text" @click="closeTutorial" class="blink">
               <v-icon style="margin-right:10px">
                 mdi-arrow-right-circle-outline
               </v-icon>
@@ -190,11 +190,11 @@
       </div>
     </v-overlay>
 
-    <v-overlay :value="alert">
+    <v-overlay :model-value="alert" persistent class="align-center justify-center">
       <div class="text-center">
         <v-card>
-          <v-card-title class="headline">
-            {{ $t("app_dialog_serverError_message") }} {{ this.$config.appName }}
+          <v-card-title class="text-h5">
+            {{ $t("app_dialog_serverError_message") }} {{ $config.appName }}
           </v-card-title>
           <v-card-text>
             {{ $t("app_dialog_serverError_message_info") }}
@@ -269,34 +269,20 @@ div.newsText {
 
 <script>
 //import VizTimeChart from "./components/visualizations/VizTimeChart";
-import VizPanel from "./components/VizPanel";
-import VizOptions from "./components/VizOptions";
-import Search from "./components/Search";
-import Clipboard from "./components/Clipboard";
+import VizPanel from "./components/VizPanel.vue";
+import VizOptions from "./components/VizOptions.vue";
+import Search from "./components/Search.vue";
+import Clipboard from "./components/Clipboard.vue";
+import { useLocale } from "vuetify";
+import { useOwidStore } from "./store/owid";
 
 export default {
   name: "App",
 
-  metaInfo() {
-    return {
-      title:
-        this.$config.appName === "OWIDplusLIVE"
-          ? this.$config.appName
-          : this.$config.appName + " (powered by: OWIDplusLIVE)",
-      meta: [
-        {
-          name: "description",
-          content: "",
-        },
-        {
-          property: "og:title",
-          content: this.$config.appName,
-        },
-        { property: "og:site_name", content: "Epiloge" },
-        { property: "og:type", content: "website" },
-        { name: "robots", content: "index,nofollow" },
-      ],
-    };
+  setup() {
+    const store = useOwidStore();
+    const { current: vuetifyLocale } = useLocale();
+    return { store, vuetifyLocale };
   },
 
   components: {
@@ -385,13 +371,31 @@ export default {
         event.target.style.background = "purple";
       }, 500);
     },
+    setMeta() {
+      const appName = this.$config.appName;
+      document.title =
+        appName === "OWIDplusLIVE" ? appName : appName + " (powered by: OWIDplusLIVE)";
+
+      const metas = [
+        { name: "description", content: "" },
+        { property: "og:title", content: appName },
+        { property: "og:site_name", content: "Epiloge" },
+        { property: "og:type", content: "website" },
+        { name: "robots", content: "index,nofollow" },
+      ];
+      metas.forEach((m) => {
+        const el = document.createElement("meta");
+        Object.keys(m).forEach((k) => el.setAttribute(k, m[k]));
+        document.head.appendChild(el);
+      });
+    },
     scrollToVizPanel() {
       document.getElementById("vizPanel").scrollIntoView(true);
       window.scrollBy(0, -100);
     },
     setLocale(locale) {
       localStorage.setItem("locale", locale);
-      this.$vuetify.lang.current = this.$i18n.locale = locale;
+      this.vuetifyLocale = this.$i18n.locale = locale;
     },
     closeTutorial() {
       localStorage.setItem("tutorial", new Date().toISOString());
@@ -420,9 +424,11 @@ export default {
 
   mounted() {
     var self = this;
-    var store = this.$store;
+    var store = this.store;
     var search = this.$refs.searchComponent;
     var config = this.$config;
+
+    this.setMeta();
 
     this.leftIconHref = config.leftIconHref;
     this.rightIconHref = config.rightIconHref;
@@ -438,7 +444,7 @@ export default {
     fetch(baseUrl + "/years")
       .then((response) => response.json())
       .then((response) => {
-        store.commit("years", response);
+        store.setYears(response);
 
         fetch(baseUrl + "/norm", {
           method: "GET",
@@ -455,9 +461,9 @@ export default {
             if (obj === null)
               throw new Error("No Data");
 
-            store.commit("init", obj);
+            store.init(obj);
 
-            store.commit("vizOption", { r: true, s: 16, g: 1 });
+            store.setVizOption({ r: true, s: 16, g: 1 });
           })
           .then(() => {
             const queries = new URLSearchParams(window.location.search);
@@ -468,7 +474,7 @@ export default {
             if (queries.has("locale")) {
               var locale = queries.get("locale");
               // vermeidet reload
-              if (this.$cookie.get("locale") != locale)
+              if (this.$i18n.locale != locale)
                 self.setLocale(locale);
             }
 
@@ -501,9 +507,9 @@ export default {
   },
   computed: {
     totalLabel: function () {
-      if (this.$store.state.owid === null) return "";
+      if (this.store.owid === null) return "";
 
-      var totals = this.$store.state.owid.Total;
+      var totals = this.store.owid.Total;
       var res = [];
       for (var i = 0; i < totals.length; i++) {
         res.push("N=" + (i + 1) + ": " + totals[i]);
