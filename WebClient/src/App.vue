@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-app-bar theme="dark" class="d-print-none" style="z-index:999">
-      <div>
+      <div style="margin-left:10px; margin-right:10px">
         <a :href="leftIconHref" target="_blank">
           <img alt="Logo" height="40px" src="./assets/logo_left.svg" />
         </a>
@@ -81,11 +81,11 @@
 
     <v-menu location="top">
       <template v-slot:activator="{ props }">
-        <v-btn color="#EF7D00" icon size="large" style="position:fixed; right:1em; bottom:1em" v-bind="props">
+        <div style="background-color: #EF7D00; position:fixed; right:1em; bottom:1em; border-radius: 50%; padding:10px;" v-bind="props">
           <v-icon>
             mdi-menu
           </v-icon>
-        </v-btn>
+        </div>
       </template>
 
       <v-list>
@@ -129,11 +129,11 @@
 
     <v-overlay :model-value="!tutorial" persistent class="align-center justify-center">
       <div
-        style="background-color: rgb(55, 55, 64); display: block; min-height: 410px; max-height: 410px; min-width: 300px; max-width: 300px; position: absolute; left: -320px; top: 50px; ">
-        <h3 style="margin: 7px 0px 10px 15px;">Neuigkeiten</h3>
+        style="background-color: rgb(55, 55, 64); color:white; display: block; min-height: 450px; max-height: 450px; min-width: 320px; max-width: 320px; position: absolute; left: -340px; top: 50px; ">
+        <h2 style="margin: 7px 0px 10px 15px;">Neuigkeiten</h2>
         <v-window :model-value="newsAll" direction="vertical" :touch="false">
           <v-window-item :value="0">
-            <v-virtual-scroll :items="news" height="368" item-height="64">
+            <v-virtual-scroll :items="news" height="388" item-height="64">
               <template v-slot:default="{ item }">
                 <v-list-item :key="item.id" class="newsItem" @click="newsSelected = item.id">
                   <div>
@@ -155,7 +155,7 @@
               </v-row>
 
               <div v-html="news[newsSelected]?.text" style="text-align:left;" class="newsText"></div>              
-              <div style="margin: 10px 0px 0px 0px; position: absolute; bottom: 0px;">
+              <div style="margin: 10px 0px 0px 0px; position: absolute; bottom: 0px; color:white">
                 <v-btn @click="newsSelected = -1">
                   <v-icon>mdi-arrow-left-circle-outline</v-icon> Zeige alle Neuigkeiten
                 </v-btn>
@@ -180,7 +180,7 @@
               <v-icon style="margin-right:10px">
                 mdi-arrow-right-circle-outline
               </v-icon>
-              <span>
+              <span style="color:black">
                 {{ $t("app_dialog_welcome_message_btn") }}
               </span>
             </v-btn>
@@ -310,46 +310,60 @@ export default {
       // Hier neue News-Items einfügen - dann alle IDs anpassen!
       {
         id: 0,
+        title: "Version 4.0",
+        date: "2026-11-10",
+        text: "Die in Version 3.0 eingeführte API wurde weiter optimiert. Es ergab sich aber das Problem, dass die Webseite/Oberfläche die Datenmenge nicht mehr effizient verarbeiten konnte. Daher wurde die Oberfläche komplett neu implementiert. Die neue Oberfläche ist deutlich schneller und bietet eine verbesserte Usability.",
+        icon: "mdi-xml"
+      },
+      {
+        id: 1,
+        title: "Jupyter-Notebook",
+        date: "2025-10-20",
+        text: "Basierend auf der neuen API wurde ein Jupyter-Notebook entwickelt, das die Nutzung der API in Python demonstriert. Das Notebook ist <a href=\"https://www.owid.de/plus/jupyter/lab/index.html?path=OwidPlusLive%2FOwidPlusLive.ipynb\">hier verfügbar</a>.",
+        icon: "mdi-book-open-variant"
+      },
+      {
+        id: 2,
         title: "Version 3.0",
         date: "2025-10-07",
         text: "Die neue API basiert auf dem <a href=\"https://notes.jan-oliver-ruediger.de/software/corpusexplorer-overview/\">CorpusExplorer</a>. Sie ist effizienter (schnellere Antwortzeiten / reduzierte Server-Ressourcen) und bietet mit der Auswahl eines Fokus-Jahres eine neue Möglichkeit, die Daten reproduzierbar zu analysieren. Außerdem wurde die Ausfallsicherheit verbessert.",
         icon: "mdi-xml"
       },
       {
-        id: 1,
+        id: 3,
         title: "Daten-Crash",
         date: "2025-09-05",
         text: "Aufgrund einer Fehlfunktion und der parallelen Migration auf einen neuen Server sind die Daten im Zeitraum 03.07.-04.09.2025 leider verloren gegangen. Bitte berücksichtigen Sie dies bei der Interpretation Ihrer Analysen.",
         icon: "mdi-alert-decagram-outline"
       },
       {
-        id: 2,
+        id: 4,
         title: "Print-Publikation",
         date: "2024-06-27",
         text: "Der Artikel \"Tagesaktuelle Aufbereitung, Analyse und Exploration sprachlicher Daten aus RSS-Feeds\" steht OpenAccess unter folgender DOI zur Verfügung: <a href=\"https://doi.org/10.1007/978-3-658-39625-1_1\">[Link zum Artikel]</a>",
         icon: "mdi-book-open-variant"
       },
       {
-        id: 3,
+        id: 5,
         title: "Poster-Präsentation",
         date: "2023-03-14",
         text: "Poster-Präsentation im Rahmen der DHd 2023 (Trier). <a href=\"https://doi.org/10.5281/zenodo.7715470\">[Link zum Abstract]</a>",
         icon: "mdi-human-male-board"
       }, {
-        id: 4,
+        id: 6,
         title: "Softwaredemo",
         date: "2022-07-14",
         text: "Softwaredemo „Day-to-day collection, exploration, analysis, and visualization of n-gram frequencies in German (online press) language: OWIDplusLIVE“ im Rahmen der EURALEX 2022 (Mannheim). <a href=\"https://videolectures.net/euralex2022_owid_plus_live/\">[Link zum Video (auf Englisch)]</a>",
         icon: "mdi-video-vintage"
       }, {
-        id: 5,
+        id: 7,
         title: "Vortrag (GAL 2021)",
         date: "2021-09-15",
         text: "Die Vortragsfolien zum Vortrag \"OWIDplusLIVE\" im Rahmen der Jahrestagung der Gesellschaft für Angewandte Linguistik (GAL) sind online verfügbar: <a href=\"./2021-09-15_GAL.pdf\">[Link zum Download]</a>",
         icon: "mdi-human-male-board"
       },
       {
-        id: 6,
+        id: 8,
         title: "Version 2.0",
         date: "2021-06-18",
         text: "Die API-basierte Version 2.0 von OWIDplusLIVE ist online. Neu: Zeitreihen-Visualisierung, Download-Funktion, verbesserte Suchfunktion, u.v.m. - Hinweis: Im News-Eintrag vom 2024-06-27 finden Sie eine Beschreibung was sich im Vergleich zur Vorversion geändert hat.",

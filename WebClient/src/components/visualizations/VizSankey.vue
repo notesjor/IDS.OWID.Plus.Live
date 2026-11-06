@@ -43,11 +43,14 @@ export default {
     return {
       initOptions: {
         renderer: "canvas"
-      }
+      },
+      chartStyle: "height:400px;"
     };
   },
   methods:{
     setChartHeight: function (height) {
+      this.chartStyle = `height:${height}px;`;
+
       var refs = this.$refs;
       setTimeout(() => {
         if (refs.myChart) refs.myChart.resize({ height: height });

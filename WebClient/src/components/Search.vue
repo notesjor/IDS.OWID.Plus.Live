@@ -1,4 +1,4 @@
-<template> 
+<template>
   <v-container>
     <v-expansion-panels v-model="expensionPanelOpen">
       <v-expansion-panel>
@@ -41,21 +41,14 @@
           <v-row>
             <v-col cols="3">
               <h5>{{ $t("search_lbl_focusYear") }}:</h5>
-                <v-select variant="outlined" v-model="focusYear" :items="years" style="max-width: 150px;margin:10px 0px 0px 0px"></v-select>
+              <v-select variant="outlined" v-model="focusYear" :items="years"
+                style="max-width: 150px;margin:10px 0px 0px 0px"></v-select>
             </v-col>
             <v-col>
               <h5 style="margin:0px 0px 0px -10px">{{ $t("search_lbl_focusYearRange") }}:</h5>
-              <v-range-slider 
-              v-model="searchRange" 
-              :max="years[years.length - 1]" 
-              :min="years[0]" 
-              :step="1" 
-              thumb-label="always" 
-              show-ticks="always" 
-              :ticks="yearTicks"
-              tick-size="5" 
-              hide-details
-              style="margin:40px 0px 0px 0px"></v-range-slider>
+              <v-range-slider v-model="searchRange" :max="years[years.length - 1]" :min="years[0]" :step="1"
+                thumb-label="always" show-ticks="always" :ticks="yearTicks" tick-size="5" hide-details
+                style="margin:40px 0px 0px 0px"></v-range-slider>
             </v-col>
           </v-row>
         </v-expansion-panel-text>
@@ -111,12 +104,12 @@
                   <span>N=3</span>
                 </v-tab>
 
-                </v-tabs>
-<v-window v-model="tabSimple" :touch="false">
-<v-window-item :value="0">
+              </v-tabs>
+              <v-window v-model="tabSimple" :touch="false">
+                <v-window-item :value="0">
                   <v-card flat>
                     <v-row>
-                      <v-col style="padding:0px; margin: 40px 0 -20px 15px">
+                      <v-col style="padding:0px; margin: 40px 0 -5px 15px">
                         <h5>{{ $t("search_lbl_query") }}:</h5>
                       </v-col>
                     </v-row>
@@ -339,9 +332,9 @@
                   <span>N=3</span>
                 </v-tab>
 
-                </v-tabs>
-<v-window v-model="tabComplex" :touch="false">
-<v-window-item :value="0">
+              </v-tabs>
+              <v-window v-model="tabComplex" :touch="false">
+                <v-window-item :value="0">
                   <v-card flat>
                     <v-row>
                       <v-col style="padding:0px; margin: 40px 0 -20px 15px">
@@ -587,12 +580,14 @@
     </v-expansion-panels>
 
     <v-overlay :model-value="progressWait" persistent class="align-center justify-center">
-      <div class="text-center">
-        <v-progress-circular indeterminate size="64"></v-progress-circular>
-        <h3>{{ $t("lbl_wait") }}</h3>
-        <h4>{{ progressMsg }}</h4>
-        <v-btn @click="abortProgress">{{ $t("lbl_abort") }}</v-btn>
-      </div>
+      <v-card>
+        <div class="text-center" style="padding: 20px; margin:20px">
+          <v-progress-circular indeterminate size="64"></v-progress-circular>
+          <h3>{{ $t("lbl_wait") }}</h3>
+          <h5 style="margin:10px 0 20px 0">{{ progressMsg }}</h5>
+          <v-btn @click="abortProgress">{{ $t("lbl_abort") }}</v-btn>
+        </div>
+      </v-card>
     </v-overlay>
 
     <v-snackbar v-model="snackbar">
@@ -669,12 +664,12 @@ class queryItem {
 const nextFrame = () => new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)));
 
 async function sendSearchRequest(data, store, n, queryItems) {
-  data.progressWait = true; 
+  data.progressWait = true;
   data.progressMsg = globalT.$t("search_progress_msg01");
 
   var baseUrl = "https://www.owid.de/plus/live-2021/api/v3";
 
-  var years = data.focusYears.sort((a, b) => b - a);  
+  var years = data.focusYears.sort((a, b) => b - a);
   var max = years[0];
   years = years.filter((x) => x !== data.focusYear);
   years = [data.focusYear].concat(years);
@@ -726,7 +721,7 @@ async function sendSearchRequest(data, store, n, queryItems) {
       data.snackbar = true;
       data.progressError = error.message;
     }
-  }  
+  }
 
   try {
     data.progressMsg = globalT.$t("search_progress_msg03");
@@ -847,7 +842,7 @@ export default {
     global_layers = [this.$t("layer_wordform"), this.$t("layer_lemma"), this.$t("layer_pos")];
     this.layer = global_layers;
 
-    globalT = this;    
+    globalT = this;
   },
   computed: {
     yearTicks: function () {

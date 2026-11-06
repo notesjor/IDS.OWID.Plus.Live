@@ -100,6 +100,7 @@ export default {
           animation: false,
           legend: {
             show: true,
+            top: "3%",
           },
           xAxis: {
             type: "category",

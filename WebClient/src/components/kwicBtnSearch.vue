@@ -4,16 +4,14 @@
     <v-icon @click="signinSearch">mdi-open-in-new</v-icon>
     <!-- BUTTON ENDE -->
     <!-- ANMELDUNG ERFOLGREICH - SUCHE - START -->
-    <v-dialog v-model="dialog_search" width="90%" style="margin-top: 200px;">
-      <div>
-        <v-card>
+    <v-dialog v-model="dialog_search" width="90%" max-height="90vh" scrollable>
+      <v-card>
           <v-card-title>
             <div style="display: inline;">
               KorAP-Belege für: <span style="font-weight:lighter; margin-left:10px; margin-right:5px">{{ query }}</span>
               <a :href="getKorapLink()" target="_blank" style="text-decoration:none"><v-icon>mdi-open-in-new</v-icon></a>
             </div>
-            <v-spacer></v-spacer>
-            <div style="display: inline;">
+            <div style="display: inline; position: absolute; right: 30px;">
               <v-icon @click="dialog_search = false">mdi-close</v-icon>
             </div>
           </v-card-title>
@@ -56,15 +54,11 @@
                 </div>
               </div>
               <div>
-                <v-pagination :length="pageMax" v-model="page" :total-visible="10" :disabled="pageMax < 2"></v-pagination>
+                <v-pagination :length="pageMax" v-model="page" :total-visible="5" :disabled="pageMax < 2"></v-pagination>
               </div>
             </div>
           </v-card-text>
-          <v-card-actions>
-            <!---->
-          </v-card-actions>
-        </v-card>
-      </div>
+      </v-card>
     </v-dialog>
     <!-- ANMELDUNG ERFOLGREICH - SUCHE - ENDE -->
     <!-- FEHLER START -->
@@ -184,7 +178,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .truncate {
   position: relative;
   overflow: hidden;
@@ -200,9 +194,5 @@ export default {
 
 .v-card__text {
   padding-top: 0px !important;
-}
-.v-dialog {
-    margin-top: 85px;
-
 }
 </style>
