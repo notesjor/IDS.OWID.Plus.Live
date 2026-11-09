@@ -5,7 +5,6 @@ using System.Net;
 using IDS.Lexik.cOWIDplusViewer.v2.WebService.Model.Configuration;
 using IDS.Lexik.cOWIDplusViewer.v2.WebService.Model.Request;
 using IDS.Lexik.WebService.Sdk.WebService.Abstract;
-using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Tfres;
 using HttpContext = Tfres.HttpContext;
@@ -13,6 +12,7 @@ using System.Data;
 using System.IO.Compression;
 using CorpusExplorer.Sdk.Model.Adapter.Corpus;
 using System.Linq;
+using System.Net.Http;
 using CorpusExplorer.Sdk.Helper;
 using CorpusExplorer.Sdk.Model.Adapter.Corpus.Abstract;
 using CorpusExplorer.Sdk.Utils.DocumentProcessing.Cleanup;
@@ -35,6 +35,7 @@ using CorpusExplorer.Sdk.Utils.CorpusManipulation.CorpusMergerTransformation;
 using CorpusExplorer.Sdk.Utils.CorpusManipulation.CorpusMergerTransformation.Abstract;
 using CorpusExplorer.Sdk.Model;
 using CorpusExplorer.Sdk.Ecosystem;
+using Microsoft.OpenApi;
 
 namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
 {
@@ -661,10 +662,10 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
           {
             "/v3/years", new OpenApiPathItem
             {
-              Operations = new Dictionary<OperationType, OpenApiOperation>
+              Operations = new Dictionary<HttpMethod, OpenApiOperation>
               {
                 {
-                  OperationType.Get, new OpenApiOperation
+                  HttpMethod.Get, new OpenApiOperation
                   {
                     Description = "Gibt die verfügbaren Jahre zurück.",
                     Responses = new OpenApiResponses
@@ -679,10 +680,10 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
           {
             "/v3/norm", new OpenApiPathItem
             {
-              Operations = new Dictionary<OperationType, OpenApiOperation>
+              Operations = new Dictionary<HttpMethod, OpenApiOperation>
               {
                 {
-                  OperationType.Get, new OpenApiOperation
+                  HttpMethod.Get, new OpenApiOperation
                   {
                     Description = "Gibt die Norm-Daten (Tages-Summe) zurück.",
                     Responses = new OpenApiResponses
@@ -697,13 +698,13 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
           {
             "/v3/search", new OpenApiPathItem
             {
-              Operations = new Dictionary<OperationType, OpenApiOperation>
+              Operations = new Dictionary<HttpMethod, OpenApiOperation>
               {
                 {
-                  OperationType.Post, new OpenApiOperation
+                  HttpMethod.Post, new OpenApiOperation
                   {
                     Description = "Sucht nach verfügbaren N-Grammen.",
-                    Parameters = new List<OpenApiParameter>
+                    Parameters = new List<IOpenApiParameter>
                     {
                       new OpenApiParameter
                       {
@@ -748,10 +749,10 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
           {
             "/v3/lookup", new OpenApiPathItem
             {
-              Operations = new Dictionary<OperationType, OpenApiOperation>
+              Operations = new Dictionary<HttpMethod, OpenApiOperation>
               {
                 {
-                  OperationType.Post, new OpenApiOperation
+                  HttpMethod.Post, new OpenApiOperation
                   {
                     Description = "Löst ein N-Gramm in korrespondierende Layer-Werte auf.",
                     Parameters = new List<OpenApiParameter>
@@ -784,10 +785,10 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
           {
             "/v3/convert", new OpenApiPathItem
             {
-              Operations = new Dictionary<OperationType, OpenApiOperation>
+              Operations = new Dictionary<HttpMethod, OpenApiOperation>
               {
                 {
-                  OperationType.Post, new OpenApiOperation
+                  HttpMethod.Post, new OpenApiOperation
                   {
                     Description = "Konvertiert die Ausgabe von POST /v3/search in ein gewünschtes Format.",
                     Parameters = new List<OpenApiParameter>
@@ -819,10 +820,10 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
           {
             "/v3/token", new OpenApiPathItem
             {
-              Operations = new Dictionary<OperationType, OpenApiOperation>
+              Operations = new Dictionary<HttpMethod, OpenApiOperation>
               {
                 {
-                  OperationType.Get, new OpenApiOperation
+                  HttpMethod.Get, new OpenApiOperation
                   {
                     Description = "Sollte als erstes aufgerufen werden, wenn man Daten auf den Server schreiben möchte. Gibt einen zufällige Token zurück.",
                     Responses = new OpenApiResponses
@@ -837,13 +838,13 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
           {
             "/v3/update", new OpenApiPathItem
             {
-              Operations = new Dictionary<OperationType, OpenApiOperation>
+              Operations = new Dictionary<HttpMethod, OpenApiOperation>
               {
                 {
-                  OperationType.Post, new OpenApiOperation
+                  HttpMethod.Post, new OpenApiOperation
                   {
                     Description = "Schreibt neue Daten auf den Server. Nur für autorisierte  Apps und Nutzer*innen.",
-                    Parameters = new List<OpenApiParameter>
+                    Parameters = new List<IOpenApiParameter>
                     {
                       new OpenApiParameter
                       {
@@ -875,10 +876,10 @@ namespace IDS.Lexik.cOWIDplusViewer.v2.WebService
           {
             "/heartbeat", new OpenApiPathItem
             {
-              Operations = new Dictionary<OperationType, OpenApiOperation>
+              Operations = new Dictionary<HttpMethod, OpenApiOperation>
               {
                 {
-                  OperationType.Get, new OpenApiOperation
+                  HttpMethod.Get, new OpenApiOperation
                   {
                     Description = "Führt eine schnelle Validierung durch, die überprüft, ob alles wie erwartet funktioniert. Sollte in der Regel nur von Monitoring-Services aufgerufen werden.",
                     Responses = new OpenApiResponses

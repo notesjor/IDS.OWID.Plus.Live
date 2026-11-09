@@ -231,10 +231,13 @@ export class OwidLiveStorage {
       // Precompute keys and values for item.Date
       const itemDate = item.Date;
       const dateKeys = Object.keys(itemDate);
-      const d = dateKeys.length;
+      let d = 0;
       let s = 0;
       for (let i = 0; i < dateKeys.length; i++) {
-        s += itemDate[dateKeys[i]].value;
+        const v = itemDate[dateKeys[i]].value;
+        s += v;
+        // nur Tage mit Treffern gelten als "erfasst"
+        if (v > 0) d++;
       }
 
       // Precompute sparkNorm array
@@ -297,83 +300,83 @@ export class OwidLiveStorage {
    * get a date array (day based)
    */
   get DatesDate() {
-    return this.calculateDateGranulation(this.#funcDate);
+    return this.calculateDateGranulation("Date", this.#funcDate);
   }
 
   /**
    * get the norm date values for N(-Gram)
    */
   get NormDate() {
-    return this.calculateGranulation(this.#funcDate);
+    return this.calculateGranulation("Date", this.#funcDate);
   }
 
   /**
    * get a date array (week based)
    */
   get DatesWeek() {
-    return this.calculateDateGranulation(this.#funcWeek);
+    return this.calculateDateGranulation("Week", this.#funcWeek);
   }
 
   /**
    * get the norm weeks values for N(-Gram)
    */
   get NormWeek() {
-    return this.calculateGranulation(this.#funcWeek);
+    return this.calculateGranulation("Week", this.#funcWeek);
   }
 
   /**
    * get a date array (month based)
    */
   get DatesMonth() {
-    return this.calculateDateGranulation(this.#funcMonth);
+    return this.calculateDateGranulation("Month", this.#funcMonth);
   }
 
   /**
    * get the norm month values for N(-Gram)
    */
   get NormMonth() {
-    return this.calculateGranulation(this.#funcMonth);
+    return this.calculateGranulation("Month", this.#funcMonth);
   }
 
   /**
    * get a date array (quarter based)
    */
   get DatesQuarter() {
-    return this.calculateDateGranulation(this.#funcQuarter);
+    return this.calculateDateGranulation("Quarter", this.#funcQuarter);
   }
 
   /**
    * get the norm quarters values for N(-Gram)
    */
   get NormQuarter() {
-    return this.calculateGranulation(this.#funcQuarter);
+    return this.calculateGranulation("Quarter", this.#funcQuarter);
   }
 
   /**
    * get a date array (year based)
    */
   get DatesYear() {
-    return this.calculateDateGranulation(this.#funcYear);
+    return this.calculateDateGranulation("Year", this.#funcYear);
   }
 
   /**
    * get the norm years values for N(-Gram)
    */
   get NormYear() {
-    return this.calculateGranulation(this.#funcYear);
+    return this.calculateGranulation("Year", this.#funcYear);
   }
 
   /**
    * HELPER-Function: Used by NormDate, NormWeek, NormMonth, NormQuarter and NormYear (see above)
    * @param  {function} func the functions needs to describe how-to find the dateTime-Key
    */
-  calculateGranulation(func) {
-    const ck = "norm" + this.#N + func.name;
+  calculateGranulation(kind, func) {
+    const ck = "norm" + this.#N + kind;
     const cached = this.#GranulationCache[ck];
     if (cached !== undefined) return cached;
     const res = new Map();
     for (const [date, value] of Object.entries(this.#Norm[this.#N - 1])) {
-      const key = granulateKey("n" + func.name, func, date);
+      const key = granulateKey("n" + kind, func, date);
       res.set(key, (res.get(key) || 0) + value);
     }
     return (this.#GranulationCache[ck] = Object.fromEntries(res));
@@ -383,10 +386,10 @@ export class OwidLiveStorage {
    * HELPER-Function: Used by NormDate, NormWeek, NormMonth, NormQuarter and NormYear (see above)
    * @param  {function} func the functions needs to describe how-to find the dateTime-Key
    */
-  calculateDateGranulation(func) {
-    const ck = "dates" + func.name;
+  calculateDateGranulation(kind, func) {
+    const ck = "dates" + kind;
     const cached = this.#GranulationCache[ck];
     if (cached !== undefined) return cached;
-    return (this.#GranulationCache[ck] = this.#Dates.map((date) => granulateKey("n" + func.name, func, date)));
+    return (this.#GranulationCache[ck] = this.#Dates.map((date) => granulateKey("n" + kind, func, date)));
   }
 }
